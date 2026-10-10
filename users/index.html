@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root {
+      --nav-width: 260px;
+      --header-height: 64px;
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --accent: #0891b2;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #1a56db;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: var(--nav-width); background: var(--sidebar-bg);
+      display: flex; flex-direction: column; z-index: 50;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      overflow-y: auto; scrollbar-width: thin; scrollbar-color: #334155 transparent;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+    .logo-block { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-text-main { font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+    .logo-text-sub { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+    .rbmp-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 5px; background: #1e293b; color: #38bdf8; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+    
+    /* Nav */
+    nav { flex: 1; padding: 12px 8px; }
+    .nav-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; padding: 8px 10px 4px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      color: var(--sidebar-text); text-decoration: none; font-size: 13px; font-weight: 500;
+      margin-bottom: 2px; transition: all 0.15s; position: relative;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+    .nav-item-active { background: var(--sidebar-active) !important; color: #fff !important; }
+    .nav-icon { width: 18px; text-align: center; font-size: 13px; opacity: 0.8; }
+    .nav-label { flex: 1; }
+    .nav-badge { background: #ef4444; color: white; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    
+    /* User area */
+    .sidebar-user {
+      padding: 12px 14px; border-top: 1px solid #1e293b; display: flex; align-items: center;
+      gap: 10px; flex-shrink: 0;
+    }
+    .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+    .user-role { font-size: 10px; color: #64748b; }
+    .user-logout { margin-left: auto; color: #475569; font-size: 12px; cursor: pointer; padding: 4px; }
+    .user-logout:hover { color: #ef4444; }
+    
+    /* Main content */
+    .main-wrapper { margin-left: var(--nav-width); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Header */
+    .top-header {
+      height: var(--header-height); background: white; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      position: sticky; top: 0; z-index: 40; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .page-title-wrap h1 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+    .breadcrumb { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .header-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; background: white; color: #475569; font-size: 12px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .header-btn:hover { background: #f8fafc; color: #1e293b; }
+    .header-btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .header-btn-primary:hover { background: var(--primary-dark); }
+    .notification-dot { position: relative; }
+    .notification-dot::after { content: ''; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; border: 1px solid white; }
+    
+    /* Content area */
+    .content-area { flex: 1; padding: 24px; overflow-x: hidden; }
+    
+    /* Cards */
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    .card-body { padding: 20px; }
+    
+    /* KPI Cards */
+    .kpi-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.15s, box-shadow 0.15s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .kpi-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .kpi-value { font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 2px; }
+    .kpi-label { font-size: 12px; color: #64748b; font-weight: 500; }
+    .kpi-trend { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #059669; }
+    .trend-down { color: #dc2626; }
+    .trend-neutral { color: #64748b; }
+    
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-good, .badge-high, .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-moderate, .badge-medium, .badge-in-review, .badge-in-implementation { background: #fef3c7; color: #92400e; }
+    .badge-poor, .badge-low, .badge-pending, .badge-planned { background: #fee2e2; color: #991b1b; }
+    .badge-active, .badge-published { background: #dbeafe; color: #1e40af; }
+    .badge-inactive, .badge-completed { background: #f1f5f9; color: #475569; }
+    .badge-achieved { background: #d1fae5; color: #065f46; }
+    .badge-bad { background: #4b0000; color: #fca5a5; }
+    .badge-under-investigation { background: #fde8d8; color: #9a3412; }
+    
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .data-table tr:hover td { background: #f8fafc; }
+    .data-table tr:last-child td { border-bottom: none; }
+    
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 8px 12px 8px 36px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: white; color: #1e293b; position: relative; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; background: white; color: #475569; cursor: pointer; }
+    
+    /* Progress bar */
+    .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    
+    /* Tabs */
+    .tab-nav { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; gap: 0; }
+    .tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .tab-btn:hover { color: #1e293b; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    
+    /* Map */
+    #wis-map { border-radius: 12px; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; margin-bottom: 18px; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+    
+    /* Stat grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .stat-item { text-align: center; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #f1f5f9; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+    
+    /* Scrollable table container */
+    .table-container { overflow-x: auto; }
+    
+    /* Map controls */
+    .map-panel { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .layer-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .layer-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    
+    /* Alert banners */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    
+    /* Tooltip */
+    .tooltip-wrap { position: relative; cursor: help; }
+    
+    /* Smooth hover for rows */
+    tr { transition: background 0.1s; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; --nav-width: 220px; }
+      .main-wrapper { margin-left: 220px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-wrapper { margin-left: 0; }
+    }
+    
+    /* Identifier pill */
+    .id-pill { font-family: monospace; font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; }
+    
+    /* Action buttons */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    
+    /* WFD Status colors */
+    .eco-high { color: #1a56db; font-weight: 600; }
+    .eco-good { color: #059669; font-weight: 600; }
+    .eco-moderate { color: #d97706; font-weight: 600; }
+    .eco-poor { color: #dc2626; font-weight: 600; }
+    .eco-bad { color: #7f1d1d; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-block">
+      <div class="logo-icon">
+        <i class="fas fa-water" style="color:white; font-size:18px;"></i>
+      </div>
+      <div>
+        <div class="logo-text-main">WIS Macedonia</div>
+        <div class="logo-text-sub">Water Information System</div>
+      </div>
+    </div>
+    <div class="rbmp-pill">
+      <i class="fas fa-circle" style="font-size:6px;"></i>
+      RBMP 2nd Cycle · 2019–2027
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section-title">Core Modules</div>
+    
+      <a href="../" class="nav-item ">
+        <i class="fas fa-chart-line nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+        
+      </a>
+      <a href="../map/" class="nav-item ">
+        <i class="fas fa-map nav-icon"></i>
+        <span class="nav-label">Map Viewer</span>
+        
+      </a>
+      <a href="../water-bodies/" class="nav-item ">
+        <i class="fas fa-water nav-icon"></i>
+        <span class="nav-label">Water Bodies</span>
+        <span class="nav-badge">156</span>
+      </a>
+      <a href="../monitoring/" class="nav-item ">
+        <i class="fas fa-satellite-dish nav-icon"></i>
+        <span class="nav-label">Monitoring</span>
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="../pressures/" class="nav-item ">
+        <i class="fas fa-industry nav-icon"></i>
+        <span class="nav-label">Pressures & Impacts</span>
+        
+      </a>
+      <a href="../permits/" class="nav-item ">
+        <i class="fas fa-file-contract nav-icon"></i>
+        <span class="nav-label">Water Book</span>
+        <span class="nav-badge">8</span>
+      </a>
+      <a href="../measures/" class="nav-item ">
+        <i class="fas fa-tasks nav-icon"></i>
+        <span class="nav-label">Measures</span>
+        
+      </a>
+      <a href="../metadata/" class="nav-item ">
+        <i class="fas fa-database nav-icon"></i>
+        <span class="nav-label">Metadata</span>
+        
+      </a>
+      <a href="../participation/" class="nav-item ">
+        <i class="fas fa-users nav-icon"></i>
+        <span class="nav-label">Public Participation</span>
+        <span class="nav-badge">23</span>
+      </a>
+      <a href="../download/" class="nav-item ">
+        <i class="fas fa-download nav-icon"></i>
+        <span class="nav-label">Data Access</span>
+        
+      </a>
+      <a href="../reporting/" class="nav-item ">
+        <i class="fas fa-chart-bar nav-icon"></i>
+        <span class="nav-label">WISE Reporting</span>
+        
+      </a>
+      <a href="../users/" class="nav-item nav-item-active">
+        <i class="fas fa-user-shield nav-icon"></i>
+        <span class="nav-label">User Management</span>
+        
+      </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">SA</div>
+    <div>
+      <div class="user-name">System Administrator</div>
+      <div class="user-role">Administrator</div>
+    </div>
+    <a href="../login/" class="user-logout" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>User Management</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn notification-dot" title="Notifications">
+        <i class="fas fa-bell"></i>
+      </button>
+      <button class="header-btn" title="Help">
+        <i class="fas fa-question-circle"></i>
+        <span>Help</span>
+      </button>
+      <a href="../download/" class="header-btn header-btn-primary">
+        <i class="fas fa-download"></i>
+        <span>Export</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="content-area">
+    
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">61</div><div style="font-size:12px; color:#64748b;">Total Users</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">54</div><div style="font-size:12px; color:#64748b;">Active</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#ef4444;">7</div><div style="font-size:12px; color:#64748b;">Inactive</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">8</div><div style="font-size:12px; color:#64748b;">Institutions</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">7</div><div style="font-size:12px; color:#64748b;">Roles Defined</div></div>
+</div>
+
+<div class="card">
+  <div style="padding:0 20px;">
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab-group="usr" data-tab="users" onclick="switchTab('usr','users')"><i class="fas fa-users" style="margin-right:5px;"></i>User Registry</button>
+      <button class="tab-btn" data-tab-group="usr" data-tab="roles" onclick="switchTab('usr','roles')"><i class="fas fa-user-shield" style="margin-right:5px;"></i>Roles & Permissions</button>
+      <button class="tab-btn" data-tab-group="usr" data-tab="audit" onclick="switchTab('usr','audit')"><i class="fas fa-history" style="margin-right:5px;"></i>Audit Log</button>
+      <button class="tab-btn" data-tab-group="usr" data-tab="institutions" onclick="switchTab('usr','institutions')"><i class="fas fa-building" style="margin-right:5px;"></i>Institutions</button>
+    </div>
+  </div>
+
+  <!-- Users Tab -->
+  <div class="tab-panel active" data-panel-group="usr" data-panel="users">
+    <div class="filter-bar">
+      <div class="search-wrap" style="flex:1; max-width:260px;"><i class="fas fa-search"></i><input class="search-input" id="usr-search" placeholder="Search users…" oninput="filterTable('usr-search','usr-table')"></div>
+      <select class="filter-select"><option>All Roles</option><option>System Admin</option><option>Data Manager</option><option>Inspector</option></select>
+      <select class="filter-select"><option>All Status</option><option>Active</option><option>Inactive</option></select>
+      <button class="btn btn-primary btn-sm"><i class="fas fa-user-plus"></i> Add User</button>
+      <button class="btn btn-secondary btn-sm"><i class="fas fa-envelope"></i> Bulk Invite</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table" id="usr-table">
+        <thead><tr><th>User</th><th>Role</th><th>Institution</th><th>Permissions</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
+        <tbody>
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:30px; height:30px; background:#1a56db20; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#1a56db; flex-shrink:0;">SA</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">System Administrator</div>
+            <div style="font-size:10px; color:#94a3b8;">admin@example.org</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:11px; background:#1a56db18; color:#1a56db; padding:2px 8px; border-radius:12px; font-weight:600;">System Admin</span></td>
+      <td style="font-size:11px;">MEPP</td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">All</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td style="font-size:11px; color:#64748b;">2024-04-07</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-key"></i></button>
+          <button class="btn btn-danger btn-sm"><i class="fas fa-ban"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:30px; height:30px; background:#05966920; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#059669; flex-shrink:0;">DM</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">Data Manager</div>
+            <div style="font-size:10px; color:#94a3b8;">data.manager@example.org</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:11px; background:#05966918; color:#059669; padding:2px 8px; border-radius:12px; font-weight:600;">Data Manager</span></td>
+      <td style="font-size:11px;">MEPP</td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">View</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">Edit</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">Approve</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td style="font-size:11px; color:#64748b;">2024-04-06</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-key"></i></button>
+          <button class="btn btn-danger btn-sm"><i class="fas fa-ban"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:30px; height:30px; background:#0891b220; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#0891b2; flex-shrink:0;">DE</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">Data Entry Officer</div>
+            <div style="font-size:10px; color:#94a3b8;">data.entry@example.org</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:11px; background:#0891b218; color:#0891b2; padding:2px 8px; border-radius:12px; font-weight:600;">Data Entry</span></td>
+      <td style="font-size:11px;">Hydrometeorological Service</td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">View</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">Edit</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td style="font-size:11px; color:#64748b;">2024-04-05</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-key"></i></button>
+          <button class="btn btn-danger btn-sm"><i class="fas fa-ban"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:30px; height:30px; background:#d9770620; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#d97706; flex-shrink:0;">IN</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">Inspector</div>
+            <div style="font-size:10px; color:#94a3b8;">inspector@example.org</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:11px; background:#d9770618; color:#d97706; padding:2px 8px; border-radius:12px; font-weight:600;">Inspector</span></td>
+      <td style="font-size:11px;">MEPP - Inspection</td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">View</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">Edit Permits</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td style="font-size:11px; color:#64748b;">2024-04-04</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-key"></i></button>
+          <button class="btn btn-danger btn-sm"><i class="fas fa-ban"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:30px; height:30px; background:#8b5cf620; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#8b5cf6; flex-shrink:0;">GA</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">GIS Analyst</div>
+            <div style="font-size:10px; color:#94a3b8;">gis.analyst@example.org</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:11px; background:#8b5cf618; color:#8b5cf6; padding:2px 8px; border-radius:12px; font-weight:600;">GIS Analyst</span></td>
+      <td style="font-size:11px;">Agency for Real Estate Cadastre</td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">View</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">Edit Spatial</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td style="font-size:11px; color:#64748b;">2024-04-03</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-key"></i></button>
+          <button class="btn btn-danger btn-sm"><i class="fas fa-ban"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:30px; height:30px; background:#94a3b820; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#94a3b8; flex-shrink:0;">VW</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">Viewer Account</div>
+            <div style="font-size:10px; color:#94a3b8;">viewer@example.org</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:11px; background:#94a3b818; color:#94a3b8; padding:2px 8px; border-radius:12px; font-weight:600;">Viewer</span></td>
+      <td style="font-size:11px;">MEPP</td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:3px; margin-right:2px;">View</span></td>
+      <td><span class="badge badge-inactive" style="font-size:10px;">Inactive</span></td>
+      <td style="font-size:11px; color:#64748b;">2024-02-15</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-key"></i></button>
+          <button class="btn btn-danger btn-sm"><i class="fas fa-ban"></i></button>
+        </div>
+      </td>
+    </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Roles Tab -->
+  <div class="tab-panel" data-panel-group="usr" data-panel="roles">
+    <div style="padding:20px; display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:12px;">
+      
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px; border-left:3px solid #1a56db;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="font-size:13px; font-weight:700; color:#0f172a;">System Admin</div>
+          <span style="font-size:10px; background:#1a56db18; color:#1a56db; padding:2px 8px; border-radius:12px; font-weight:600;">2 users</span>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Full system access, user management, system configuration</div>
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          <span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">View all</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Edit all</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Delete</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Manage users</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">System config</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Audit logs</span>
+        </div>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px; border-left:3px solid #059669;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="font-size:13px; font-weight:700; color:#0f172a;">Data Manager</div>
+          <span style="font-size:10px; background:#05966918; color:#059669; padding:2px 8px; border-radius:12px; font-weight:600;">4 users</span>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Manage datasets, approve uploads, publish metadata</div>
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          <span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">View all</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Edit datasets</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Approve</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Publish</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Manage metadata</span>
+        </div>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px; border-left:3px solid #0891b2;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="font-size:13px; font-weight:700; color:#0f172a;">Data Entry</div>
+          <span style="font-size:10px; background:#0891b218; color:#0891b2; padding:2px 8px; border-radius:12px; font-weight:600;">12 users</span>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Upload monitoring data, enter attribute data</div>
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          <span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">View</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Upload data</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Edit own records</span>
+        </div>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px; border-left:3px solid #d97706;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="font-size:13px; font-weight:700; color:#0f172a;">Inspector</div>
+          <span style="font-size:10px; background:#d9770618; color:#d97706; padding:2px 8px; border-radius:12px; font-weight:600;">6 users</span>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Review and process water permits, field inspections</div>
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          <span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">View</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Edit permits</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Approve permits</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Field reports</span>
+        </div>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px; border-left:3px solid #8b5cf6;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="font-size:13px; font-weight:700; color:#0f172a;">GIS Analyst</div>
+          <span style="font-size:10px; background:#8b5cf618; color:#8b5cf6; padding:2px 8px; border-radius:12px; font-weight:600;">3 users</span>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Manage spatial layers, run analysis</div>
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          <span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">View</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Edit spatial</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Run analysis</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Export</span>
+        </div>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px; border-left:3px solid #94a3b8;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="font-size:13px; font-weight:700; color:#0f172a;">Viewer</div>
+          <span style="font-size:10px; background:#94a3b818; color:#94a3b8; padding:2px 8px; border-radius:12px; font-weight:600;">34 users</span>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Read-only access to published data</div>
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          <span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">View published</span>
+        </div>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px; border-left:3px solid #64748b;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="font-size:13px; font-weight:700; color:#0f172a;">Public User</div>
+          
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Access public portal, submit comments</div>
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          <span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">View public</span><span style="font-size:10px; background:#f8fafc; color:#475569; padding:1px 6px; border-radius:4px; border:1px solid #f1f5f9;">Submit comments</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit Log -->
+  <div class="tab-panel" data-panel-group="usr" data-panel="audit">
+    <div style="padding:16px 20px;">
+      <div class="filter-bar" style="padding:0; margin-bottom:12px;">
+        <select class="filter-select"><option>All Actions</option><option>Login</option><option>Data Edit</option><option>Publish</option><option>Delete</option></select>
+        <select class="filter-select"><option>All Users</option></select>
+        <input type="date" class="filter-select" style="padding:7px 10px;">
+        <input type="date" class="filter-select" style="padding:7px 10px;">
+        <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export Log</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Entity</th><th>Details</th><th>IP</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-family:monospace; font-size:11px; color:#64748b;">2024-04-07 09:42:18</td>
+            <td style="font-size:12px; font-weight:600;">Data Entry Officer</td>
+            <td><span class="badge badge-active" style="font-size:10px;">UPLOAD</span></td>
+            <td><span class="id-pill">MS-VAR-SW-001 data</span></td>
+            <td style="font-size:11px; color:#64748b;">Monitoring data uploaded (CSV, 12 records)</td>
+            <td style="font-family:monospace; font-size:10px; color:#94a3b8;">195.18.x.x</td>
+          </tr><tr>
+            <td style="font-family:monospace; font-size:11px; color:#64748b;">2024-04-07 09:15:04</td>
+            <td style="font-size:12px; font-weight:600;">Data Manager</td>
+            <td><span class="badge badge-good" style="font-size:10px;">APPROVE</span></td>
+            <td><span class="id-pill">WP-2024-003</span></td>
+            <td style="font-size:11px; color:#64748b;">Permit application approved</td>
+            <td style="font-family:monospace; font-size:10px; color:#94a3b8;">195.18.x.x</td>
+          </tr><tr>
+            <td style="font-family:monospace; font-size:11px; color:#64748b;">2024-04-07 08:58:33</td>
+            <td style="font-size:12px; font-weight:600;">Administrator</td>
+            <td><span class="badge badge-active" style="font-size:10px;">PUBLISH</span></td>
+            <td><span class="id-pill">MD-MK-003</span></td>
+            <td style="font-size:11px; color:#64748b;">Metadata record published to catalog</td>
+            <td style="font-family:monospace; font-size:10px; color:#94a3b8;">195.18.x.x</td>
+          </tr><tr>
+            <td style="font-family:monospace; font-size:11px; color:#64748b;">2024-04-07 08:22:10</td>
+            <td style="font-size:12px; font-weight:600;">Public User</td>
+            <td><span class="badge badge-moderate" style="font-size:10px;">LOGIN</span></td>
+            <td><span class="id-pill">Public Portal</span></td>
+            <td style="font-size:11px; color:#64748b;">Successful login via web form</td>
+            <td style="font-family:monospace; font-size:10px; color:#94a3b8;">89.102.x.x</td>
+          </tr><tr>
+            <td style="font-family:monospace; font-size:11px; color:#64748b;">2024-04-06 17:45:22</td>
+            <td style="font-size:12px; font-weight:600;">GIS Analyst</td>
+            <td><span class="badge badge-moderate" style="font-size:10px;">EDIT</span></td>
+            <td><span class="id-pill">RW-MK-VAR-003</span></td>
+            <td style="font-size:11px; color:#64748b;">Spatial geometry updated (3 vertices modified)</td>
+            <td style="font-family:monospace; font-size:10px; color:#94a3b8;">195.18.x.x</td>
+          </tr><tr>
+            <td style="font-family:monospace; font-size:11px; color:#64748b;">2024-04-06 16:30:01</td>
+            <td style="font-size:12px; font-weight:600;">Data Manager</td>
+            <td><span class="badge badge-moderate" style="font-size:10px;">EXPORT</span></td>
+            <td><span class="id-pill">Water Bodies dataset</span></td>
+            <td style="font-size:11px; color:#64748b;">GeoJSON export (89 features, 2.4 MB)</td>
+            <td style="font-family:monospace; font-size:10px; color:#94a3b8;">195.18.x.x</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Institutions Tab -->
+  <div class="tab-panel" data-panel-group="usr" data-panel="institutions">
+    <div style="padding:20px; display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px;">
+      
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <div style="width:38px; height:38px; background:linear-gradient(135deg,#1a56db18,#0891b218); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-government" style="color:#1a56db; font-size:16px;"></i>
+          </div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">MEPP</div>
+            <div style="font-size:10px; color:#64748b;">Ministry of Environment (MEPP)</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#1a56db;">28</div><div style="font-size:9px; color:#94a3b8;">Users</div></div>
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#059669;">22</div><div style="font-size:9px; color:#94a3b8;">Datasets</div></div>
+        </div>
+        <span class="badge badge-active" style="font-size:10px; margin-top:8px; display:inline-flex;">Competent Authority</span>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <div style="width:38px; height:38px; background:linear-gradient(135deg,#1a56db18,#0891b218); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-cloud" style="color:#1a56db; font-size:16px;"></i>
+          </div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">HMS</div>
+            <div style="font-size:10px; color:#64748b;">Hydrometeorological Service</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#1a56db;">14</div><div style="font-size:9px; color:#94a3b8;">Users</div></div>
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#059669;">18</div><div style="font-size:9px; color:#94a3b8;">Datasets</div></div>
+        </div>
+        <span class="badge badge-active" style="font-size:10px; margin-top:8px; display:inline-flex;">Data Provider</span>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <div style="width:38px; height:38px; background:linear-gradient(135deg,#1a56db18,#0891b218); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-map" style="color:#1a56db; font-size:16px;"></i>
+          </div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">AREC</div>
+            <div style="font-size:10px; color:#64748b;">Agency for Real Estate Cadastre</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#1a56db;">5</div><div style="font-size:9px; color:#94a3b8;">Users</div></div>
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#059669;">6</div><div style="font-size:9px; color:#94a3b8;">Datasets</div></div>
+        </div>
+        <span class="badge badge-active" style="font-size:10px; margin-top:8px; display:inline-flex;">GIS Provider</span>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <div style="width:38px; height:38px; background:linear-gradient(135deg,#1a56db18,#0891b218); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-tint" style="color:#1a56db; font-size:16px;"></i>
+          </div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">AWR</div>
+            <div style="font-size:10px; color:#64748b;">Agency for Water Resources</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#1a56db;">8</div><div style="font-size:9px; color:#94a3b8;">Users</div></div>
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#059669;">4</div><div style="font-size:9px; color:#94a3b8;">Datasets</div></div>
+        </div>
+        <span class="badge badge-active" style="font-size:10px; margin-top:8px; display:inline-flex;">Technical Body</span>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <div style="width:38px; height:38px; background:linear-gradient(135deg,#1a56db18,#0891b218); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-flask" style="color:#1a56db; font-size:16px;"></i>
+          </div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">IPH</div>
+            <div style="font-size:10px; color:#64748b;">Public Health Institute</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#1a56db;">4</div><div style="font-size:9px; color:#94a3b8;">Users</div></div>
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#059669;">3</div><div style="font-size:9px; color:#94a3b8;">Datasets</div></div>
+        </div>
+        <span class="badge badge-active" style="font-size:10px; margin-top:8px; display:inline-flex;">Monitoring</span>
+      </div>
+      <div style="border:1px solid #f1f5f9; border-radius:10px; padding:14px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <div style="width:38px; height:38px; background:linear-gradient(135deg,#1a56db18,#0891b218); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-leaf" style="color:#1a56db; font-size:16px;"></i>
+          </div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">WWF</div>
+            <div style="font-size:10px; color:#64748b;">WWF Adria</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#1a56db;">2</div><div style="font-size:9px; color:#94a3b8;">Users</div></div>
+          <div style="flex:1; text-align:center; background:#f8fafc; border-radius:7px; padding:6px;"><div style="font-size:16px; font-weight:800; color:#059669;">1</div><div style="font-size:9px; color:#94a3b8;">Datasets</div></div>
+        </div>
+        <span class="badge badge-active" style="font-size:10px; margin-top:8px; display:inline-flex;">External Partner</span>
+      </div>
+    </div>
+  </div>
+</div>
+  </main>
+</div>
+
+<script>
+// ─── Tab switching ─────────────────────────────────────────
+function switchTab(groupId, tabId) {
+  document.querySelectorAll('[data-tab-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-panel-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-tab-group="' + groupId + '"][data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelector('[data-panel-group="' + groupId + '"][data-panel="' + tabId + '"]').classList.add('active');
+}
+
+// ─── Search filter ─────────────────────────────────────────
+function filterTable(inputId, tableId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+}
+
+// ─── Sidebar highlight ─────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-item-active'));
+    el.classList.add('nav-item-active');
+  });
+});
+</script>
+</body>
+</html>

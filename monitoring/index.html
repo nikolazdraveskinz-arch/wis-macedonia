@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Network — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root {
+      --nav-width: 260px;
+      --header-height: 64px;
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --accent: #0891b2;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #1a56db;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: var(--nav-width); background: var(--sidebar-bg);
+      display: flex; flex-direction: column; z-index: 50;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      overflow-y: auto; scrollbar-width: thin; scrollbar-color: #334155 transparent;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+    .logo-block { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-text-main { font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+    .logo-text-sub { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+    .rbmp-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 5px; background: #1e293b; color: #38bdf8; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+    
+    /* Nav */
+    nav { flex: 1; padding: 12px 8px; }
+    .nav-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; padding: 8px 10px 4px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      color: var(--sidebar-text); text-decoration: none; font-size: 13px; font-weight: 500;
+      margin-bottom: 2px; transition: all 0.15s; position: relative;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+    .nav-item-active { background: var(--sidebar-active) !important; color: #fff !important; }
+    .nav-icon { width: 18px; text-align: center; font-size: 13px; opacity: 0.8; }
+    .nav-label { flex: 1; }
+    .nav-badge { background: #ef4444; color: white; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    
+    /* User area */
+    .sidebar-user {
+      padding: 12px 14px; border-top: 1px solid #1e293b; display: flex; align-items: center;
+      gap: 10px; flex-shrink: 0;
+    }
+    .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+    .user-role { font-size: 10px; color: #64748b; }
+    .user-logout { margin-left: auto; color: #475569; font-size: 12px; cursor: pointer; padding: 4px; }
+    .user-logout:hover { color: #ef4444; }
+    
+    /* Main content */
+    .main-wrapper { margin-left: var(--nav-width); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Header */
+    .top-header {
+      height: var(--header-height); background: white; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      position: sticky; top: 0; z-index: 40; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .page-title-wrap h1 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+    .breadcrumb { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .header-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; background: white; color: #475569; font-size: 12px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .header-btn:hover { background: #f8fafc; color: #1e293b; }
+    .header-btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .header-btn-primary:hover { background: var(--primary-dark); }
+    .notification-dot { position: relative; }
+    .notification-dot::after { content: ''; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; border: 1px solid white; }
+    
+    /* Content area */
+    .content-area { flex: 1; padding: 24px; overflow-x: hidden; }
+    
+    /* Cards */
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    .card-body { padding: 20px; }
+    
+    /* KPI Cards */
+    .kpi-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.15s, box-shadow 0.15s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .kpi-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .kpi-value { font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 2px; }
+    .kpi-label { font-size: 12px; color: #64748b; font-weight: 500; }
+    .kpi-trend { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #059669; }
+    .trend-down { color: #dc2626; }
+    .trend-neutral { color: #64748b; }
+    
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-good, .badge-high, .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-moderate, .badge-medium, .badge-in-review, .badge-in-implementation { background: #fef3c7; color: #92400e; }
+    .badge-poor, .badge-low, .badge-pending, .badge-planned { background: #fee2e2; color: #991b1b; }
+    .badge-active, .badge-published { background: #dbeafe; color: #1e40af; }
+    .badge-inactive, .badge-completed { background: #f1f5f9; color: #475569; }
+    .badge-achieved { background: #d1fae5; color: #065f46; }
+    .badge-bad { background: #4b0000; color: #fca5a5; }
+    .badge-under-investigation { background: #fde8d8; color: #9a3412; }
+    
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .data-table tr:hover td { background: #f8fafc; }
+    .data-table tr:last-child td { border-bottom: none; }
+    
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 8px 12px 8px 36px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: white; color: #1e293b; position: relative; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; background: white; color: #475569; cursor: pointer; }
+    
+    /* Progress bar */
+    .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    
+    /* Tabs */
+    .tab-nav { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; gap: 0; }
+    .tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .tab-btn:hover { color: #1e293b; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    
+    /* Map */
+    #wis-map { border-radius: 12px; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; margin-bottom: 18px; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+    
+    /* Stat grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .stat-item { text-align: center; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #f1f5f9; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+    
+    /* Scrollable table container */
+    .table-container { overflow-x: auto; }
+    
+    /* Map controls */
+    .map-panel { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .layer-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .layer-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    
+    /* Alert banners */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    
+    /* Tooltip */
+    .tooltip-wrap { position: relative; cursor: help; }
+    
+    /* Smooth hover for rows */
+    tr { transition: background 0.1s; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; --nav-width: 220px; }
+      .main-wrapper { margin-left: 220px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-wrapper { margin-left: 0; }
+    }
+    
+    /* Identifier pill */
+    .id-pill { font-family: monospace; font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; }
+    
+    /* Action buttons */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    
+    /* WFD Status colors */
+    .eco-high { color: #1a56db; font-weight: 600; }
+    .eco-good { color: #059669; font-weight: 600; }
+    .eco-moderate { color: #d97706; font-weight: 600; }
+    .eco-poor { color: #dc2626; font-weight: 600; }
+    .eco-bad { color: #7f1d1d; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-block">
+      <div class="logo-icon">
+        <i class="fas fa-water" style="color:white; font-size:18px;"></i>
+      </div>
+      <div>
+        <div class="logo-text-main">WIS Macedonia</div>
+        <div class="logo-text-sub">Water Information System</div>
+      </div>
+    </div>
+    <div class="rbmp-pill">
+      <i class="fas fa-circle" style="font-size:6px;"></i>
+      RBMP 2nd Cycle · 2019–2027
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section-title">Core Modules</div>
+    
+      <a href="../" class="nav-item ">
+        <i class="fas fa-chart-line nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+        
+      </a>
+      <a href="../map/" class="nav-item ">
+        <i class="fas fa-map nav-icon"></i>
+        <span class="nav-label">Map Viewer</span>
+        
+      </a>
+      <a href="../water-bodies/" class="nav-item ">
+        <i class="fas fa-water nav-icon"></i>
+        <span class="nav-label">Water Bodies</span>
+        <span class="nav-badge">156</span>
+      </a>
+      <a href="../monitoring/" class="nav-item nav-item-active">
+        <i class="fas fa-satellite-dish nav-icon"></i>
+        <span class="nav-label">Monitoring</span>
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="../pressures/" class="nav-item ">
+        <i class="fas fa-industry nav-icon"></i>
+        <span class="nav-label">Pressures & Impacts</span>
+        
+      </a>
+      <a href="../permits/" class="nav-item ">
+        <i class="fas fa-file-contract nav-icon"></i>
+        <span class="nav-label">Water Book</span>
+        <span class="nav-badge">8</span>
+      </a>
+      <a href="../measures/" class="nav-item ">
+        <i class="fas fa-tasks nav-icon"></i>
+        <span class="nav-label">Measures</span>
+        
+      </a>
+      <a href="../metadata/" class="nav-item ">
+        <i class="fas fa-database nav-icon"></i>
+        <span class="nav-label">Metadata</span>
+        
+      </a>
+      <a href="../participation/" class="nav-item ">
+        <i class="fas fa-users nav-icon"></i>
+        <span class="nav-label">Public Participation</span>
+        <span class="nav-badge">23</span>
+      </a>
+      <a href="../download/" class="nav-item ">
+        <i class="fas fa-download nav-icon"></i>
+        <span class="nav-label">Data Access</span>
+        
+      </a>
+      <a href="../reporting/" class="nav-item ">
+        <i class="fas fa-chart-bar nav-icon"></i>
+        <span class="nav-label">WISE Reporting</span>
+        
+      </a>
+      <a href="../users/" class="nav-item ">
+        <i class="fas fa-user-shield nav-icon"></i>
+        <span class="nav-label">User Management</span>
+        
+      </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">SA</div>
+    <div>
+      <div class="user-name">System Administrator</div>
+      <div class="user-role">Administrator</div>
+    </div>
+    <a href="../login/" class="user-logout" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Monitoring Network</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn notification-dot" title="Notifications">
+        <i class="fas fa-bell"></i>
+      </button>
+      <button class="header-btn" title="Help">
+        <i class="fas fa-question-circle"></i>
+        <span>Help</span>
+      </button>
+      <a href="../download/" class="header-btn header-btn-primary">
+        <i class="fas fa-download"></i>
+        <span>Export</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="content-area">
+    
+<!-- ═══ STATUS OVERVIEW ═══ -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">141</div><div style="font-size:12px; color:#64748b;">Active Stations</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">Online & transmitting</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#ef4444;">15</div><div style="font-size:12px; color:#64748b;">Inactive Stations</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">Maintenance / Offline</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">94</div><div style="font-size:12px; color:#64748b;">Surface Water</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">Rivers & Lakes</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">62</div><div style="font-size:12px; color:#64748b;">Groundwater</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">Wells & piezometers</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">12</div><div style="font-size:12px; color:#64748b;">Alerts Active</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">Threshold exceeded</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#0891b2;">99.2%</div><div style="font-size:12px; color:#64748b;">Data Completeness</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">Last 30 days</div></div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 360px; gap:16px;">
+  <div class="card">
+    <div style="padding:0 20px;">
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab-group="mon" data-tab="network" onclick="switchTab('mon','network')"><i class="fas fa-satellite-dish" style="margin-right:5px;"></i>Monitoring Network</button>
+        <button class="tab-btn" data-tab-group="mon" data-tab="data" onclick="switchTab('mon','data')"><i class="fas fa-chart-area" style="margin-right:5px;"></i>Time-Series Data</button>
+        <button class="tab-btn" data-tab-group="mon" data-tab="alerts" onclick="switchTab('mon','alerts')"><i class="fas fa-bell" style="margin-right:5px;"></i>Alerts <span class="nav-badge" style="display:inline;">12</span></button>
+      </div>
+    </div>
+
+    <!-- Network Tab -->
+    <div class="tab-panel active" data-panel-group="mon" data-panel="network">
+      <div class="filter-bar">
+        <div class="search-wrap" style="flex:1; max-width:250px;">
+          <i class="fas fa-search"></i>
+          <input class="search-input" id="st-search" placeholder="Search stations…" oninput="filterTable('st-search','st-table')">
+        </div>
+        <select class="filter-select"><option>All Types</option><option>Surface Water</option><option>Groundwater</option><option>Lake</option></select>
+        <select class="filter-select"><option>All Status</option><option>Active</option><option>Inactive</option></select>
+        <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Station</button>
+        <button class="btn btn-secondary btn-sm"><i class="fas fa-upload"></i> Import Data</button>
+      </div>
+      <div class="table-container">
+        <table class="data-table" id="st-table">
+          <thead><tr>
+            <th>Station ID</th><th>Name</th><th>Type</th><th>Coordinates</th>
+            <th>Status</th><th>Last Reading</th><th>Parameters</th>
+            <th>Frequency</th><th>Water Body</th><th>Actions</th>
+          </tr></thead>
+          <tbody>
+    <tr>
+      <td><span class="id-pill">MS-VAR-SW-001</span></td>
+      <td><strong>Vardar @ Negotino</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">Surface Water</span></td>
+      <td>41.481°N, 22.089°E</td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td>2024-04-01</td>
+      <td>Flow, Temperature, DO +3</td>
+      <td>Monthly</td>
+      <td><span class="id-pill">MK-VAR-RW-001</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-primary btn-sm" onclick="showChart('MS-VAR-SW-001')"><i class="fas fa-chart-line"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MS-VAR-SW-002</span></td>
+      <td><strong>Treska @ Makedonski Brod</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">Surface Water</span></td>
+      <td>41.514°N, 21.209°E</td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td>2024-04-01</td>
+      <td>Flow, Temperature, DO +1</td>
+      <td>Monthly</td>
+      <td><span class="id-pill">MK-VAR-RW-002</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-primary btn-sm" onclick="showChart('MS-VAR-SW-002')"><i class="fas fa-chart-line"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MS-VAR-GW-001</span></td>
+      <td><strong>Pelagonia Well PZ-14</strong></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">Groundwater</span></td>
+      <td>41.045°N, 21.332°E</td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td>2024-03-28</td>
+      <td>Level, Temperature, Conductivity +1</td>
+      <td>Weekly</td>
+      <td><span class="id-pill">MK-VAR-GW-001</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-primary btn-sm" onclick="showChart('MS-VAR-GW-001')"><i class="fas fa-chart-line"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MS-OHR-LW-001</span></td>
+      <td><strong>Ohrid Lake - Centre</strong></td>
+      <td><span class="badge badge-published" style="font-size:10px;">Lake</span></td>
+      <td>41.094°N, 20.792°E</td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td>2024-04-01</td>
+      <td>Temperature, DO, Chlorophyll +1</td>
+      <td>Fortnightly</td>
+      <td><span class="id-pill">MK-VAR-LW-002</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-primary btn-sm" onclick="showChart('MS-OHR-LW-001')"><i class="fas fa-chart-line"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MS-STR-SW-001</span></td>
+      <td><strong>Strumica @ Novo Selo</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">Surface Water</span></td>
+      <td>41.418°N, 22.857°E</td>
+      <td><span class="badge badge-good" style="font-size:10px;">Active</span></td>
+      <td>2024-04-01</td>
+      <td>Flow, Temperature, DO +1</td>
+      <td>Monthly</td>
+      <td><span class="id-pill">MK-STR-RW-001</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-primary btn-sm" onclick="showChart('MS-STR-SW-001')"><i class="fas fa-chart-line"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Data Tab -->
+    <div class="tab-panel" data-panel-group="mon" data-panel="data">
+      <div style="padding:16px 20px;">
+        <div style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+          <select class="filter-select" id="station-select">
+            <option value="MS-VAR-SW-001">Vardar @ Negotino</option><option value="MS-VAR-SW-002">Treska @ Makedonski Brod</option><option value="MS-VAR-GW-001">Pelagonia Well PZ-14</option><option value="MS-OHR-LW-001">Ohrid Lake - Centre</option><option value="MS-STR-SW-001">Strumica @ Novo Selo</option>
+          </select>
+          <select class="filter-select" id="param-select">
+            <option>Dissolved Oxygen (mg/L)</option>
+            <option>Nitrates (mg/L)</option>
+            <option>Phosphates (mg/L)</option>
+            <option>Temperature (°C)</option>
+            <option>pH</option>
+          </select>
+          <select class="filter-select">
+            <option>Last 12 months</option>
+            <option>Last 24 months</option>
+            <option>2023</option>
+            <option>2022</option>
+          </select>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Download CSV</button>
+        </div>
+        <canvas id="monChart" height="200"></canvas>
+
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;">
+          <div class="stat-item"><div class="stat-val" style="font-size:16px; color:#ef4444;">6.8 mg/L</div><div class="stat-lbl">Min (DO)</div><div style="font-size:10px; color:#94a3b8;">Aug 2023</div></div><div class="stat-item"><div class="stat-val" style="font-size:16px; color:#059669;">9.1 mg/L</div><div class="stat-lbl">Max (DO)</div><div style="font-size:10px; color:#94a3b8;">Jan 2024</div></div><div class="stat-item"><div class="stat-val" style="font-size:16px; color:#1a56db;">8.3 mg/L</div><div class="stat-lbl">Average</div><div style="font-size:10px; color:#94a3b8;">12 months</div></div><div class="stat-item"><div class="stat-val" style="font-size:16px; color:#d97706;">7.0 mg/L</div><div class="stat-lbl">WFD Threshold</div><div style="font-size:10px; color:#94a3b8;">Good status</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts Tab -->
+    <div class="tab-panel" data-panel-group="mon" data-panel="alerts">
+      <div style="padding:16px 20px;">
+        
+        <div style="border:1px solid #fecaca; background:#fef2f2; border-radius:8px; padding:12px; margin-bottom:8px;">
+          <div style="display:flex; align-items:start; justify-content:space-between;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:#991b1b;">
+                <i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i>Strumica @ Novo Selo — Nitrates Exceedance
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Value: <strong>14.2 mg/L</strong> | Threshold: 11.3 mg/L | 2024-04-07 06:23
+              </div>
+            </div>
+            <span class="badge badge-poor">HIGH</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-eye"></i> View Data</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-check"></i> Acknowledge</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-file-alt"></i> Report</button>
+          </div>
+        </div>
+        <div style="border:1px solid #fde68a; background:#fffbeb; border-radius:8px; padding:12px; margin-bottom:8px;">
+          <div style="display:flex; align-items:start; justify-content:space-between;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:#92400e;">
+                <i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i>Pelagonia Well PZ-14 — Nitrate Exceedance
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Value: <strong>48.1 mg/L</strong> | Threshold: 50 mg/L (GW limit) | 2024-04-06 18:00
+              </div>
+            </div>
+            <span class="badge badge-moderate">MODERATE</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-eye"></i> View Data</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-check"></i> Acknowledge</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-file-alt"></i> Report</button>
+          </div>
+        </div>
+        <div style="border:1px solid #fecaca; background:#fef2f2; border-radius:8px; padding:12px; margin-bottom:8px;">
+          <div style="display:flex; align-items:start; justify-content:space-between;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:#991b1b;">
+                <i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i>Vardar @ Negotino — Dissolved Oxygen Exceedance
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Value: <strong>5.8 mg/L</strong> | Threshold: 7.0 mg/L | 2024-04-05 12:30
+              </div>
+            </div>
+            <span class="badge badge-poor">HIGH</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-eye"></i> View Data</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-check"></i> Acknowledge</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-file-alt"></i> Report</button>
+          </div>
+        </div>
+        <div style="border:1px solid #fecaca; background:#fef2f2; border-radius:8px; padding:12px; margin-bottom:8px;">
+          <div style="display:flex; align-items:start; justify-content:space-between;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:#991b1b;">
+                <i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i>Crna Reka station — Phosphates Exceedance
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Value: <strong>0.28 mg/L</strong> | Threshold: 0.10 mg/L | 2024-04-05 08:15
+              </div>
+            </div>
+            <span class="badge badge-poor">HIGH</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-eye"></i> View Data</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-check"></i> Acknowledge</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-file-alt"></i> Report</button>
+          </div>
+        </div>
+        <div style="border:1px solid #fde68a; background:#fffbeb; border-radius:8px; padding:12px; margin-bottom:8px;">
+          <div style="display:flex; align-items:start; justify-content:space-between;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:#92400e;">
+                <i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i>Ohrid Lake - Centre — Chlorophyll-a Exceedance
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Value: <strong>12.4 µg/L</strong> | Threshold: 10 µg/L | 2024-04-04 14:00
+              </div>
+            </div>
+            <span class="badge badge-moderate">MODERATE</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-eye"></i> View Data</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-check"></i> Acknowledge</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-file-alt"></i> Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <!-- Parameters reference -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" style="font-size:12px;"><i class="fas fa-flask" style="color:#8b5cf6; margin-right:5px;"></i>Monitoring Parameters</span>
+      </div>
+      <div class="card-body" style="padding:12px 16px;">
+        
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Biological</div>
+          <div style="display:flex; flex-wrap:wrap; gap:3px;">
+            <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Phytoplankton</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Macrophytes</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Phytobenthos</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Benthic invertebrates</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Fish fauna</span>
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Physico-Chemical</div>
+          <div style="display:flex; flex-wrap:wrap; gap:3px;">
+            <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Temperature</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">DO</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">pH</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Conductivity</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Turbidity</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">BOD5</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">TOC</span>
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Nutrients</div>
+          <div style="display:flex; flex-wrap:wrap; gap:3px;">
+            <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Nitrates (NO₃)</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Nitrites (NO₂)</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Ammonium (NH₄)</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Total Phosphorus</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Ortho-P</span>
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Priority Substances</div>
+          <div style="display:flex; flex-wrap:wrap; gap:3px;">
+            <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Pesticides (selected)</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">Heavy metals</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">PAHs</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px;">PCBs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data upload -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" style="font-size:12px;"><i class="fas fa-upload" style="color:#059669; margin-right:5px;"></i>Upload Monitoring Data</span>
+      </div>
+      <div class="card-body" style="padding:14px 16px;">
+        <div style="border:2px dashed #e2e8f0; border-radius:8px; padding:16px; text-align:center; background:#f8fafc; margin-bottom:10px; cursor:pointer;">
+          <i class="fas fa-cloud-upload-alt" style="font-size:24px; color:#94a3b8; margin-bottom:6px; display:block;"></i>
+          <div style="font-size:11px; color:#64748b;">Drop files here or <span style="color:#1a56db; cursor:pointer;">browse</span></div>
+          <div style="font-size:10px; color:#94a3b8; margin-top:3px;">CSV, XLS, XML · Max 50MB</div>
+        </div>
+        <select class="filter-select" style="width:100%; margin-bottom:8px;">
+          <option>Select monitoring station…</option>
+          <option>Vardar @ Negotino</option><option>Treska @ Makedonski Brod</option><option>Pelagonia Well PZ-14</option><option>Ohrid Lake - Centre</option><option>Strumica @ Novo Selo</option>
+        </select>
+        <button class="btn btn-primary btn-sm" style="width:100%;"><i class="fas fa-check"></i> Validate & Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Monitoring chart
+const monCtx = document.getElementById('monChart').getContext('2d');
+new Chart(monCtx, {
+  type: 'line',
+  data: {
+    labels: ["Apr 23","May 23","Jun 23","Jul 23","Aug 23","Sep 23","Oct 23","Nov 23","Dec 23","Jan 24","Feb 24","Mar 24"],
+    datasets: [
+      { label: 'DO (mg/L)', data: [8.2,8.8,7.9,7.1,6.8,7.4,8.1,8.6,8.9,9.1,9,8.7],
+        borderColor:'#1a56db', backgroundColor:'#1a56db14', fill:true, tension:0.4, borderWidth:2.5, pointRadius:4 },
+      { label: 'Nitrates (mg/L)', data: [3.1,2.9,4.2,4.8,5.1,4.3,3.8,3.2,2.8,2.6,2.7,3],
+        borderColor:'#ef4444', backgroundColor:'transparent', tension:0.4, borderWidth:2, pointRadius:3 },
+      { label: 'WFD Threshold (DO)', data: Array(12).fill(7.0),
+        borderColor:'#d97706', borderDash:[5,5], backgroundColor:'transparent', borderWidth:1.5, pointRadius:0 }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:true,
+    plugins: { legend:{ labels:{ font:{size:10}, boxWidth:12 } } },
+    scales: {
+      x: { grid:{display:false}, ticks:{font:{size:9}} },
+      y: { grid:{color:'#f1f5f9'}, ticks:{font:{size:9}} }
+    }
+  }
+});
+</script>
+  </main>
+</div>
+
+<script>
+// ─── Tab switching ─────────────────────────────────────────
+function switchTab(groupId, tabId) {
+  document.querySelectorAll('[data-tab-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-panel-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-tab-group="' + groupId + '"][data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelector('[data-panel-group="' + groupId + '"][data-panel="' + tabId + '"]').classList.add('active');
+}
+
+// ─── Search filter ─────────────────────────────────────────
+function filterTable(inputId, tableId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+}
+
+// ─── Sidebar highlight ─────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-item-active'));
+    el.classList.add('nav-item-active');
+  });
+});
+</script>
+</body>
+</html>

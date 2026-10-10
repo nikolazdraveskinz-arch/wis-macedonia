@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metadata Governance — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root {
+      --nav-width: 260px;
+      --header-height: 64px;
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --accent: #0891b2;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #1a56db;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: var(--nav-width); background: var(--sidebar-bg);
+      display: flex; flex-direction: column; z-index: 50;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      overflow-y: auto; scrollbar-width: thin; scrollbar-color: #334155 transparent;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+    .logo-block { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-text-main { font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+    .logo-text-sub { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+    .rbmp-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 5px; background: #1e293b; color: #38bdf8; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+    
+    /* Nav */
+    nav { flex: 1; padding: 12px 8px; }
+    .nav-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; padding: 8px 10px 4px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      color: var(--sidebar-text); text-decoration: none; font-size: 13px; font-weight: 500;
+      margin-bottom: 2px; transition: all 0.15s; position: relative;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+    .nav-item-active { background: var(--sidebar-active) !important; color: #fff !important; }
+    .nav-icon { width: 18px; text-align: center; font-size: 13px; opacity: 0.8; }
+    .nav-label { flex: 1; }
+    .nav-badge { background: #ef4444; color: white; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    
+    /* User area */
+    .sidebar-user {
+      padding: 12px 14px; border-top: 1px solid #1e293b; display: flex; align-items: center;
+      gap: 10px; flex-shrink: 0;
+    }
+    .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+    .user-role { font-size: 10px; color: #64748b; }
+    .user-logout { margin-left: auto; color: #475569; font-size: 12px; cursor: pointer; padding: 4px; }
+    .user-logout:hover { color: #ef4444; }
+    
+    /* Main content */
+    .main-wrapper { margin-left: var(--nav-width); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Header */
+    .top-header {
+      height: var(--header-height); background: white; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      position: sticky; top: 0; z-index: 40; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .page-title-wrap h1 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+    .breadcrumb { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .header-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; background: white; color: #475569; font-size: 12px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .header-btn:hover { background: #f8fafc; color: #1e293b; }
+    .header-btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .header-btn-primary:hover { background: var(--primary-dark); }
+    .notification-dot { position: relative; }
+    .notification-dot::after { content: ''; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; border: 1px solid white; }
+    
+    /* Content area */
+    .content-area { flex: 1; padding: 24px; overflow-x: hidden; }
+    
+    /* Cards */
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    .card-body { padding: 20px; }
+    
+    /* KPI Cards */
+    .kpi-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.15s, box-shadow 0.15s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .kpi-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .kpi-value { font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 2px; }
+    .kpi-label { font-size: 12px; color: #64748b; font-weight: 500; }
+    .kpi-trend { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #059669; }
+    .trend-down { color: #dc2626; }
+    .trend-neutral { color: #64748b; }
+    
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-good, .badge-high, .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-moderate, .badge-medium, .badge-in-review, .badge-in-implementation { background: #fef3c7; color: #92400e; }
+    .badge-poor, .badge-low, .badge-pending, .badge-planned { background: #fee2e2; color: #991b1b; }
+    .badge-active, .badge-published { background: #dbeafe; color: #1e40af; }
+    .badge-inactive, .badge-completed { background: #f1f5f9; color: #475569; }
+    .badge-achieved { background: #d1fae5; color: #065f46; }
+    .badge-bad { background: #4b0000; color: #fca5a5; }
+    .badge-under-investigation { background: #fde8d8; color: #9a3412; }
+    
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .data-table tr:hover td { background: #f8fafc; }
+    .data-table tr:last-child td { border-bottom: none; }
+    
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 8px 12px 8px 36px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: white; color: #1e293b; position: relative; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; background: white; color: #475569; cursor: pointer; }
+    
+    /* Progress bar */
+    .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    
+    /* Tabs */
+    .tab-nav { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; gap: 0; }
+    .tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .tab-btn:hover { color: #1e293b; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    
+    /* Map */
+    #wis-map { border-radius: 12px; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; margin-bottom: 18px; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+    
+    /* Stat grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .stat-item { text-align: center; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #f1f5f9; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+    
+    /* Scrollable table container */
+    .table-container { overflow-x: auto; }
+    
+    /* Map controls */
+    .map-panel { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .layer-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .layer-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    
+    /* Alert banners */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    
+    /* Tooltip */
+    .tooltip-wrap { position: relative; cursor: help; }
+    
+    /* Smooth hover for rows */
+    tr { transition: background 0.1s; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; --nav-width: 220px; }
+      .main-wrapper { margin-left: 220px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-wrapper { margin-left: 0; }
+    }
+    
+    /* Identifier pill */
+    .id-pill { font-family: monospace; font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; }
+    
+    /* Action buttons */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    
+    /* WFD Status colors */
+    .eco-high { color: #1a56db; font-weight: 600; }
+    .eco-good { color: #059669; font-weight: 600; }
+    .eco-moderate { color: #d97706; font-weight: 600; }
+    .eco-poor { color: #dc2626; font-weight: 600; }
+    .eco-bad { color: #7f1d1d; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-block">
+      <div class="logo-icon">
+        <i class="fas fa-water" style="color:white; font-size:18px;"></i>
+      </div>
+      <div>
+        <div class="logo-text-main">WIS Macedonia</div>
+        <div class="logo-text-sub">Water Information System</div>
+      </div>
+    </div>
+    <div class="rbmp-pill">
+      <i class="fas fa-circle" style="font-size:6px;"></i>
+      RBMP 2nd Cycle · 2019–2027
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section-title">Core Modules</div>
+    
+      <a href="../" class="nav-item ">
+        <i class="fas fa-chart-line nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+        
+      </a>
+      <a href="../map/" class="nav-item ">
+        <i class="fas fa-map nav-icon"></i>
+        <span class="nav-label">Map Viewer</span>
+        
+      </a>
+      <a href="../water-bodies/" class="nav-item ">
+        <i class="fas fa-water nav-icon"></i>
+        <span class="nav-label">Water Bodies</span>
+        <span class="nav-badge">156</span>
+      </a>
+      <a href="../monitoring/" class="nav-item ">
+        <i class="fas fa-satellite-dish nav-icon"></i>
+        <span class="nav-label">Monitoring</span>
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="../pressures/" class="nav-item ">
+        <i class="fas fa-industry nav-icon"></i>
+        <span class="nav-label">Pressures & Impacts</span>
+        
+      </a>
+      <a href="../permits/" class="nav-item ">
+        <i class="fas fa-file-contract nav-icon"></i>
+        <span class="nav-label">Water Book</span>
+        <span class="nav-badge">8</span>
+      </a>
+      <a href="../measures/" class="nav-item ">
+        <i class="fas fa-tasks nav-icon"></i>
+        <span class="nav-label">Measures</span>
+        
+      </a>
+      <a href="../metadata/" class="nav-item nav-item-active">
+        <i class="fas fa-database nav-icon"></i>
+        <span class="nav-label">Metadata</span>
+        
+      </a>
+      <a href="../participation/" class="nav-item ">
+        <i class="fas fa-users nav-icon"></i>
+        <span class="nav-label">Public Participation</span>
+        <span class="nav-badge">23</span>
+      </a>
+      <a href="../download/" class="nav-item ">
+        <i class="fas fa-download nav-icon"></i>
+        <span class="nav-label">Data Access</span>
+        
+      </a>
+      <a href="../reporting/" class="nav-item ">
+        <i class="fas fa-chart-bar nav-icon"></i>
+        <span class="nav-label">WISE Reporting</span>
+        
+      </a>
+      <a href="../users/" class="nav-item ">
+        <i class="fas fa-user-shield nav-icon"></i>
+        <span class="nav-label">User Management</span>
+        
+      </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">SA</div>
+    <div>
+      <div class="user-name">System Administrator</div>
+      <div class="user-role">Administrator</div>
+    </div>
+    <a href="../login/" class="user-logout" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Metadata Governance</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn notification-dot" title="Notifications">
+        <i class="fas fa-bell"></i>
+      </button>
+      <button class="header-btn" title="Help">
+        <i class="fas fa-question-circle"></i>
+        <span>Help</span>
+      </button>
+      <a href="../download/" class="header-btn header-btn-primary">
+        <i class="fas fa-download"></i>
+        <span>Export</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="content-area">
+    
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">47</div><div style="font-size:12px; color:#64748b;">Dataset Records</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">38</div><div style="font-size:12px; color:#64748b;">Published</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">9</div><div style="font-size:12px; color:#64748b;">Draft / Under Review</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#0891b2;">96.4%</div><div style="font-size:12px; color:#64748b;">Avg Quality Score</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">INSPIRE</div><div style="font-size:12px; color:#64748b;">Compliant</div></div>
+</div>
+
+<div class="card">
+  <div style="padding:0 20px;">
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab-group="meta" data-tab="catalog" onclick="switchTab('meta','catalog')"><i class="fas fa-database" style="margin-right:5px;"></i>Metadata Catalog</button>
+      <button class="tab-btn" data-tab-group="meta" data-tab="inspire" onclick="switchTab('meta','inspire')"><i class="fas fa-globe" style="margin-right:5px;"></i>INSPIRE Compliance</button>
+      <button class="tab-btn" data-tab-group="meta" data-tab="editor" onclick="switchTab('meta','editor')"><i class="fas fa-edit" style="margin-right:5px;"></i>Metadata Editor</button>
+    </div>
+  </div>
+
+  <!-- Catalog Tab -->
+  <div class="tab-panel active" data-panel-group="meta" data-panel="catalog">
+    <div class="filter-bar">
+      <div class="search-wrap" style="flex:1; max-width:260px;"><i class="fas fa-search"></i><input class="search-input" id="md-search" placeholder="Search metadata…" oninput="filterTable('md-search','md-table')"></div>
+      <select class="filter-select"><option>All Standards</option><option>INSPIRE WFD</option><option>INSPIRE EF</option><option>INSPIRE PS</option></select>
+      <select class="filter-select"><option>All Types</option><option>Vector</option><option>Raster</option><option>Tabular</option></select>
+      <select class="filter-select"><option>All Status</option><option>Published</option><option>Draft</option></select>
+      <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Record</button>
+      <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table" id="md-table">
+        <thead><tr>
+          <th>ID</th><th>Title / Institution</th><th>Type</th><th>CRS</th><th>Standard</th>
+          <th>Version</th><th>Updated</th><th>Quality</th><th>Status</th><th>License</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+    <tr>
+      <td><span class="id-pill">MD-MK-001</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">River Water Bodies - North Macedonia</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
+      </td>
+      <td style="font-size:11px;">Vector - Polygon/Polyline</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE WFD</span></td>
+      <td style="font-size:11px;">v3.2</td>
+      <td style="font-size:11px;">2024-01-15</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:98%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">98%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-002</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">Groundwater Bodies - North Macedonia</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
+      </td>
+      <td style="font-size:11px;">Vector - Polygon</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE WFD</span></td>
+      <td style="font-size:11px;">v2.1</td>
+      <td style="font-size:11px;">2024-01-15</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:96%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">96%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-003</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">Surface Water Monitoring Network</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP / HMS</div>
+      </td>
+      <td style="font-size:11px;">Vector - Point</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:4326</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE EF</span></td>
+      <td style="font-size:11px;">v4.0</td>
+      <td style="font-size:11px;">2024-03-01</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:99%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">99%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-004</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">Protected Areas - Drinking Water</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
+      </td>
+      <td style="font-size:11px;">Vector - Polygon</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE PS</span></td>
+      <td style="font-size:11px;">v1.5</td>
+      <td style="font-size:11px;">2023-09-20</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:94%; background:#d97706;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#d97706;">94%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-005</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">DEM - Republic of North Macedonia 10m</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Agency for Real Estate Cadastre</div>
+      </td>
+      <td style="font-size:11px;">Raster - GeoTIFF</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE EL</span></td>
+      <td style="font-size:11px;">v2.0</td>
+      <td style="font-size:11px;">2023-06-01</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:97%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">97%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">Government Use</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INSPIRE Tab -->
+  <div class="tab-panel" data-panel-group="meta" data-panel="inspire">
+    <div style="padding:20px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+        <div>
+          <h4 style="font-size:13px; font-weight:700; margin:0 0 12px;">INSPIRE Annex Coverage</h4>
+          
+          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; color:#334155;">Annex I - Reference Data</span>
+              <span class="badge badge-good" style="font-size:10px;">Compliant</span>
+            </div>
+            <div class="progress-bar" style="height:8px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">12 datasets · 100% compliant</div>
+          </div>
+          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; color:#334155;">Annex II - Themes</span>
+              <span class="badge badge-moderate" style="font-size:10px;">Partial</span>
+            </div>
+            <div class="progress-bar" style="height:8px;">
+              <div class="progress-fill" style="width:75%; background:#d97706;"></div>
+            </div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">8 datasets · 75% compliant</div>
+          </div>
+          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; color:#334155;">Annex III - WFD/Water</span>
+              <span class="badge badge-good" style="font-size:10px;">Compliant</span>
+            </div>
+            <div class="progress-bar" style="height:8px;">
+              <div class="progress-fill" style="width:94%; background:#d97706;"></div>
+            </div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">27 datasets · 94% compliant</div>
+          </div>
+        </div>
+        <div>
+          <h4 style="font-size:13px; font-weight:700; margin:0 0 12px;">Metadata Elements Status</h4>
+          
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Resource Title</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Abstract / Description</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Responsible Party</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:97%; background:#d97706;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">97%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Spatial Extent (BBox)</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Temporal Extent</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:89%; background:#dc2626;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">89%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">CRS / Projection</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Data Lineage</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:84%; background:#dc2626;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">84%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Quality / Conformity</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:91%; background:#d97706;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">91%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Access Restrictions</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Distribution URL</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:96%; background:#d97706;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">96%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor Tab -->
+  <div class="tab-panel" data-panel-group="meta" data-panel="editor">
+    <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Resource Title *</label>
+        <input type="text" placeholder="e.g. River Water Bodies - North Macedonia" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Abstract *</label>
+        <input type="text" placeholder="Description of the dataset..." style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Language</label>
+        <input type="text" placeholder="eng (ISO 639-2)" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Responsible Institution *</label>
+        <input type="text" placeholder="Ministry of Environment and Physical Planning" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Contact Email *</label>
+        <input type="email" placeholder="gis@moepp.gov.mk" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Update Frequency</label>
+        <input type="text" placeholder="Annually / Continuously" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Coordinate Reference System *</label>
+        <input type="text" placeholder="EPSG:6204 (MGI 1901)" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Bounding Box (W,S,E,N)</label>
+        <input type="text" placeholder="20.45, 40.85, 23.03, 42.37" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Temporal Extent From</label>
+        <input type="date" placeholder="" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Data Source / Lineage</label>
+        <input type="text" placeholder="Derived from national GIS survey 2021" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Quality Conformance</label>
+        <input type="text" placeholder="INSPIRE Spec WFD v1.0" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">License</label>
+        <input type="text" placeholder="CC BY 4.0" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div style="grid-column:span 2; display:flex; gap:8px;">
+        <button class="btn btn-primary"><i class="fas fa-check"></i> Validate & Save</button>
+        <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+        <button class="btn btn-secondary"><i class="fas fa-code"></i> View XML</button>
+      </div>
+    </div>
+  </div>
+</div>
+  </main>
+</div>
+
+<script>
+// ─── Tab switching ─────────────────────────────────────────
+function switchTab(groupId, tabId) {
+  document.querySelectorAll('[data-tab-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-panel-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-tab-group="' + groupId + '"][data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelector('[data-panel-group="' + groupId + '"][data-panel="' + tabId + '"]').classList.add('active');
+}
+
+// ─── Search filter ─────────────────────────────────────────
+function filterTable(inputId, tableId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+}
+
+// ─── Sidebar highlight ─────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-item-active'));
+    el.classList.add('nav-item-active');
+  });
+});
+</script>
+</body>
+</html>

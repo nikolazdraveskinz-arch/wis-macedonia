@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Map Viewer — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root {
+      --nav-width: 260px;
+      --header-height: 64px;
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --accent: #0891b2;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #1a56db;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: var(--nav-width); background: var(--sidebar-bg);
+      display: flex; flex-direction: column; z-index: 50;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      overflow-y: auto; scrollbar-width: thin; scrollbar-color: #334155 transparent;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+    .logo-block { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-text-main { font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+    .logo-text-sub { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+    .rbmp-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 5px; background: #1e293b; color: #38bdf8; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+    
+    /* Nav */
+    nav { flex: 1; padding: 12px 8px; }
+    .nav-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; padding: 8px 10px 4px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      color: var(--sidebar-text); text-decoration: none; font-size: 13px; font-weight: 500;
+      margin-bottom: 2px; transition: all 0.15s; position: relative;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+    .nav-item-active { background: var(--sidebar-active) !important; color: #fff !important; }
+    .nav-icon { width: 18px; text-align: center; font-size: 13px; opacity: 0.8; }
+    .nav-label { flex: 1; }
+    .nav-badge { background: #ef4444; color: white; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    
+    /* User area */
+    .sidebar-user {
+      padding: 12px 14px; border-top: 1px solid #1e293b; display: flex; align-items: center;
+      gap: 10px; flex-shrink: 0;
+    }
+    .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+    .user-role { font-size: 10px; color: #64748b; }
+    .user-logout { margin-left: auto; color: #475569; font-size: 12px; cursor: pointer; padding: 4px; }
+    .user-logout:hover { color: #ef4444; }
+    
+    /* Main content */
+    .main-wrapper { margin-left: var(--nav-width); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Header */
+    .top-header {
+      height: var(--header-height); background: white; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      position: sticky; top: 0; z-index: 40; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .page-title-wrap h1 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+    .breadcrumb { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .header-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; background: white; color: #475569; font-size: 12px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .header-btn:hover { background: #f8fafc; color: #1e293b; }
+    .header-btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .header-btn-primary:hover { background: var(--primary-dark); }
+    .notification-dot { position: relative; }
+    .notification-dot::after { content: ''; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; border: 1px solid white; }
+    
+    /* Content area */
+    .content-area { flex: 1; padding: 24px; overflow-x: hidden; }
+    
+    /* Cards */
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    .card-body { padding: 20px; }
+    
+    /* KPI Cards */
+    .kpi-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.15s, box-shadow 0.15s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .kpi-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .kpi-value { font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 2px; }
+    .kpi-label { font-size: 12px; color: #64748b; font-weight: 500; }
+    .kpi-trend { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #059669; }
+    .trend-down { color: #dc2626; }
+    .trend-neutral { color: #64748b; }
+    
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-good, .badge-high, .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-moderate, .badge-medium, .badge-in-review, .badge-in-implementation { background: #fef3c7; color: #92400e; }
+    .badge-poor, .badge-low, .badge-pending, .badge-planned { background: #fee2e2; color: #991b1b; }
+    .badge-active, .badge-published { background: #dbeafe; color: #1e40af; }
+    .badge-inactive, .badge-completed { background: #f1f5f9; color: #475569; }
+    .badge-achieved { background: #d1fae5; color: #065f46; }
+    .badge-bad { background: #4b0000; color: #fca5a5; }
+    .badge-under-investigation { background: #fde8d8; color: #9a3412; }
+    
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .data-table tr:hover td { background: #f8fafc; }
+    .data-table tr:last-child td { border-bottom: none; }
+    
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 8px 12px 8px 36px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: white; color: #1e293b; position: relative; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; background: white; color: #475569; cursor: pointer; }
+    
+    /* Progress bar */
+    .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    
+    /* Tabs */
+    .tab-nav { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; gap: 0; }
+    .tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .tab-btn:hover { color: #1e293b; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    
+    /* Map */
+    #wis-map { border-radius: 12px; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; margin-bottom: 18px; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+    
+    /* Stat grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .stat-item { text-align: center; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #f1f5f9; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+    
+    /* Scrollable table container */
+    .table-container { overflow-x: auto; }
+    
+    /* Map controls */
+    .map-panel { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .layer-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .layer-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    
+    /* Alert banners */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    
+    /* Tooltip */
+    .tooltip-wrap { position: relative; cursor: help; }
+    
+    /* Smooth hover for rows */
+    tr { transition: background 0.1s; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; --nav-width: 220px; }
+      .main-wrapper { margin-left: 220px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-wrapper { margin-left: 0; }
+    }
+    
+    /* Identifier pill */
+    .id-pill { font-family: monospace; font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; }
+    
+    /* Action buttons */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    
+    /* WFD Status colors */
+    .eco-high { color: #1a56db; font-weight: 600; }
+    .eco-good { color: #059669; font-weight: 600; }
+    .eco-moderate { color: #d97706; font-weight: 600; }
+    .eco-poor { color: #dc2626; font-weight: 600; }
+    .eco-bad { color: #7f1d1d; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-block">
+      <div class="logo-icon">
+        <i class="fas fa-water" style="color:white; font-size:18px;"></i>
+      </div>
+      <div>
+        <div class="logo-text-main">WIS Macedonia</div>
+        <div class="logo-text-sub">Water Information System</div>
+      </div>
+    </div>
+    <div class="rbmp-pill">
+      <i class="fas fa-circle" style="font-size:6px;"></i>
+      RBMP 2nd Cycle · 2019–2027
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section-title">Core Modules</div>
+    
+      <a href="../" class="nav-item ">
+        <i class="fas fa-chart-line nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+        
+      </a>
+      <a href="../map/" class="nav-item nav-item-active">
+        <i class="fas fa-map nav-icon"></i>
+        <span class="nav-label">Map Viewer</span>
+        
+      </a>
+      <a href="../water-bodies/" class="nav-item ">
+        <i class="fas fa-water nav-icon"></i>
+        <span class="nav-label">Water Bodies</span>
+        <span class="nav-badge">156</span>
+      </a>
+      <a href="../monitoring/" class="nav-item ">
+        <i class="fas fa-satellite-dish nav-icon"></i>
+        <span class="nav-label">Monitoring</span>
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="../pressures/" class="nav-item ">
+        <i class="fas fa-industry nav-icon"></i>
+        <span class="nav-label">Pressures & Impacts</span>
+        
+      </a>
+      <a href="../permits/" class="nav-item ">
+        <i class="fas fa-file-contract nav-icon"></i>
+        <span class="nav-label">Water Book</span>
+        <span class="nav-badge">8</span>
+      </a>
+      <a href="../measures/" class="nav-item ">
+        <i class="fas fa-tasks nav-icon"></i>
+        <span class="nav-label">Measures</span>
+        
+      </a>
+      <a href="../metadata/" class="nav-item ">
+        <i class="fas fa-database nav-icon"></i>
+        <span class="nav-label">Metadata</span>
+        
+      </a>
+      <a href="../participation/" class="nav-item ">
+        <i class="fas fa-users nav-icon"></i>
+        <span class="nav-label">Public Participation</span>
+        <span class="nav-badge">23</span>
+      </a>
+      <a href="../download/" class="nav-item ">
+        <i class="fas fa-download nav-icon"></i>
+        <span class="nav-label">Data Access</span>
+        
+      </a>
+      <a href="../reporting/" class="nav-item ">
+        <i class="fas fa-chart-bar nav-icon"></i>
+        <span class="nav-label">WISE Reporting</span>
+        
+      </a>
+      <a href="../users/" class="nav-item ">
+        <i class="fas fa-user-shield nav-icon"></i>
+        <span class="nav-label">User Management</span>
+        
+      </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">SA</div>
+    <div>
+      <div class="user-name">System Administrator</div>
+      <div class="user-role">Administrator</div>
+    </div>
+    <a href="../login/" class="user-logout" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Interactive Map Viewer</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn notification-dot" title="Notifications">
+        <i class="fas fa-bell"></i>
+      </button>
+      <button class="header-btn" title="Help">
+        <i class="fas fa-question-circle"></i>
+        <span>Help</span>
+      </button>
+      <a href="../download/" class="header-btn header-btn-primary">
+        <i class="fas fa-download"></i>
+        <span>Export</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="content-area">
+    
+<div style="display:flex; gap:0; height:calc(100vh - 120px);">
+
+  <!-- ═══ LEFT PANEL - Layer Control ═══ -->
+  <div style="width:260px; background:white; border-radius:12px 0 0 12px; border:1px solid #e2e8f0; display:flex; flex-direction:column; flex-shrink:0; overflow:hidden;">
+    
+    <!-- Panel header -->
+    <div style="padding:14px 16px; border-bottom:1px solid #f1f5f9; background:#f8fafc;">
+      <div style="font-size:13px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:6px;">
+        <i class="fas fa-layer-group" style="color:#1a56db;"></i> Layer Control
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div style="padding:10px 12px; border-bottom:1px solid #f1f5f9;">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input class="search-input" id="map-search-input" placeholder="Search location…" style="width:100%; padding:7px 8px 7px 30px; font-size:12px; border:1px solid #e2e8f0; border-radius:7px; background:white;">
+      </div>
+    </div>
+
+    <!-- Layer groups -->
+    <div style="overflow-y:auto; flex:1; padding:10px 12px;">
+      
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Water Bodies</div>
+        <div class="layer-item"><input type="checkbox" checked onchange="toggleLayer('rivers',this.checked)"> <div class="layer-dot" style="background:#1a56db;"></div> <span style="flex:1;">River Water Bodies</span> <span style="font-size:10px; color:#94a3b8;">89</span></div>
+        <div class="layer-item"><input type="checkbox" checked onchange="toggleLayer('lakes',this.checked)"> <div class="layer-dot" style="background:#0891b2;"></div> <span style="flex:1;">Lake Water Bodies</span> <span style="font-size:10px; color:#94a3b8;">14</span></div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('gw',this.checked)"> <div class="layer-dot" style="background:#8b5cf6;"></div> <span style="flex:1;">Groundwater Bodies</span> <span style="font-size:10px; color:#94a3b8;">34</span></div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Monitoring</div>
+        <div class="layer-item"><input type="checkbox" checked onchange="toggleLayer('stations',this.checked)"> <div class="layer-dot" style="background:#f97316; border-radius:50%;"></div> <span style="flex:1;">Monitoring Stations</span> <span style="font-size:10px; color:#94a3b8;">156</span></div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('sw-obs',this.checked)"> <div class="layer-dot" style="background:#06b6d4; border-radius:50%;"></div> <span style="flex:1;">Hydro Observations</span></div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Protected Areas</div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('natura2000',this.checked)"> <div class="layer-dot" style="background:#059669;"></div> <span style="flex:1;">Natura 2000</span> <span style="font-size:10px; color:#94a3b8;">12</span></div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('drinkingwater',this.checked)"> <div class="layer-dot" style="background:#3b82f6;"></div> <span style="flex:1;">Drinking Water</span> <span style="font-size:10px; color:#94a3b8;">38</span></div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('fish',this.checked)"> <div class="layer-dot" style="background:#10b981;"></div> <span style="flex:1;">Fish Waters</span> <span style="font-size:10px; color:#94a3b8;">22</span></div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Pressures</div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('wwtp',this.checked)"> <div class="layer-dot" style="background:#ef4444;"></div> <span style="flex:1;">WWTPs</span></div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('industry',this.checked)"> <div class="layer-dot" style="background:#dc2626;"></div> <span style="flex:1;">Industrial Facilities</span></div>
+        <div class="layer-item"><input type="checkbox" onchange="toggleLayer('agri',this.checked)"> <div class="layer-dot" style="background:#d97706;"></div> <span style="flex:1;">Agricultural Zones</span></div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Base Maps</div>
+        <div class="layer-item"><input type="radio" name="basemap" checked onchange="switchBasemap('osm')"> <span>OpenStreetMap</span></div>
+        <div class="layer-item"><input type="radio" name="basemap" onchange="switchBasemap('satellite')"> <span>Satellite</span></div>
+        <div class="layer-item"><input type="radio" name="basemap" onchange="switchBasemap('topo')"> <span>Topographic</span></div>
+      </div>
+    </div>
+
+    <!-- WFD Legend -->
+    <div style="padding:10px 12px; border-top:1px solid #f1f5f9; background:#f8fafc;">
+      <div style="font-size:10px; font-weight:600; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">WFD Eco. Status</div>
+      <div style="display:flex; flex-wrap:wrap; gap:4px;">
+        <div style="display:flex; align-items:center; gap:3px; font-size:10px; color:#475569;">
+            <div style="width:10px; height:10px; background:#1a56db; border-radius:2px;"></div>High
+          </div><div style="display:flex; align-items:center; gap:3px; font-size:10px; color:#475569;">
+            <div style="width:10px; height:10px; background:#31c48d; border-radius:2px;"></div>Good
+          </div><div style="display:flex; align-items:center; gap:3px; font-size:10px; color:#475569;">
+            <div style="width:10px; height:10px; background:#faca15; border-radius:2px;"></div>Moderate
+          </div><div style="display:flex; align-items:center; gap:3px; font-size:10px; color:#475569;">
+            <div style="width:10px; height:10px; background:#e74c3c; border-radius:2px;"></div>Poor
+          </div><div style="display:flex; align-items:center; gap:3px; font-size:10px; color:#475569;">
+            <div style="width:10px; height:10px; background:#7f1d1d; border-radius:2px;"></div>Bad
+          </div><div style="display:flex; align-items:center; gap:3px; font-size:10px; color:#475569;">
+            <div style="width:10px; height:10px; background:#9ca3af; border-radius:2px;"></div>N/A
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAP ═══ -->
+  <div style="flex:1; position:relative;">
+    <div id="wis-map" style="width:100%; height:100%; border-radius:0 12px 12px 0; border:1px solid #e2e8f0; border-left:none;"></div>
+
+    <!-- Map toolbar -->
+    <div style="position:absolute; top:12px; right:12px; z-index:500; display:flex; flex-direction:column; gap:6px;">
+      <div class="map-panel" style="padding:6px;">
+        <button onclick="wisMap.zoomIn()" style="width:32px; height:32px; border:none; background:white; border-radius:6px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Zoom in"><i class="fas fa-plus"></i></button>
+        <button onclick="wisMap.zoomOut()" style="width:32px; height:32px; border:none; background:white; border-radius:6px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-top:2px;" title="Zoom out"><i class="fas fa-minus"></i></button>
+      </div>
+      <div class="map-panel" style="padding:6px; display:flex; flex-direction:column; gap:2px;">
+        <button onclick="wisMap.setView([41.6, 21.7], 8)" style="width:32px; height:32px; border:none; background:white; border-radius:6px; font-size:11px; cursor:pointer;" title="Zoom to Macedonia">MK</button>
+        <button onclick="wisMap.setView([41.99, 21.43], 11)" style="width:32px; height:32px; border:none; background:white; border-radius:6px; font-size:9px; cursor:pointer;" title="Vardar Basin">VAR</button>
+      </div>
+      <div class="map-panel" style="padding:6px;">
+        <button onclick="toggleMeasure()" style="width:32px; height:32px; border:none; background:white; border-radius:6px; font-size:12px; cursor:pointer;" title="Measure distance"><i class="fas fa-ruler"></i></button>
+      </div>
+    </div>
+
+    <!-- Coordinates display -->
+    <div id="coords-display" style="position:absolute; bottom:12px; left:12px; z-index:500; background:rgba(255,255,255,0.9); backdrop-filter:blur(4px); padding:4px 10px; border-radius:6px; font-size:10px; font-family:monospace; color:#475569; border:1px solid #e2e8f0;">
+      Lat: 41.9981 | Lon: 21.4254 | CRS: WGS84
+    </div>
+
+    <!-- Download button -->
+    <div style="position:absolute; top:12px; left:12px; z-index:500;">
+      <button class="btn btn-primary btn-sm" onclick="alert('Download options: GeoJSON, SHP, GPKG, WMS/WFS')">
+        <i class="fas fa-download"></i> Export Layer
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ RIGHT PANEL - Feature Info ═══ -->
+  <div id="feature-info-panel" style="width:280px; background:white; border-radius:0 12px 12px 0; border:1px solid #e2e8f0; border-left:none; display:flex; flex-direction:column; overflow:hidden; flex-shrink:0;">
+    <div style="padding:14px 16px; border-bottom:1px solid #f1f5f9; background:#f8fafc;">
+      <div style="font-size:13px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:6px;">
+        <i class="fas fa-info-circle" style="color:#1a56db;"></i> Feature Info
+      </div>
+    </div>
+    <div id="feature-info-content" style="padding:16px; overflow-y:auto; flex:1; font-size:12px; color:#64748b;">
+      <div style="text-align:center; margin-top:40px; color:#94a3b8;">
+        <i class="fas fa-mouse-pointer" style="font-size:32px; margin-bottom:12px; display:block;"></i>
+        Click a feature on the map to view its attributes
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div style="padding:12px; border-top:1px solid #f1f5f9; background:#f8fafc;">
+      <div style="font-size:10px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Map Summary</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+        <div style="background:white; border-radius:7px; padding:8px; border:1px solid #f1f5f9; text-align:center;">
+          <div style="font-size:16px; font-weight:800; color:#1a56db;">5</div>
+          <div style="font-size:9px; color:#94a3b8;">Visible WBs</div>
+        </div>
+        <div style="background:white; border-radius:7px; padding:8px; border:1px solid #f1f5f9; text-align:center;">
+          <div style="font-size:16px; font-weight:800; color:#f97316;">5</div>
+          <div style="font-size:9px; color:#94a3b8;">Stations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Initialize Leaflet Map ───────────────────────────────
+var wisMap = L.map('wis-map', {
+  center: [41.6, 21.7], zoom: 8,
+  zoomControl: false
+});
+
+var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors', maxZoom: 18
+});
+osmLayer.addTo(wisMap);
+
+var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: '© Esri', maxZoom: 18
+});
+
+// ─── Water Bodies Layer ─────────────────────────────────
+var wbData = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"LineString","coordinates":[[22.05,41.52],[22.09,41.48],[22.18,41.43]]},"properties":{"id":"MK-VAR-RW-001","name":"Vardar - Negotino","eco":"Moderate","type":"river","color":"#faca15"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[21.15,41.55],[21.2,41.51],[21.25,41.47]]},"properties":{"id":"MK-VAR-RW-002","name":"Treska - Mavrovo","eco":"Good","type":"river","color":"#31c48d"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[21.4,41.3],[21.5,41.2],[21.6,41.1]]},"properties":{"id":"MK-VAR-RW-003","name":"Crna Reka","eco":"Poor","type":"river","color":"#e74c3c"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[20.8,41.25],[20.9,41.15],[21,41.05]]},"properties":{"id":"MK-BLA-RW-001","name":"Black Drim - Upper","eco":"Good","type":"river","color":"#31c48d"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[22.7,41.44],[22.8,41.42],[22.9,41.4]]},"properties":{"id":"MK-STR-RW-001","name":"Strumica - Lower","eco":"Poor","type":"river","color":"#e74c3c"}}]};
+var lakeData = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[20.72,41.17],[20.8,41.17],[20.82,41.02],[20.76,40.87],[20.7,40.86],[20.65,40.97],[20.65,41.12],[20.72,41.17]]]},"properties":{"id":"MK-VAR-LW-002","name":"Ohrid Lake","eco":"Good"}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[22.7,41.23],[22.74,41.23],[22.74,41.18],[22.7,41.18],[22.7,41.23]]]},"properties":{"id":"MK-VAR-LW-001","name":"Dojran Lake","eco":"Moderate"}}]};
+var stationData = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[22.089,41.481]},"properties":{"id":"MS-VAR-SW-001","name":"Vardar @ Negotino","type":"Surface Water","status":"Active","lastReading":"2024-04-01","waterbody":"MK-VAR-RW-001"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[21.209,41.514]},"properties":{"id":"MS-VAR-SW-002","name":"Treska @ Makedonski Brod","type":"Surface Water","status":"Active","lastReading":"2024-04-01","waterbody":"MK-VAR-RW-002"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[21.332,41.045]},"properties":{"id":"MS-VAR-GW-001","name":"Pelagonia Well PZ-14","type":"Groundwater","status":"Active","lastReading":"2024-03-28","waterbody":"MK-VAR-GW-001"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[20.792,41.094]},"properties":{"id":"MS-OHR-LW-001","name":"Ohrid Lake - Centre","type":"Lake","status":"Active","lastReading":"2024-04-01","waterbody":"MK-VAR-LW-002"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[22.857,41.418]},"properties":{"id":"MS-STR-SW-001","name":"Strumica @ Novo Selo","type":"Surface Water","status":"Active","lastReading":"2024-04-01","waterbody":"MK-STR-RW-001"}}]};
+
+function getWBColor(eco) {
+  var c = { 'High': '#1a56db', 'Good': '#31c48d', 'Moderate': '#faca15', 'Poor': '#e74c3c', 'Bad': '#7f1d1d' };
+  return c[eco] || '#9ca3af';
+}
+
+var riverLayer = L.geoJSON(wbData, {
+  style: function(f) {
+    return { color: getWBColor(f.properties.eco), weight: 4, opacity: 0.8, lineCap: 'round' };
+  },
+  onEachFeature: function(f, layer) {
+    layer.on('click', function() { showFeatureInfo('river', f.properties); });
+    layer.bindTooltip('<strong>' + f.properties.name + '</strong><br>Eco: ' + f.properties.eco, { sticky: true, className: 'wis-tooltip' });
+  }
+}).addTo(wisMap);
+
+var lakeLayer = L.geoJSON(lakeData, {
+  style: function(f) {
+    return { fillColor: getWBColor(f.properties.eco), color: '#0891b2', weight: 2, fillOpacity: 0.4 };
+  },
+  onEachFeature: function(f, layer) {
+    layer.on('click', function() { showFeatureInfo('lake', f.properties); });
+    layer.bindTooltip('<strong>' + f.properties.name + '</strong><br>Eco: ' + f.properties.eco, { sticky: true });
+  }
+}).addTo(wisMap);
+
+var stationMarkers = L.geoJSON(stationData, {
+  pointToLayer: function(f, latlng) {
+    var typeColors = { 'Surface Water': '#1a56db', 'Groundwater': '#8b5cf6', 'Lake': '#0891b2' };
+    var col = typeColors[f.properties.type] || '#f97316';
+    return L.circleMarker(latlng, {
+      radius: 8, fillColor: col, color: 'white', weight: 2, opacity: 1, fillOpacity: 0.9
+    });
+  },
+  onEachFeature: function(f, layer) {
+    layer.on('click', function() { showFeatureInfo('station', f.properties); });
+    layer.bindTooltip('<strong>' + f.properties.name + '</strong><br>Type: ' + f.properties.type + '<br>Status: ' + f.properties.status, { sticky: true });
+  }
+}).addTo(wisMap);
+
+// ─── Feature Info ────────────────────────────────────────
+function showFeatureInfo(type, props) {
+  var html = '';
+  if (type === 'station') {
+    html = '<div style="margin-bottom:10px;"><div style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:4px;">' + props.name + '</div>' +
+      '<span class="badge badge-active" style="font-size:10px;">' + props.type + '</span></div>' +
+      '<table style="width:100%; font-size:11px; border-collapse:collapse;">' +
+      '<tr><td style="padding:3px 0; color:#64748b;">ID</td><td style="font-family:monospace; color:#1e293b;">' + props.id + '</td></tr>' +
+      '<tr><td style="padding:3px 0; color:#64748b;">Status</td><td><span class="badge badge-good" style="font-size:10px;">' + props.status + '</span></td></tr>' +
+      '<tr><td style="padding:3px 0; color:#64748b;">Water Body</td><td style="font-family:monospace;">' + props.waterbody + '</td></tr>' +
+      '<tr><td style="padding:3px 0; color:#64748b;">Last Reading</td><td>' + props.lastReading + '</td></tr>' +
+      '</table>' +
+      '<div style="margin-top:10px; display:flex; gap:6px;">' +
+      '<a href="../monitoring/" class="btn btn-primary btn-sm" style="font-size:10px;">View Data</a>' +
+      '<a href="../download/" class="btn btn-secondary btn-sm" style="font-size:10px;">Download</a></div>';
+  } else if (type === 'river') {
+    var ecoColor = { High: '#1a56db', Good: '#059669', Moderate: '#d97706', Poor: '#dc2626' }[props.eco] || '#64748b';
+    html = '<div style="margin-bottom:10px;"><div style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:4px;">' + props.name + '</div>' +
+      '<span style="font-size:11px; font-weight:600; color:' + ecoColor + ';">● Eco: ' + props.eco + '</span></div>' +
+      '<table style="width:100%; font-size:11px; border-collapse:collapse;">' +
+      '<tr><td style="padding:3px 0; color:#64748b;">ID</td><td style="font-family:monospace;">' + props.id + '</td></tr>' +
+      '<tr><td style="padding:3px 0; color:#64748b;">Type</td><td>River Water Body</td></tr>' +
+      '<tr><td style="padding:3px 0; color:#64748b;">Eco. Status</td><td style="font-weight:600; color:' + ecoColor + ';">' + props.eco + '</td></tr>' +
+      '</table>' +
+      '<div style="margin-top:10px; display:flex; gap:6px;">' +
+      '<a href="../water-bodies/" class="btn btn-primary btn-sm" style="font-size:10px;">Details</a>' +
+      '<a href="../participation/" class="btn btn-secondary btn-sm" style="font-size:10px;">Comment</a></div>';
+  } else if (type === 'lake') {
+    html = '<div style="margin-bottom:10px;"><div style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:4px;">' + props.name + '</div>' +
+      '<span class="badge badge-published" style="font-size:10px;">Lake</span></div>' +
+      '<table style="width:100%; font-size:11px; border-collapse:collapse;">' +
+      '<tr><td style="padding:3px 0; color:#64748b;">ID</td><td style="font-family:monospace;">' + props.id + '</td></tr>' +
+      '<tr><td style="padding:3px 0; color:#64748b;">Eco. Status</td><td>' + props.eco + '</td></tr>' +
+      '</table>' +
+      '<div style="margin-top:10px;"><a href="../water-bodies/" class="btn btn-primary btn-sm" style="font-size:10px;">Details</a></div>';
+  }
+  document.getElementById('feature-info-content').innerHTML = html;
+}
+
+// ─── Update coords display ───────────────────────────────
+wisMap.on('mousemove', function(e) {
+  document.getElementById('coords-display').textContent =
+    'Lat: ' + e.latlng.lat.toFixed(4) + ' | Lon: ' + e.latlng.lng.toFixed(4) + ' | CRS: WGS84';
+});
+
+// ─── Layer toggle ────────────────────────────────────────
+function toggleLayer(id, show) {
+  var layerMap = { rivers: riverLayer, lakes: lakeLayer, stations: stationMarkers };
+  if (layerMap[id]) {
+    if (show) wisMap.addLayer(layerMap[id]);
+    else wisMap.removeLayer(layerMap[id]);
+  }
+}
+
+function switchBasemap(type) {
+  wisMap.removeLayer(osmLayer);
+  wisMap.removeLayer(satelliteLayer);
+  if (type === 'osm') osmLayer.addTo(wisMap);
+  else if (type === 'satellite') satelliteLayer.addTo(wisMap);
+  else osmLayer.addTo(wisMap);
+}
+
+function toggleMeasure() {
+  alert('Measurement tool: Click points on map to measure distance. Feature in production build.');
+}
+</script>
+  </main>
+</div>
+
+<script>
+// ─── Tab switching ─────────────────────────────────────────
+function switchTab(groupId, tabId) {
+  document.querySelectorAll('[data-tab-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-panel-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-tab-group="' + groupId + '"][data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelector('[data-panel-group="' + groupId + '"][data-panel="' + tabId + '"]').classList.add('active');
+}
+
+// ─── Search filter ─────────────────────────────────────────
+function filterTable(inputId, tableId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+}
+
+// ─── Sidebar highlight ─────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-item-active'));
+    el.classList.add('nav-item-active');
+  });
+});
+</script>
+</body>
+</html>

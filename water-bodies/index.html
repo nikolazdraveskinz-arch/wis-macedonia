@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water Bodies Registry — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root {
+      --nav-width: 260px;
+      --header-height: 64px;
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --accent: #0891b2;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #1a56db;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: var(--nav-width); background: var(--sidebar-bg);
+      display: flex; flex-direction: column; z-index: 50;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      overflow-y: auto; scrollbar-width: thin; scrollbar-color: #334155 transparent;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+    .logo-block { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-text-main { font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+    .logo-text-sub { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+    .rbmp-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 5px; background: #1e293b; color: #38bdf8; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+    
+    /* Nav */
+    nav { flex: 1; padding: 12px 8px; }
+    .nav-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; padding: 8px 10px 4px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      color: var(--sidebar-text); text-decoration: none; font-size: 13px; font-weight: 500;
+      margin-bottom: 2px; transition: all 0.15s; position: relative;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+    .nav-item-active { background: var(--sidebar-active) !important; color: #fff !important; }
+    .nav-icon { width: 18px; text-align: center; font-size: 13px; opacity: 0.8; }
+    .nav-label { flex: 1; }
+    .nav-badge { background: #ef4444; color: white; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    
+    /* User area */
+    .sidebar-user {
+      padding: 12px 14px; border-top: 1px solid #1e293b; display: flex; align-items: center;
+      gap: 10px; flex-shrink: 0;
+    }
+    .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+    .user-role { font-size: 10px; color: #64748b; }
+    .user-logout { margin-left: auto; color: #475569; font-size: 12px; cursor: pointer; padding: 4px; }
+    .user-logout:hover { color: #ef4444; }
+    
+    /* Main content */
+    .main-wrapper { margin-left: var(--nav-width); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Header */
+    .top-header {
+      height: var(--header-height); background: white; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      position: sticky; top: 0; z-index: 40; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .page-title-wrap h1 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+    .breadcrumb { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .header-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; background: white; color: #475569; font-size: 12px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .header-btn:hover { background: #f8fafc; color: #1e293b; }
+    .header-btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .header-btn-primary:hover { background: var(--primary-dark); }
+    .notification-dot { position: relative; }
+    .notification-dot::after { content: ''; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; border: 1px solid white; }
+    
+    /* Content area */
+    .content-area { flex: 1; padding: 24px; overflow-x: hidden; }
+    
+    /* Cards */
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    .card-body { padding: 20px; }
+    
+    /* KPI Cards */
+    .kpi-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.15s, box-shadow 0.15s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .kpi-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .kpi-value { font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 2px; }
+    .kpi-label { font-size: 12px; color: #64748b; font-weight: 500; }
+    .kpi-trend { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #059669; }
+    .trend-down { color: #dc2626; }
+    .trend-neutral { color: #64748b; }
+    
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-good, .badge-high, .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-moderate, .badge-medium, .badge-in-review, .badge-in-implementation { background: #fef3c7; color: #92400e; }
+    .badge-poor, .badge-low, .badge-pending, .badge-planned { background: #fee2e2; color: #991b1b; }
+    .badge-active, .badge-published { background: #dbeafe; color: #1e40af; }
+    .badge-inactive, .badge-completed { background: #f1f5f9; color: #475569; }
+    .badge-achieved { background: #d1fae5; color: #065f46; }
+    .badge-bad { background: #4b0000; color: #fca5a5; }
+    .badge-under-investigation { background: #fde8d8; color: #9a3412; }
+    
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .data-table tr:hover td { background: #f8fafc; }
+    .data-table tr:last-child td { border-bottom: none; }
+    
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 8px 12px 8px 36px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: white; color: #1e293b; position: relative; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; background: white; color: #475569; cursor: pointer; }
+    
+    /* Progress bar */
+    .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    
+    /* Tabs */
+    .tab-nav { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; gap: 0; }
+    .tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .tab-btn:hover { color: #1e293b; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    
+    /* Map */
+    #wis-map { border-radius: 12px; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; margin-bottom: 18px; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+    
+    /* Stat grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .stat-item { text-align: center; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #f1f5f9; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+    
+    /* Scrollable table container */
+    .table-container { overflow-x: auto; }
+    
+    /* Map controls */
+    .map-panel { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .layer-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .layer-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    
+    /* Alert banners */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    
+    /* Tooltip */
+    .tooltip-wrap { position: relative; cursor: help; }
+    
+    /* Smooth hover for rows */
+    tr { transition: background 0.1s; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; --nav-width: 220px; }
+      .main-wrapper { margin-left: 220px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-wrapper { margin-left: 0; }
+    }
+    
+    /* Identifier pill */
+    .id-pill { font-family: monospace; font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; }
+    
+    /* Action buttons */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    
+    /* WFD Status colors */
+    .eco-high { color: #1a56db; font-weight: 600; }
+    .eco-good { color: #059669; font-weight: 600; }
+    .eco-moderate { color: #d97706; font-weight: 600; }
+    .eco-poor { color: #dc2626; font-weight: 600; }
+    .eco-bad { color: #7f1d1d; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-block">
+      <div class="logo-icon">
+        <i class="fas fa-water" style="color:white; font-size:18px;"></i>
+      </div>
+      <div>
+        <div class="logo-text-main">WIS Macedonia</div>
+        <div class="logo-text-sub">Water Information System</div>
+      </div>
+    </div>
+    <div class="rbmp-pill">
+      <i class="fas fa-circle" style="font-size:6px;"></i>
+      RBMP 2nd Cycle · 2019–2027
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section-title">Core Modules</div>
+    
+      <a href="../" class="nav-item ">
+        <i class="fas fa-chart-line nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+        
+      </a>
+      <a href="../map/" class="nav-item ">
+        <i class="fas fa-map nav-icon"></i>
+        <span class="nav-label">Map Viewer</span>
+        
+      </a>
+      <a href="../water-bodies/" class="nav-item nav-item-active">
+        <i class="fas fa-water nav-icon"></i>
+        <span class="nav-label">Water Bodies</span>
+        <span class="nav-badge">156</span>
+      </a>
+      <a href="../monitoring/" class="nav-item ">
+        <i class="fas fa-satellite-dish nav-icon"></i>
+        <span class="nav-label">Monitoring</span>
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="../pressures/" class="nav-item ">
+        <i class="fas fa-industry nav-icon"></i>
+        <span class="nav-label">Pressures & Impacts</span>
+        
+      </a>
+      <a href="../permits/" class="nav-item ">
+        <i class="fas fa-file-contract nav-icon"></i>
+        <span class="nav-label">Water Book</span>
+        <span class="nav-badge">8</span>
+      </a>
+      <a href="../measures/" class="nav-item ">
+        <i class="fas fa-tasks nav-icon"></i>
+        <span class="nav-label">Measures</span>
+        
+      </a>
+      <a href="../metadata/" class="nav-item ">
+        <i class="fas fa-database nav-icon"></i>
+        <span class="nav-label">Metadata</span>
+        
+      </a>
+      <a href="../participation/" class="nav-item ">
+        <i class="fas fa-users nav-icon"></i>
+        <span class="nav-label">Public Participation</span>
+        <span class="nav-badge">23</span>
+      </a>
+      <a href="../download/" class="nav-item ">
+        <i class="fas fa-download nav-icon"></i>
+        <span class="nav-label">Data Access</span>
+        
+      </a>
+      <a href="../reporting/" class="nav-item ">
+        <i class="fas fa-chart-bar nav-icon"></i>
+        <span class="nav-label">WISE Reporting</span>
+        
+      </a>
+      <a href="../users/" class="nav-item ">
+        <i class="fas fa-user-shield nav-icon"></i>
+        <span class="nav-label">User Management</span>
+        
+      </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">SA</div>
+    <div>
+      <div class="user-name">System Administrator</div>
+      <div class="user-role">Administrator</div>
+    </div>
+    <a href="../login/" class="user-logout" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Water Bodies Registry</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn notification-dot" title="Notifications">
+        <i class="fas fa-bell"></i>
+      </button>
+      <button class="header-btn" title="Help">
+        <i class="fas fa-question-circle"></i>
+        <span>Help</span>
+      </button>
+      <a href="../download/" class="header-btn header-btn-primary">
+        <i class="fas fa-download"></i>
+        <span>Export</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="content-area">
+    
+<!-- ═══ HEADER STATS ═══ -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#1a56db;">89</div>
+    <div style="font-size:12px; color:#64748b;">River Water Bodies</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">4 river basins</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#0891b2;">14</div>
+    <div style="font-size:12px; color:#64748b;">Lake Water Bodies</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">Natural + Reservoirs</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#8b5cf6;">34</div>
+    <div style="font-size:12px; color:#64748b;">Groundwater Bodies</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">Alluvial + Karst</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#059669;">53%</div>
+    <div style="font-size:12px; color:#64748b;">At Good Status</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">WFD objective</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#d97706;">2027</div>
+    <div style="font-size:12px; color:#64748b;">Next Deadline</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">25 water bodies</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#ef4444;">2033</div>
+    <div style="font-size:12px; color:#64748b;">Extended Deadline</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">18 water bodies</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN CARD ═══ -->
+<div class="card">
+  <!-- Tabs -->
+  <div style="padding:0 20px;">
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab-group="wb" data-tab="list" onclick="switchTab('wb','list')"><i class="fas fa-list" style="margin-right:5px;"></i>Water Bodies Registry</button>
+      <button class="tab-btn" data-tab-group="wb" data-tab="status" onclick="switchTab('wb','status')"><i class="fas fa-chart-bar" style="margin-right:5px;"></i>Status Analysis</button>
+      <button class="tab-btn" data-tab-group="wb" data-tab="identifiers" onclick="switchTab('wb','identifiers')"><i class="fas fa-fingerprint" style="margin-right:5px;"></i>Identifier Management</button>
+    </div>
+  </div>
+
+  <!-- Tab: List -->
+  <div class="tab-panel active" data-panel-group="wb" data-panel="list">
+    <div class="filter-bar">
+      <div class="search-wrap" style="flex:1; max-width:280px;">
+        <i class="fas fa-search"></i>
+        <input class="search-input" id="wb-search" placeholder="Search water bodies…" oninput="filterTable('wb-search','wb-table')">
+      </div>
+      <select class="filter-select">
+        <option>All Basins</option>
+        <option>Vardar</option>
+        <option>Black Drim</option>
+        <option>Strumica</option>
+        <option>Bregalnica</option>
+      </select>
+      <select class="filter-select">
+        <option>All Types</option>
+        <option>River</option>
+        <option>Lake</option>
+        <option>Groundwater</option>
+      </select>
+      <select class="filter-select">
+        <option>All Statuses</option>
+        <option>High</option>
+        <option>Good</option>
+        <option>Moderate</option>
+        <option>Poor</option>
+        <option>Bad</option>
+      </select>
+      <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add WB</button>
+      <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table" id="wb-table">
+        <thead><tr>
+          <th>Permanent ID</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>River Basin</th>
+          <th>Dimension</th>
+          <th>Eco. Status</th>
+          <th>Chem. Status</th>
+          <th>WFD Goal</th>
+          <th>Pressures</th>
+          <th>Monitored</th>
+          <th>Actions</th>
+        </tr></thead>
+        <tbody>
+    <tr>
+      <td><span class="id-pill">MK-VAR-RW-001</span></td>
+      <td><strong style="color:#0f172a;">Vardar - Negotino</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Vardar</td>
+      <td>42.3 km</td>
+      <td><span class="eco-moderate">Moderate</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">2027</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Point source</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-RW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-RW-002</span></td>
+      <td><strong style="color:#0f172a;">Treska - Mavrovo</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Vardar</td>
+      <td>28.1 km</td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Achieved</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Hydro-morphology</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-RW-002')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-RW-003</span></td>
+      <td><strong style="color:#0f172a;">Crna Reka - Middle</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Vardar</td>
+      <td>67.4 km</td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="eco-moderate">Moderate</span></td>
+      <td><span class="badge badge-poor" style="font-size:10px;">2033</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Urban</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-RW-003')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-LW-001</span></td>
+      <td><strong style="color:#0f172a;">Dojran Lake</strong></td>
+      <td><span class="badge badge-published" style="font-size:10px;">Lake</span></td>
+      <td>Vardar</td>
+      <td>42.9 km²</td>
+      <td><span class="eco-moderate">Moderate</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">2027</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Water extraction</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-LW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-LW-002</span></td>
+      <td><strong style="color:#0f172a;">Ohrid Lake</strong></td>
+      <td><span class="badge badge-published" style="font-size:10px;">Lake</span></td>
+      <td>Black Drim</td>
+      <td>358 km²</td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Achieved</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Tourism</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Urban</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-LW-002')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-GW-001</span></td>
+      <td><strong style="color:#0f172a;">Pelagonia Alluvial</strong></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">Groundwater</span></td>
+      <td>Vardar</td>
+      <td>4100 km²</td>
+      <td>Q: Good</td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">2027</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture - nitrates</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-GW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-BLA-RW-001</span></td>
+      <td><strong style="color:#0f172a;">Black Drim - Upper</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Black Drim</td>
+      <td>34.7 km</td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Achieved</span></td>
+      <td></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-BLA-RW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-STR-RW-001</span></td>
+      <td><strong style="color:#0f172a;">Strumica - Lower</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Strumica</td>
+      <td>22.8 km</td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="badge badge-poor" style="font-size:10px;">2033</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Industry</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Urban</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-STR-RW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 20px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-size:11px; color:#64748b;">Showing 8 of 137 water bodies</span>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-secondary btn-sm">← Prev</button>
+        <button class="btn btn-secondary btn-sm" style="background:#1a56db; color:white; border-color:#1a56db;">1</button>
+        <button class="btn btn-secondary btn-sm">2</button>
+        <button class="btn btn-secondary btn-sm">3</button>
+        <button class="btn btn-secondary btn-sm">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Status Analysis -->
+  <div class="tab-panel" data-panel-group="wb" data-panel="status">
+    <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+      <div>
+        <h4 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 12px;">Overall Ecological Status</h4>
+        <canvas id="overallEcoChart" height="220"></canvas>
+      </div>
+      <div>
+        <h4 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 12px;">By River Basin</h4>
+        <canvas id="basinChart" height="220"></canvas>
+      </div>
+      <div>
+        <h4 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 12px;">WFD Deadline Distribution</h4>
+        <canvas id="deadlineChart" height="220"></canvas>
+        <div style="margin-top:12px; font-size:11px; color:#64748b; line-height:1.6;">
+          <div>● <strong>53%</strong> already at or above good status</div>
+          <div>● <strong>28%</strong> target: Good by 2027</div>
+          <div>● <strong>19%</strong> target: Good by 2033 (Art. 4(4))</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 20px 20px;">
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:14px;">
+        <div style="font-size:12px; font-weight:700; color:#1e40af; margin-bottom:8px;"><i class="fas fa-info-circle"></i> WFD Status Classification Note</div>
+        <div style="font-size:11px; color:#1e40af; line-height:1.6;">
+          Status classification follows the WFD Annex V biological quality elements, supported by physico-chemical and hydromorphological supporting elements.
+          Classification is based on the ICES approach using national boundary setting and intercalibration results agreed under EU WFD CIS process.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Identifiers -->
+  <div class="tab-panel" data-panel-group="wb" data-panel="identifiers">
+    <div style="padding:20px;">
+      <div class="alert alert-info" style="margin-bottom:16px;">
+        <i class="fas fa-fingerprint"></i>
+        <span>Permanent identifiers are immutable after assignment. They follow the INSPIRE WFD schema: <code style="background:#dbeafe; padding:1px 4px; border-radius:3px;">MK-{BASIN}-{TYPE}-{NUMBER}</code></span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="card" style="padding:16px; border:1px solid #e2e8f0;">
+          <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Identifier Schema</h4>
+          <div style="font-family:monospace; font-size:11px; background:#f8fafc; padding:12px; border-radius:7px; line-height:1.8;">
+            <div><span style="color:#1a56db;">MK</span> — Country code (ISO 3166-1)</div>
+            <div><span style="color:#059669;">VAR/BLA/STR/BRE</span> — Basin code</div>
+            <div><span style="color:#8b5cf6;">RW/LW/GW</span> — Water body type</div>
+            <div><span style="color:#f97316;">001..999</span> — Sequential number</div>
+            <div style="margin-top:6px; padding-top:6px; border-top:1px solid #e2e8f0;">
+              Example: <strong>MK-VAR-RW-001</strong>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:16px; border:1px solid #e2e8f0;">
+          <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Identifier Registry Stats</h4>
+          <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="stat-item"><div class="stat-val" style="color:#1a56db;">137</div><div class="stat-lbl">Total Assigned</div></div>
+            <div class="stat-item"><div class="stat-val" style="color:#059669;">137</div><div class="stat-lbl">Active</div></div>
+            <div class="stat-item"><div class="stat-val" style="color:#d97706;">0</div><div class="stat-lbl">Deprecated</div></div>
+            <div class="stat-item"><div class="stat-val" style="color:#64748b;">2</div><div class="stat-lbl">Pending</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DETAIL MODAL (hidden) ═══ -->
+<div id="wb-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center;" onclick="if(event.target===this)closeWBModal()">
+  <div style="background:white; border-radius:14px; width:640px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);" id="wb-modal-content">
+  </div>
+</div>
+
+<script>
+function showWBDetails(id) {
+  var wb = [{"id":"MK-VAR-RW-001","name":"Vardar - Negotino","type":"River","basin":"Vardar","length":42.3,"ecoStatus":"Moderate","chemStatus":"Good","wfd":"2027","pressures":["Agriculture","Point source"],"monitoring":true},{"id":"MK-VAR-RW-002","name":"Treska - Mavrovo","type":"River","basin":"Vardar","length":28.1,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":["Hydro-morphology"],"monitoring":true},{"id":"MK-VAR-RW-003","name":"Crna Reka - Middle","type":"River","basin":"Vardar","length":67.4,"ecoStatus":"Poor","chemStatus":"Moderate","wfd":"2033","pressures":["Agriculture","Urban"],"monitoring":true},{"id":"MK-VAR-LW-001","name":"Dojran Lake","type":"Lake","basin":"Vardar","area":42.9,"ecoStatus":"Moderate","chemStatus":"Good","wfd":"2027","pressures":["Water extraction"],"monitoring":true},{"id":"MK-VAR-LW-002","name":"Ohrid Lake","type":"Lake","basin":"Black Drim","area":358,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":["Tourism","Urban"],"monitoring":true},{"id":"MK-VAR-GW-001","name":"Pelagonia Alluvial","type":"Groundwater","basin":"Vardar","area":4100,"quanStatus":"Good","qualStatus":"Poor","wfd":"2027","pressures":["Agriculture - nitrates"],"monitoring":true},{"id":"MK-BLA-RW-001","name":"Black Drim - Upper","type":"River","basin":"Black Drim","length":34.7,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":[],"monitoring":true},{"id":"MK-STR-RW-001","name":"Strumica - Lower","type":"River","basin":"Strumica","length":22.8,"ecoStatus":"Poor","chemStatus":"Poor","wfd":"2033","pressures":["Agriculture","Industry","Urban"],"monitoring":true}].find(w => w.id === id);
+  if (!wb) return;
+  var ecoColor = { High: '#1a56db', Good: '#059669', Moderate: '#d97706', Poor: '#dc2626', Bad: '#7f1d1d' };
+  var eco = wb.ecoStatus || (wb.quanStatus + '/' + wb.qualStatus);
+  var col = ecoColor[wb.ecoStatus] || '#64748b';
+  document.getElementById('wb-modal-content').innerHTML = 
+    '<div style="padding:20px; border-bottom:1px solid #f1f5f9; background:linear-gradient(135deg, #1a56db08, #0891b208);">' +
+    '<div style="display:flex; align-items:start; justify-content:space-between;">' +
+    '<div><div style="font-size:16px; font-weight:800; color:#0f172a;">' + wb.name + '</div>' +
+    '<span class="id-pill" style="margin-top:4px; display:inline-block;">' + wb.id + '</span></div>' +
+    '<button onclick="closeWBModal()" style="border:none; background:#f1f5f9; border-radius:6px; width:28px; height:28px; cursor:pointer; font-size:14px;">✕</button>' +
+    '</div></div>' +
+    '<div style="padding:20px;">' +
+    '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">' +
+    '<div style="background:#f8fafc; padding:12px; border-radius:8px;"><div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">Ecological Status</div><div style="font-size:20px; font-weight:800; color:' + col + '; margin-top:3px;">' + eco + '</div></div>' +
+    '<div style="background:#f8fafc; padding:12px; border-radius:8px;"><div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">River Basin</div><div style="font-size:15px; font-weight:700; color:#0f172a; margin-top:3px;">' + wb.basin + '</div></div>' +
+    '</div>' +
+    '<table style="width:100%; border-collapse:collapse; font-size:12px;" class="data-table">' +
+    '<tr><td>Type</td><td>' + wb.type + '</td></tr>' +
+    '<tr><td>Dimension</td><td>' + (wb.length ? wb.length + ' km' : wb.area ? wb.area + ' km²' : '—') + '</td></tr>' +
+    '<tr><td>Chemical Status</td><td>' + (wb.chemStatus || wb.qualStatus || '—') + '</td></tr>' +
+    '<tr><td>WFD Objective</td><td>' + wb.wfd + '</td></tr>' +
+    '<tr><td>Pressures</td><td>' + ((wb.pressures || []).join(', ') || 'None identified') + '</td></tr>' +
+    '<tr><td>Monitored</td><td>' + (wb.monitoring ? 'Yes' : 'No') + '</td></tr>' +
+    '</table>' +
+    '<div style="display:flex; gap:8px; margin-top:16px;">' +
+    '<a href="../map/" class="btn btn-primary btn-sm"><i class="fas fa-map-pin"></i> View on Map</a>' +
+    '<a href="../monitoring/" class="btn btn-secondary btn-sm"><i class="fas fa-chart-line"></i> Monitoring Data</a>' +
+    '<a href="../pressures/" class="btn btn-secondary btn-sm"><i class="fas fa-industry"></i> Pressures</a>' +
+    '</div></div>';
+  document.getElementById('wb-modal').style.display = 'flex';
+}
+function closeWBModal() {
+  document.getElementById('wb-modal').style.display = 'none';
+}
+
+// Charts
+const overallCtx = document.getElementById('overallEcoChart').getContext('2d');
+new Chart(overallCtx, {
+  type: 'bar',
+  data: {
+    labels: ['High','Good','Moderate','Poor','Bad','N/A'],
+    datasets: [{ data: [12,42,31,16,5,17], backgroundColor: ['#1a56db','#31c48d','#faca15','#e74c3c','#7b1010','#9ca3af'], borderRadius: 4 }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{font:{size:10}}}, y:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}} } }
+});
+
+const basinCtx = document.getElementById('basinChart').getContext('2d');
+new Chart(basinCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Vardar','Black Drim','Strumica','Bregalnica'],
+    datasets: [
+      { label:'Good+', data:[48,14,5,10], backgroundColor:'#31c48d', borderRadius:3 },
+      { label:'<Good', data:[41,8,7,8], backgroundColor:'#e74c3c', borderRadius:3 }
+    ]
+  },
+  options: { responsive:true, scales:{ x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}}, y:{stacked:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}} }, plugins:{legend:{labels:{font:{size:10},boxWidth:10}}} }
+});
+
+const deadlineCtx = document.getElementById('deadlineChart').getContext('2d');
+new Chart(deadlineCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Achieved','2027','2033'],
+    datasets: [{ data:[73,25,19], backgroundColor:['#31c48d','#faca15','#e74c3c'], borderWidth:2, borderColor:'#fff' }]
+  },
+  options: { responsive:true, cutout:'60%', plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}} }
+});
+</script>
+  </main>
+</div>
+
+<script>
+// ─── Tab switching ─────────────────────────────────────────
+function switchTab(groupId, tabId) {
+  document.querySelectorAll('[data-tab-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-panel-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-tab-group="' + groupId + '"][data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelector('[data-panel-group="' + groupId + '"][data-panel="' + tabId + '"]').classList.add('active');
+}
+
+// ─── Search filter ─────────────────────────────────────────
+function filterTable(inputId, tableId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+}
+
+// ─── Sidebar highlight ─────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-item-active'));
+    el.classList.add('nav-item-active');
+  });
+});
+</script>
+</body>
+</html>

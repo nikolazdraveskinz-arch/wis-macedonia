@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Access & Download — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root {
+      --nav-width: 260px;
+      --header-height: 64px;
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --accent: #0891b2;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #1a56db;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: var(--nav-width); background: var(--sidebar-bg);
+      display: flex; flex-direction: column; z-index: 50;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      overflow-y: auto; scrollbar-width: thin; scrollbar-color: #334155 transparent;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+    .logo-block { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-text-main { font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+    .logo-text-sub { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+    .rbmp-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 5px; background: #1e293b; color: #38bdf8; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+    
+    /* Nav */
+    nav { flex: 1; padding: 12px 8px; }
+    .nav-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; padding: 8px 10px 4px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      color: var(--sidebar-text); text-decoration: none; font-size: 13px; font-weight: 500;
+      margin-bottom: 2px; transition: all 0.15s; position: relative;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+    .nav-item-active { background: var(--sidebar-active) !important; color: #fff !important; }
+    .nav-icon { width: 18px; text-align: center; font-size: 13px; opacity: 0.8; }
+    .nav-label { flex: 1; }
+    .nav-badge { background: #ef4444; color: white; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    
+    /* User area */
+    .sidebar-user {
+      padding: 12px 14px; border-top: 1px solid #1e293b; display: flex; align-items: center;
+      gap: 10px; flex-shrink: 0;
+    }
+    .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, #1a56db, #0891b2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+    .user-role { font-size: 10px; color: #64748b; }
+    .user-logout { margin-left: auto; color: #475569; font-size: 12px; cursor: pointer; padding: 4px; }
+    .user-logout:hover { color: #ef4444; }
+    
+    /* Main content */
+    .main-wrapper { margin-left: var(--nav-width); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Header */
+    .top-header {
+      height: var(--header-height); background: white; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      position: sticky; top: 0; z-index: 40; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .page-title-wrap h1 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+    .breadcrumb { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .header-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; background: white; color: #475569; font-size: 12px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .header-btn:hover { background: #f8fafc; color: #1e293b; }
+    .header-btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .header-btn-primary:hover { background: var(--primary-dark); }
+    .notification-dot { position: relative; }
+    .notification-dot::after { content: ''; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; border: 1px solid white; }
+    
+    /* Content area */
+    .content-area { flex: 1; padding: 24px; overflow-x: hidden; }
+    
+    /* Cards */
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    .card-body { padding: 20px; }
+    
+    /* KPI Cards */
+    .kpi-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.15s, box-shadow 0.15s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .kpi-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .kpi-value { font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 2px; }
+    .kpi-label { font-size: 12px; color: #64748b; font-weight: 500; }
+    .kpi-trend { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #059669; }
+    .trend-down { color: #dc2626; }
+    .trend-neutral { color: #64748b; }
+    
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-good, .badge-high, .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-moderate, .badge-medium, .badge-in-review, .badge-in-implementation { background: #fef3c7; color: #92400e; }
+    .badge-poor, .badge-low, .badge-pending, .badge-planned { background: #fee2e2; color: #991b1b; }
+    .badge-active, .badge-published { background: #dbeafe; color: #1e40af; }
+    .badge-inactive, .badge-completed { background: #f1f5f9; color: #475569; }
+    .badge-achieved { background: #d1fae5; color: #065f46; }
+    .badge-bad { background: #4b0000; color: #fca5a5; }
+    .badge-under-investigation { background: #fde8d8; color: #9a3412; }
+    
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .data-table tr:hover td { background: #f8fafc; }
+    .data-table tr:last-child td { border-bottom: none; }
+    
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 8px 12px 8px 36px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: white; color: #1e293b; position: relative; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; background: white; color: #475569; cursor: pointer; }
+    
+    /* Progress bar */
+    .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    
+    /* Tabs */
+    .tab-nav { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; gap: 0; }
+    .tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .tab-btn:hover { color: #1e293b; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    
+    /* Map */
+    #wis-map { border-radius: 12px; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; margin-bottom: 18px; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+    
+    /* Stat grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .stat-item { text-align: center; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #f1f5f9; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+    
+    /* Scrollable table container */
+    .table-container { overflow-x: auto; }
+    
+    /* Map controls */
+    .map-panel { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .layer-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .layer-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    
+    /* Alert banners */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    
+    /* Tooltip */
+    .tooltip-wrap { position: relative; cursor: help; }
+    
+    /* Smooth hover for rows */
+    tr { transition: background 0.1s; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; --nav-width: 220px; }
+      .main-wrapper { margin-left: 220px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-wrapper { margin-left: 0; }
+    }
+    
+    /* Identifier pill */
+    .id-pill { font-family: monospace; font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; }
+    
+    /* Action buttons */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    
+    /* WFD Status colors */
+    .eco-high { color: #1a56db; font-weight: 600; }
+    .eco-good { color: #059669; font-weight: 600; }
+    .eco-moderate { color: #d97706; font-weight: 600; }
+    .eco-poor { color: #dc2626; font-weight: 600; }
+    .eco-bad { color: #7f1d1d; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-block">
+      <div class="logo-icon">
+        <i class="fas fa-water" style="color:white; font-size:18px;"></i>
+      </div>
+      <div>
+        <div class="logo-text-main">WIS Macedonia</div>
+        <div class="logo-text-sub">Water Information System</div>
+      </div>
+    </div>
+    <div class="rbmp-pill">
+      <i class="fas fa-circle" style="font-size:6px;"></i>
+      RBMP 2nd Cycle · 2019–2027
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section-title">Core Modules</div>
+    
+      <a href="../" class="nav-item ">
+        <i class="fas fa-chart-line nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+        
+      </a>
+      <a href="../map/" class="nav-item ">
+        <i class="fas fa-map nav-icon"></i>
+        <span class="nav-label">Map Viewer</span>
+        
+      </a>
+      <a href="../water-bodies/" class="nav-item ">
+        <i class="fas fa-water nav-icon"></i>
+        <span class="nav-label">Water Bodies</span>
+        <span class="nav-badge">156</span>
+      </a>
+      <a href="../monitoring/" class="nav-item ">
+        <i class="fas fa-satellite-dish nav-icon"></i>
+        <span class="nav-label">Monitoring</span>
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="../pressures/" class="nav-item ">
+        <i class="fas fa-industry nav-icon"></i>
+        <span class="nav-label">Pressures & Impacts</span>
+        
+      </a>
+      <a href="../permits/" class="nav-item ">
+        <i class="fas fa-file-contract nav-icon"></i>
+        <span class="nav-label">Water Book</span>
+        <span class="nav-badge">8</span>
+      </a>
+      <a href="../measures/" class="nav-item ">
+        <i class="fas fa-tasks nav-icon"></i>
+        <span class="nav-label">Measures</span>
+        
+      </a>
+      <a href="../metadata/" class="nav-item ">
+        <i class="fas fa-database nav-icon"></i>
+        <span class="nav-label">Metadata</span>
+        
+      </a>
+      <a href="../participation/" class="nav-item ">
+        <i class="fas fa-users nav-icon"></i>
+        <span class="nav-label">Public Participation</span>
+        <span class="nav-badge">23</span>
+      </a>
+      <a href="../download/" class="nav-item nav-item-active">
+        <i class="fas fa-download nav-icon"></i>
+        <span class="nav-label">Data Access</span>
+        
+      </a>
+      <a href="../reporting/" class="nav-item ">
+        <i class="fas fa-chart-bar nav-icon"></i>
+        <span class="nav-label">WISE Reporting</span>
+        
+      </a>
+      <a href="../users/" class="nav-item ">
+        <i class="fas fa-user-shield nav-icon"></i>
+        <span class="nav-label">User Management</span>
+        
+      </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">SA</div>
+    <div>
+      <div class="user-name">System Administrator</div>
+      <div class="user-role">Administrator</div>
+    </div>
+    <a href="../login/" class="user-logout" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Data Access & Download</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn notification-dot" title="Notifications">
+        <i class="fas fa-bell"></i>
+      </button>
+      <button class="header-btn" title="Help">
+        <i class="fas fa-question-circle"></i>
+        <span>Help</span>
+      </button>
+      <a href="../download/" class="header-btn header-btn-primary">
+        <i class="fas fa-download"></i>
+        <span>Export</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="content-area">
+    
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">47</div><div style="font-size:12px; color:#64748b;">Datasets Available</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">8</div><div style="font-size:12px; color:#64748b;">API Endpoints</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#0891b2;">3</div><div style="font-size:12px; color:#64748b;">OGC Services</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">4</div><div style="font-size:12px; color:#64748b;">Download Formats</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">1,284</div><div style="font-size:12px; color:#64748b;">Downloads (30d)</div></div>
+</div>
+
+<div class="card">
+  <div style="padding:0 20px;">
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab-group="da" data-tab="download" onclick="switchTab('da','download')"><i class="fas fa-download" style="margin-right:5px;"></i>Dataset Download</button>
+      <button class="tab-btn" data-tab-group="da" data-tab="api" onclick="switchTab('da','api')"><i class="fas fa-code" style="margin-right:5px;"></i>REST API</button>
+      <button class="tab-btn" data-tab-group="da" data-tab="ogc" onclick="switchTab('da','ogc')"><i class="fas fa-globe" style="margin-right:5px;"></i>OGC Services</button>
+      <button class="tab-btn" data-tab-group="da" data-tab="apikey" onclick="switchTab('da','apikey')"><i class="fas fa-key" style="margin-right:5px;"></i>API Key Management</button>
+    </div>
+  </div>
+
+  <!-- Download Tab -->
+  <div class="tab-panel active" data-panel-group="da" data-panel="download">
+    <div style="padding:16px 20px;">
+      <div class="alert alert-info" style="margin-bottom:16px;">
+        <i class="fas fa-info-circle"></i>
+        <span>Data is provided under <strong>CC BY 4.0</strong> license unless otherwise stated. Cite as: Ministry of Environment and Physical Planning, North Macedonia, Water Information System, 2026.</span>
+      </div>
+
+      <!-- Quick download -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+        <div>
+          <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:5px;">Select Dataset</label>
+          <select class="filter-select" style="width:100%; padding:9px;">
+            <option>River Water Bodies — Full national dataset</option>
+            <option>Groundwater Bodies</option>
+            <option>Lake Water Bodies</option>
+            <option>Monitoring Stations Network</option>
+            <option>Water Monitoring Data — Time Series</option>
+            <option>Protected Areas — Drinking Water</option>
+            <option>Natura 2000 — Water-related sites</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:5px;">Format</label>
+          <div style="display:flex; gap:8px;">
+            
+            <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; padding:6px 10px; border:1px solid #e2e8f0; border-radius:7px; background:white;">
+              <input type="radio" name="dlformat" checked> GeoJSON
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; padding:6px 10px; border:1px solid #e2e8f0; border-radius:7px; background:white;">
+              <input type="radio" name="dlformat" > SHP
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; padding:6px 10px; border:1px solid #e2e8f0; border-radius:7px; background:white;">
+              <input type="radio" name="dlformat" > GPKG
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; padding:6px 10px; border:1px solid #e2e8f0; border-radius:7px; background:white;">
+              <input type="radio" name="dlformat" > CSV
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; padding:6px 10px; border:1px solid #e2e8f0; border-radius:7px; background:white;">
+              <input type="radio" name="dlformat" > GML
+            </label>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div>
+          <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:5px;">River Basin Filter</label>
+          <select class="filter-select" style="width:100%;"><option>All Basins</option><option>Vardar</option><option>Strumica</option></select>
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:5px;">CRS</label>
+          <select class="filter-select" style="width:100%;"><option>WGS84 (EPSG:4326)</option><option>MGI 1901 (EPSG:6204)</option><option>ETRS89 (EPSG:4258)</option></select>
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:5px;">Version</label>
+          <select class="filter-select" style="width:100%;"><option>Latest (v3.2, Jan 2024)</option><option>v3.1 (Jul 2023)</option><option>v3.0 (Jan 2022)</option></select>
+        </div>
+      </div>
+      <button class="btn btn-primary"><i class="fas fa-download"></i> Download Dataset</button>
+
+      <hr style="border:none; border-top:1px solid #f1f5f9; margin:20px 0;">
+
+      <!-- Dataset catalogue -->
+      <h4 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 12px;">Available Datasets</h4>
+      <div style="display:grid; gap:8px;">
+        
+        <div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #f1f5f9; border-radius:8px; background:#f8fafc;">
+          <div style="width:36px; height:36px; background:#eff6ff; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-draw-polygon" style="color:#1a56db; font-size:14px;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">River Water Bodies - North Macedonia</div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Vector - Polygon/Polyline · EPSG:6204 · v3.2 · Updated 2024-01-15</div>
+          </div>
+          <span class="badge badge-good" style="font-size:10px;">CC BY 4.0</span>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-primary btn-sm" style="font-size:10px;"><i class="fas fa-download"></i> GeoJSON</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;">SHP</button>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #f1f5f9; border-radius:8px; background:#f8fafc;">
+          <div style="width:36px; height:36px; background:#eff6ff; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-draw-polygon" style="color:#1a56db; font-size:14px;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">Groundwater Bodies - North Macedonia</div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Vector - Polygon · EPSG:6204 · v2.1 · Updated 2024-01-15</div>
+          </div>
+          <span class="badge badge-good" style="font-size:10px;">CC BY 4.0</span>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-primary btn-sm" style="font-size:10px;"><i class="fas fa-download"></i> GeoJSON</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;">SHP</button>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #f1f5f9; border-radius:8px; background:#f8fafc;">
+          <div style="width:36px; height:36px; background:#eff6ff; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-draw-polygon" style="color:#1a56db; font-size:14px;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">Surface Water Monitoring Network</div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Vector - Point · EPSG:4326 · v4.0 · Updated 2024-03-01</div>
+          </div>
+          <span class="badge badge-good" style="font-size:10px;">CC BY 4.0</span>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-primary btn-sm" style="font-size:10px;"><i class="fas fa-download"></i> GeoJSON</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;">SHP</button>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #f1f5f9; border-radius:8px; background:#f8fafc;">
+          <div style="width:36px; height:36px; background:#eff6ff; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-draw-polygon" style="color:#1a56db; font-size:14px;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">Protected Areas - Drinking Water</div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Vector - Polygon · EPSG:6204 · v1.5 · Updated 2023-09-20</div>
+          </div>
+          <span class="badge badge-good" style="font-size:10px;">CC BY 4.0</span>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-primary btn-sm" style="font-size:10px;"><i class="fas fa-download"></i> GeoJSON</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;">SHP</button>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #f1f5f9; border-radius:8px; background:#f8fafc;">
+          <div style="width:36px; height:36px; background:#f5f3ff; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-layer-group" style="color:#8b5cf6; font-size:14px;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:700; color:#0f172a;">DEM - Republic of North Macedonia 10m</div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Raster - GeoTIFF · EPSG:6204 · v2.0 · Updated 2023-06-01</div>
+          </div>
+          <span class="badge badge-good" style="font-size:10px;">Government Use</span>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-primary btn-sm" style="font-size:10px;"><i class="fas fa-download"></i> GeoJSON</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;">SHP</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Tab -->
+  <div class="tab-panel" data-panel-group="da" data-panel="api">
+    <div style="padding:16px 20px;">
+      <div class="alert alert-info" style="margin-bottom:16px;">
+        <i class="fas fa-code"></i>
+        <span>Base URL: <code style="background:#dbeafe; padding:1px 6px; border-radius:3px; font-size:12px;">https://wis.moepp.gov.mk/api/v1</code> — Authentication via API Key in header: <code style="background:#dbeafe; padding:1px 4px; border-radius:3px; font-size:12px;">X-API-Key: your_key</code></span>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Auth</th><th>Format</th><th>Try</th></tr></thead>
+        <tbody>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/api/v1/water-bodies</code></td>
+      <td style="font-size:11px;">List all water bodies with filtering</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">API Key</span></td>
+      <td style="font-size:11px; color:#64748b;">JSON/GeoJSON</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/api/v1/water-bodies/{id}</code></td>
+      <td style="font-size:11px;">Get specific water body by permanent ID</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">API Key</span></td>
+      <td style="font-size:11px; color:#64748b;">JSON/GeoJSON</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/api/v1/monitoring-stations</code></td>
+      <td style="font-size:11px;">List monitoring stations</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">API Key</span></td>
+      <td style="font-size:11px; color:#64748b;">JSON/GeoJSON</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/api/v1/monitoring-data/{stationId}</code></td>
+      <td style="font-size:11px;">Get monitoring time-series data</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">API Key</span></td>
+      <td style="font-size:11px; color:#64748b;">JSON</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/api/v1/permits</code></td>
+      <td style="font-size:11px;">List water permits (filtered by role)</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">Bearer JWT</span></td>
+      <td style="font-size:11px; color:#64748b;">JSON</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/api/v1/measures</code></td>
+      <td style="font-size:11px;">List programme of measures</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">API Key</span></td>
+      <td style="font-size:11px; color:#64748b;">JSON</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/ows/wms</code></td>
+      <td style="font-size:11px;">OGC WMS - Map tile service</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">None (public)</span></td>
+      <td style="font-size:11px; color:#64748b;">PNG/GeoTIFF</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-active" style="font-size:10px;">GET</span></td>
+      <td><code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#1a56db;">/ows/wfs</code></td>
+      <td style="font-size:11px;">OGC WFS - Feature service</td>
+      <td><span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">API Key</span></td>
+      <td style="font-size:11px; color:#64748b;">GeoJSON/GML</td>
+      <td><button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-play"></i> Try</button></td>
+    </tr></tbody>
+      </table>
+      <hr style="border:none; border-top:1px solid #f1f5f9; margin:20px 0;">
+      <h4 style="font-size:13px; font-weight:700; margin:0 0 10px;">Example Request</h4>
+      <div style="background:#0f172a; border-radius:8px; padding:16px; font-family:monospace; font-size:12px; color:#e2e8f0; overflow-x:auto;">
+        <span style="color:#64748b;"># Get all river water bodies in Vardar Basin</span><br>
+        <span style="color:#38bdf8;">curl</span> <span style="color:#fbbf24;">-H</span> <span style="color:#34d399;">"X-API-Key: your_api_key"</span> <span style="color:#e2e8f0;"></span><br>
+        &nbsp;&nbsp;<span style="color:#38bdf8;">"https://wis.moepp.gov.mk/api/v1/water-bodies?basin=VAR&type=river&format=geojson"</span><br><br>
+        <span style="color:#64748b;"># Response:</span><br>
+        {<br>
+        &nbsp;&nbsp;<span style="color:#fbbf24;">"total"</span>: 89,<br>
+        &nbsp;&nbsp;<span style="color:#fbbf24;">"page"</span>: 1,<br>
+        &nbsp;&nbsp;<span style="color:#fbbf24;">"data"</span>: [<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:#fbbf24;">"id"</span>: <span style="color:#34d399;">"MK-VAR-RW-001"</span>, <span style="color:#fbbf24;">"name"</span>: <span style="color:#34d399;">"Vardar - Negotino"</span>, ... }<br>
+        &nbsp;&nbsp;]<br>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- OGC Services Tab -->
+  <div class="tab-panel" data-panel-group="da" data-panel="ogc">
+    <div style="padding:20px;">
+      
+      <div style="border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:12px;">
+        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a;">WMS — Web Map Service</div>
+            <code style="font-size:11px; color:#1a56db; background:#eff6ff; padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block;">https://wis.moepp.gov.mk/ows/wms</code>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <span class="badge badge-active" style="font-size:10px;">v1.3.0</span>
+            <span class="badge badge-good" style="font-size:10px;">Public</span>
+          </div>
+        </div>
+        <div style="font-size:11px; color:#64748b;">Render map tiles for all published spatial layers. Supports EPSG:4326 and EPSG:6204.</div>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-external-link-alt"></i> Get Capabilities</button>
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-book"></i> Documentation</button>
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-copy"></i> Copy URL</button>
+        </div>
+      </div>
+      <div style="border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:12px;">
+        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a;">WFS — Web Feature Service</div>
+            <code style="font-size:11px; color:#1a56db; background:#eff6ff; padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block;">https://wis.moepp.gov.mk/ows/wfs</code>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <span class="badge badge-active" style="font-size:10px;">v2.0.0</span>
+            <span class="badge badge-moderate" style="font-size:10px;">API Key</span>
+          </div>
+        </div>
+        <div style="font-size:11px; color:#64748b;">Access vector feature data with spatial and attribute filtering. Returns GeoJSON or GML.</div>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-external-link-alt"></i> Get Capabilities</button>
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-book"></i> Documentation</button>
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-copy"></i> Copy URL</button>
+        </div>
+      </div>
+      <div style="border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:12px;">
+        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a;">WMTS — Tile Service</div>
+            <code style="font-size:11px; color:#1a56db; background:#eff6ff; padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block;">https://wis.moepp.gov.mk/ows/wmts</code>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <span class="badge badge-active" style="font-size:10px;">v1.0.0</span>
+            <span class="badge badge-good" style="font-size:10px;">Public</span>
+          </div>
+        </div>
+        <div style="font-size:11px; color:#64748b;">Pre-rendered cached map tiles for base layers and thematic overlays.</div>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-external-link-alt"></i> Get Capabilities</button>
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-book"></i> Documentation</button>
+          <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-copy"></i> Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key Tab -->
+  <div class="tab-panel" data-panel-group="da" data-panel="apikey">
+    <div style="padding:20px; max-width:700px;">
+      <div style="margin-bottom:20px;">
+        <h4 style="font-size:13px; font-weight:700; margin:0 0 12px;">Your API Keys</h4>
+        
+        <div style="border:1px solid #e2e8f0; border-radius:9px; padding:14px; margin-bottom:10px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div style="font-size:12px; font-weight:700; color:#334155;">Production Key</div>
+            <span class="badge badge-good" style="font-size:10px;">Active</span>
+          </div>
+          <code style="font-size:11px; color:#475569; background:#f8fafc; padding:6px 10px; border-radius:6px; display:block; margin-bottom:8px;">wis_prod_••••••••••••••••••••••••••••abc1</code>
+          <div style="display:flex; gap:16px; font-size:10px; color:#94a3b8;">
+            <span>Created: 2024-01-10</span>
+            <span>Last used: 2024-04-07</span>
+            <span>Requests: 12,840</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-sync"></i> Rotate</button>
+            <button class="btn btn-danger btn-sm" style="font-size:10px;"><i class="fas fa-trash"></i> Revoke</button>
+          </div>
+        </div>
+        <div style="border:1px solid #e2e8f0; border-radius:9px; padding:14px; margin-bottom:10px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div style="font-size:12px; font-weight:700; color:#334155;">Development Key</div>
+            <span class="badge badge-good" style="font-size:10px;">Active</span>
+          </div>
+          <code style="font-size:11px; color:#475569; background:#f8fafc; padding:6px 10px; border-radius:6px; display:block; margin-bottom:8px;">wis_dev_••••••••••••••••••••••••••••def2</code>
+          <div style="display:flex; gap:16px; font-size:10px; color:#94a3b8;">
+            <span>Created: 2024-02-15</span>
+            <span>Last used: 2024-04-05</span>
+            <span>Requests: 342</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn btn-secondary btn-sm" style="font-size:10px;"><i class="fas fa-sync"></i> Rotate</button>
+            <button class="btn btn-danger btn-sm" style="font-size:10px;"><i class="fas fa-trash"></i> Revoke</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Generate New Key</button>
+      </div>
+    </div>
+  </div>
+</div>
+  </main>
+</div>
+
+<script>
+// ─── Tab switching ─────────────────────────────────────────
+function switchTab(groupId, tabId) {
+  document.querySelectorAll('[data-tab-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-panel-group="' + groupId + '"]').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-tab-group="' + groupId + '"][data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelector('[data-panel-group="' + groupId + '"][data-panel="' + tabId + '"]').classList.add('active');
+}
+
+// ─── Search filter ─────────────────────────────────────────
+function filterTable(inputId, tableId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+}
+
+// ─── Sidebar highlight ─────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-item-active'));
+    el.classList.add('nav-item-active');
+  });
+});
+</script>
+</body>
+</html>
