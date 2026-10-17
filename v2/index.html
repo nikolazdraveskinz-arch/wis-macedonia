@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public portal — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="assets/wis.css">
+</head>
+<body data-base="" data-active="home" data-portal="public" style="background:#f1f5f9;">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<div class="pub-hero">
+  <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;opacity:.8;">Vardar River Basin District</div>
+  <h1 style="font-size:30px;font-weight:800;margin:6px 0 10px;">Water information for the Vardar River Basin Management Plan</h1>
+  <p style="font-size:15px;max-width:720px;opacity:.92;margin:0 0 20px;">Explore the state of rivers, lakes and groundwater, read the plan's documents, and tell the Ministry what you think. No account is needed to view; register to comment.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <a href="explore/" class="btn" style="background:#fff;color:#1e429f;padding:10px 16px;font-size:13px;"><i class="fas fa-water"></i>Explore water bodies</a>
+    <a href="participate/" class="btn" style="background:rgba(255,255,255,.15);color:#fff;padding:10px 16px;font-size:13px;border:1px solid rgba(255,255,255,.4);"><i class="fas fa-comments"></i>Have your say</a>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:22px;">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn" style="color:#7c3aed;margin-right:6px;"></i>Public consultation</h3><span class="phase-chip chip-it3">Full module in iteration 3</span></div>
+    <div class="card-body">
+      <p style="font-size:13px;color:#475569;margin-top:0;">The plan is consulted in three stages, each open for written comments for at least six months (Water Framework Directive, Article 14).</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div class="stat-item" style="text-align:left;"><div style="font-size:11px;color:#64748b;">Stage 1</div><b style="font-size:13px;">Timetable and work programme</b><div style="margin-top:6px;"><span class="badge badge-inactive">Not started</span></div></div>
+        <div class="stat-item" style="text-align:left;"><div style="font-size:11px;color:#64748b;">Stage 2</div><b style="font-size:13px;">Significant water management issues</b><div style="margin-top:6px;"><span class="badge badge-inactive">Not started</span></div></div>
+        <div class="stat-item" style="text-align:left;"><div style="font-size:11px;color:#64748b;">Stage 3</div><b style="font-size:13px;">Draft River Basin Management Plan</b><div style="margin-top:6px;"><span class="badge badge-inactive">Not started</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="fas fa-user-plus" style="color:#059669;margin-right:6px;"></i>Take part</h3></div>
+    <div class="card-body" style="font-size:13px;color:#475569;">
+      <p style="margin-top:0;">Register with your e-mail to comment, follow consultations and track what happened to your comments.</p>
+      <a href="register/" class="btn btn-primary"><i class="fas fa-user-plus"></i>Register</a>
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:0;">Institutions and consultants can request technical access during registration.</p>
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px;">
+  <a href="explore/" class="kpi-card" style="text-decoration:none;"><div class="kpi-icon" style="background:#dbeafe;color:#1a56db;"><i class="fas fa-water"></i></div><div style="font-weight:700;margin-top:10px;color:#0f172a;">Water bodies</div><div class="kpi-label">Rivers, lakes and groundwater, with status</div></a>
+  <a href="explore/#map" class="kpi-card" style="text-decoration:none;"><div class="kpi-icon" style="background:#cffafe;color:#0891b2;"><i class="fas fa-map"></i></div><div style="font-weight:700;margin-top:10px;color:#0f172a;">Map</div><div class="kpi-label">Public map viewer (iteration 3)</div></a>
+  <a href="participate/#documents" class="kpi-card" style="text-decoration:none;"><div class="kpi-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-file-alt"></i></div><div style="font-weight:700;margin-top:10px;color:#0f172a;">RBMP documents</div><div class="kpi-label">Drafts, final plan and summaries</div></a>
+  <a href="explore/#open-data" class="kpi-card" style="text-decoration:none;"><div class="kpi-icon" style="background:#d1fae5;color:#059669;"><i class="fas fa-download"></i></div><div style="font-weight:700;margin-top:10px;color:#0f172a;">Open data</div><div class="kpi-label">Downloads, WMS/WFS and metadata</div></a>
+</div>
+
+<div class="alert alert-info" style="margin-top:18px;"><i class="fas fa-info-circle"></i><div><b>Mockup v2 – iteration 2.</b> This public portal is new in v2 (ToR Task 7). It opens without login; the internal portal for institutions is behind <a href="login/" style="font-weight:600;">Sign in</a>. Public dashboards follow in iteration 4. All content is placeholder.</div></div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="assets/shell.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pressures & Impacts — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="pressures" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Pressures & Impacts</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-industry"></i><div><b>Imported results.</b> Pressure and impact analyses are produced outside the WIS by the pressures and impacts study (Subproject 3) and imported as datasets DS-VAR-006/007 with their source and date. The WIS stores, links and publishes them; it does not run the analysis.</div></div>
+
+    
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#ef4444;">181</div><div style="font-size:12px; color:#64748b;">Total Significant Pressures</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">48</div><div style="font-size:12px; color:#64748b;">Diffuse Agriculture</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#dc2626;">34</div><div style="font-size:12px; color:#64748b;">Urban Wastewater</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">22</div><div style="font-size:12px; color:#64748b;">Industrial Discharge</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">31</div><div style="font-size:12px; color:#64748b;">Hydromorphological</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#0891b2;">73</div><div style="font-size:12px; color:#64748b;">WBs Affected</div></div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 380px; gap:16px;">
+  <div class="card">
+    <div style="padding:0 20px;">
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab-group="pres" data-tab="overview" onclick="switchTab('pres','overview')">Pressure Overview</button>
+        <button class="tab-btn" data-tab-group="pres" data-tab="linkage" onclick="switchTab('pres','linkage')">Pressure-Impact Linkage</button>
+        <button class="tab-btn" data-tab-group="pres" data-tab="sources" onclick="switchTab('pres','sources')">Point Sources</button>
+      </div>
+    </div>
+
+    <div class="tab-panel active" data-panel-group="pres" data-panel="overview">
+      <div style="padding:20px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+          <div>
+            <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Pressures by Category</h4>
+            <canvas id="pressureChart" height="200"></canvas>
+          </div>
+          <div>
+            <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Severity Distribution</h4>
+            <canvas id="severityChart" height="200"></canvas>
+          </div>
+        </div>
+
+        <!-- Pressure type rows -->
+        <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Pressure Type Details</h4>
+        
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="width:28px; height:28px; border-radius:7px; background:#fee2e2; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-industry" style="font-size:12px; color:#dc2626;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Agriculture - Diffuse</div>
+            <div class="progress-bar" style="margin-top:4px;">
+              <div class="progress-fill" style="width:100%; background:#dc2626;"></div>
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">48</div>
+            <span class="badge badge-poor" style="font-size:9px;">High</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="width:28px; height:28px; border-radius:7px; background:#fee2e2; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-industry" style="font-size:12px; color:#dc2626;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Urban Wastewater</div>
+            <div class="progress-bar" style="margin-top:4px;">
+              <div class="progress-fill" style="width:71%; background:#dc2626;"></div>
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">34</div>
+            <span class="badge badge-poor" style="font-size:9px;">High</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="width:28px; height:28px; border-radius:7px; background:#fef3c7; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-industry" style="font-size:12px; color:#d97706;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Industrial Discharge</div>
+            <div class="progress-bar" style="margin-top:4px;">
+              <div class="progress-fill" style="width:46%; background:#d97706;"></div>
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">22</div>
+            <span class="badge badge-moderate" style="font-size:9px;">Medium</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="width:28px; height:28px; border-radius:7px; background:#fef3c7; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-industry" style="font-size:12px; color:#d97706;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Hydro-morphological</div>
+            <div class="progress-bar" style="margin-top:4px;">
+              <div class="progress-fill" style="width:65%; background:#d97706;"></div>
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">31</div>
+            <span class="badge badge-moderate" style="font-size:9px;">Medium</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="width:28px; height:28px; border-radius:7px; background:#fef3c7; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-industry" style="font-size:12px; color:#d97706;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Water Extraction</div>
+            <div class="progress-bar" style="margin-top:4px;">
+              <div class="progress-fill" style="width:56%; background:#d97706;"></div>
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">27</div>
+            <span class="badge badge-moderate" style="font-size:9px;">Medium</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="width:28px; height:28px; border-radius:7px; background:#fee2e2; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-industry" style="font-size:12px; color:#dc2626;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Mining / Tailings</div>
+            <div class="progress-bar" style="margin-top:4px;">
+              <div class="progress-fill" style="width:17%; background:#dc2626;"></div>
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">8</div>
+            <span class="badge badge-poor" style="font-size:9px;">High</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="width:28px; height:28px; border-radius:7px; background:#f0fdf4; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-industry" style="font-size:12px; color:#059669;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Tourism & Recreation</div>
+            <div class="progress-bar" style="margin-top:4px;">
+              <div class="progress-fill" style="width:23%; background:#059669;"></div>
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">11</div>
+            <span class="badge badge-good" style="font-size:9px;">Low</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel-group="pres" data-panel="linkage">
+      <div style="padding:20px;">
+        <div class="alert alert-info" style="margin-bottom:16px;"><i class="fas fa-info-circle"></i> <span>The pressure-impact linkage analysis follows the DPSIR (Drivers-Pressures-State-Impact-Response) framework as required by the WFD RBMP methodology.</span></div>
+        <table class="data-table">
+          <thead><tr><th>Water Body</th><th>Main Pressure</th><th>Impact Type</th><th>Significance</th><th>Linked Measure</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td><span class="id-pill">MK-VAR-RW-001</span><br><span style="font-size:11px;">Vardar - Negotino</span></td>
+              <td>Agriculture</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Nutrient enrichment</span></td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Medium</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-001</span></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Point source</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Hydro-morphological</span></td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Medium</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-002</span></td>
+            </tr>
+            <tr>
+              <td><span class="id-pill">MK-VAR-RW-002</span><br><span style="font-size:11px;">Treska - Mavrovo</span></td>
+              <td>Hydro-morphology</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Hydro-morphological</span></td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Medium</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-001</span></td>
+            </tr>
+            <tr>
+              <td><span class="id-pill">MK-VAR-RW-003</span><br><span style="font-size:11px;">Crna Reka - Middle</span></td>
+              <td>Agriculture</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Nutrient enrichment</span></td>
+              <td><span class="badge badge-poor" style="font-size:10px;">High</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-001</span></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Urban</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Organic loading</span></td>
+              <td><span class="badge badge-poor" style="font-size:10px;">High</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-002</span></td>
+            </tr>
+            <tr>
+              <td><span class="id-pill">MK-VAR-LW-001</span><br><span style="font-size:11px;">Dojran Lake</span></td>
+              <td>Water extraction</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Hydro-morphological</span></td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Medium</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-001</span></td>
+            </tr>
+            <tr>
+              <td><span class="id-pill">MK-VAR-LW-002</span><br><span style="font-size:11px;">Ohrid Lake</span></td>
+              <td>Tourism</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Hydro-morphological</span></td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Medium</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-001</span></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Urban</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Organic loading</span></td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Medium</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-002</span></td>
+            </tr>
+            <tr>
+              <td><span class="id-pill">MK-VAR-GW-001</span><br><span style="font-size:11px;">Pelagonia Alluvial</span></td>
+              <td>Agriculture - nitrates</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Nutrient enrichment</span></td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Medium</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-001</span></td>
+            </tr>
+            <tr>
+              <td><span class="id-pill">MK-STR-RW-001</span><br><span style="font-size:11px;">Strumica - Lower</span></td>
+              <td>Agriculture</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Nutrient enrichment</span></td>
+              <td><span class="badge badge-poor" style="font-size:10px;">High</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-001</span></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Industry</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Hydro-morphological</span></td>
+              <td><span class="badge badge-poor" style="font-size:10px;">High</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-002</span></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Urban</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Organic loading</span></td>
+              <td><span class="badge badge-poor" style="font-size:10px;">High</span></td>
+              <td><span class="id-pill" style="font-size:10px;">M-MK-003</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel-group="pres" data-panel="sources">
+      <div style="padding:20px;">
+        <table class="data-table">
+          <thead><tr><th>Source ID</th><th>Name</th><th>Type</th><th>Location</th><th>Parameter</th><th>Permitted Load (t/yr)</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="id-pill">PS-001</span></td>
+              <td><strong>Skopje WWTP</strong></td>
+              <td>Urban WWT</td>
+              <td>Vardar Basin</td>
+              <td style="font-size:11px;">BOD5, P, N</td>
+              <td style="text-align:right; font-family:monospace;">2,840</td>
+              <td><span class="badge badge-good" style="font-size:10px;">Operational</span></td>
+            </tr><tr>
+              <td><span class="id-pill">PS-002</span></td>
+              <td><strong>Strumica WWTP (under construction)</strong></td>
+              <td>Urban WWT</td>
+              <td>Strumica Basin</td>
+              <td style="font-size:11px;">BOD5, P</td>
+              <td style="text-align:right; font-family:monospace;">—</td>
+              <td><span class="badge badge-moderate" style="font-size:10px;">Construction</span></td>
+            </tr><tr>
+              <td><span class="id-pill">PS-003</span></td>
+              <td><strong>OHIS Chemical Plant</strong></td>
+              <td>Industrial</td>
+              <td>Vardar Basin</td>
+              <td style="font-size:11px;">COD, Metals</td>
+              <td style="text-align:right; font-family:monospace;">142</td>
+              <td><span class="badge badge-good" style="font-size:10px;">Licensed</span></td>
+            </tr><tr>
+              <td><span class="id-pill">PS-004</span></td>
+              <td><strong>Mine Sasa Tailings</strong></td>
+              <td>Mining</td>
+              <td>Bregalnica Basin</td>
+              <td style="font-size:11px;">As, Pb, Zn</td>
+              <td style="text-align:right; font-family:monospace;">8.4</td>
+              <td><span class="badge badge-active" style="font-size:10px;">Monitoring</span></td>
+            </tr><tr>
+              <td><span class="id-pill">PS-005</span></td>
+              <td><strong>Negotino Industrial Zone</strong></td>
+              <td>Industrial</td>
+              <td>Vardar Basin</td>
+              <td style="font-size:11px;">COD, Phenols</td>
+              <td style="text-align:right; font-family:monospace;">89</td>
+              <td><span class="badge badge-good" style="font-size:10px;">Licensed</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title" style="font-size:12px;"><i class="fas fa-exclamation-triangle" style="color:#ef4444; margin-right:5px;"></i>High Risk Water Bodies</span></div>
+      <div class="card-body" style="padding:12px 16px;">
+        
+        <div style="padding:8px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="font-size:12px; font-weight:600; color:#334155;">Crna Reka - Middle</div>
+          <div style="font-size:10px; color:#94a3b8; margin-top:2px;"><span class="id-pill">MK-VAR-RW-003</span></div>
+          <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
+            <span style="font-size:10px; background:#fee2e2; color:#991b1b; padding:1px 5px; border-radius:3px;">Agriculture</span><span style="font-size:10px; background:#fee2e2; color:#991b1b; padding:1px 5px; border-radius:3px;">Urban</span>
+          </div>
+        </div>
+        <div style="padding:8px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="font-size:12px; font-weight:600; color:#334155;">Pelagonia Alluvial</div>
+          <div style="font-size:10px; color:#94a3b8; margin-top:2px;"><span class="id-pill">MK-VAR-GW-001</span></div>
+          <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
+            <span style="font-size:10px; background:#fee2e2; color:#991b1b; padding:1px 5px; border-radius:3px;">Agriculture - nitrates</span>
+          </div>
+        </div>
+        <div style="padding:8px 0; border-bottom:1px solid #f1f5f9;">
+          <div style="font-size:12px; font-weight:600; color:#334155;">Strumica - Lower</div>
+          <div style="font-size:10px; color:#94a3b8; margin-top:2px;"><span class="id-pill">MK-STR-RW-001</span></div>
+          <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
+            <span style="font-size:10px; background:#fee2e2; color:#991b1b; padding:1px 5px; border-radius:3px;">Agriculture</span><span style="font-size:10px; background:#fee2e2; color:#991b1b; padding:1px 5px; border-radius:3px;">Industry</span><span style="font-size:10px; background:#fee2e2; color:#991b1b; padding:1px 5px; border-radius:3px;">Urban</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title" style="font-size:12px;"><i class="fas fa-chart-bar" style="color:#1a56db; margin-right:5px;"></i>Pressure Statistics</span></div>
+      <div class="card-body" style="padding:12px 16px;">
+        <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);">
+          <div class="stat-item"><div class="stat-val" style="color:#dc2626; font-size:20px;">73%</div><div class="stat-lbl">WBs with pressures</div></div>
+          <div class="stat-item"><div class="stat-val" style="color:#d97706; font-size:20px;">2.4</div><div class="stat-lbl">Avg pressures/WB</div></div>
+          <div class="stat-item"><div class="stat-val" style="color:#059669; font-size:20px;">42%</div><div class="stat-lbl">Addressed by measures</div></div>
+          <div class="stat-item"><div class="stat-val" style="color:#ef4444; font-size:20px;">58%</div><div class="stat-lbl">Still unaddressed</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const pressCtx = document.getElementById('pressureChart').getContext('2d');
+new Chart(pressCtx, {
+  type: 'bar',
+  data: {
+    labels: ["Agriculture - Diffuse","Urban Wastewater","Industrial Discharge","Hydro-morphological","Water Extraction","Mining / Tailings","Tourism & Recreation"],
+    datasets: [{
+      data: [48,34,22,31,27,8,11],
+      backgroundColor: ["#dc2626","#dc2626","#d97706","#d97706","#d97706","#dc2626","#059669"],
+      borderRadius: 4
+    }]
+  },
+  options: { indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:'#f1f5f9'},ticks:{font:{size:9}}}, y:{grid:{display:false},ticks:{font:{size:9}}} } }
+});
+const sevCtx = document.getElementById('severityChart').getContext('2d');
+new Chart(sevCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['High','Medium','Low'],
+    datasets: [{data:[90,68,23], backgroundColor:['#dc2626','#d97706','#059669'], borderWidth:2, borderColor:'#fff'}]
+  },
+  options:{responsive:true, cutout:'55%', plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}}}
+});
+</script>
+
+  </main>
+</div>
+<script src="../../assets/shell.js"></script>
+
+</body>
+</html>

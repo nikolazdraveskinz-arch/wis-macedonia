@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Programme of Measures — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="measures" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-tasks" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Programme of Measures</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-tasks"></i><div><b>Phase 1 scope: PoM as an RBMP dataset.</b> Each measure has a permanent identifier and is linked to the pressures it addresses, the water bodies it targets and a WISE Key Type of Measure. Progress, financing and implementation tracking are foreseen in a later phase and are not part of the current development.</div></div>
+
+<div class="card">
+  <div class="filter-bar">
+    <div class="search-wrap"><i class="fas fa-search"></i><input id="ms-q" class="search-input" placeholder="Search measures, KTM, water bodies…" oninput="filterTable('ms-q','ms-table')"></div>
+    <select class="filter-select"><option>All types</option><option>Basic</option><option>Supplementary</option></select>
+    <select class="filter-select"><option>All KTM</option><option>KTM1 Wastewater</option><option>KTM2 Agriculture nutrients</option><option>KTM5 Continuity</option><option>KTM8 Water efficiency</option><option>KTM13 Drinking water protection</option><option>KTM14 Knowledge</option></select>
+    <button class="btn btn-primary" onclick="wisToast('New measure: identifier MK_MSR_VAR_045 reserved (mockup)')"><i class="fas fa-plus"></i>Add measure</button>
+  </div>
+  <div class="table-container"><table class="data-table" id="ms-table">
+    <thead><tr><th>Permanent ID</th><th>Measure</th><th>Type</th><th>KTM</th><th>Pressure addressed</th><th>Target water bodies</th><th>Cost estimate</th><th>Planned by</th></tr></thead>
+    <tbody><tr><td><span class="id-pill">MK_MSR_VAR_001</span></td><td><b>Construction of UWWTP Veles</b></td><td>Basic – Art. 11(3)(a) UWWT</td><td><span class="badge badge-active">KTM1</span></td><td><span class="id-pill">MK_PRS_PT_0412</span></td><td style="font-size:12px;">MK-VAR-RW-0014, MK-VAR-RW-0015</td><td>€ 18.2 m</td><td>2030</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_012</span></td><td><b>Nitrate action programme – Polog</b></td><td>Supplementary</td><td><span class="badge badge-active">KTM2</span></td><td><span class="id-pill">MK_PRS_DF_0031</span></td><td style="font-size:12px;">MK-VAR-GW-004</td><td>€ 3.2 m</td><td>2031</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_019</span></td><td><b>Fish passage at Treska weir</b></td><td>Supplementary</td><td><span class="badge badge-active">KTM5</span></td><td><span class="id-pill">MK_PRS_HM_0077</span></td><td style="font-size:12px;">MK-VAR-RW-0102</td><td>€ 0.9 m</td><td>2029</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_027</span></td><td><b>Drinking-water protection zones – delineation</b></td><td>Basic – Art. 7</td><td><span class="badge badge-active">KTM13</span></td><td><span class="id-pill">—</span></td><td style="font-size:12px;">MK-VAR-GW-001 … _012</td><td>€ 1.1 m</td><td>2028</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_033</span></td><td><b>Abstraction permit review – Bregalnica</b></td><td>Basic – Art. 11(3)(e)</td><td><span class="badge badge-active">KTM8</span></td><td><span class="id-pill">MK_PRS_HM_0120</span></td><td style="font-size:12px;">MK-VAR-RW-0201</td><td>Administrative</td><td>2029</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_044</span></td><td><b>Upgrade of the Water Information System</b></td><td>Supplementary – knowledge</td><td><span class="badge badge-active">KTM14</span></td><td><span class="id-pill">—</span></td><td style="font-size:12px;">Basin-wide</td><td>€ 0.6 m</td><td>2027</td></tr></tbody></table></div>
+  <div class="meta-row" style="padding:12px 20px;border-top:1px solid #f1f5f9;"><span><b>Dataset:</b> DS-VAR-009 · v0.3</span><span><b>Source:</b> Subproject 1 (River basin management)</span><span><b>QA/QC:</b> Draft</span><span><b>Reporting period:</b> 2028–2033</span></div>
+</div>
+<div class="card" style="margin-top:18px;opacity:.75;">
+  <div class="card-header"><h3 class="card-title"><i class="fas fa-hourglass-half" style="color:#64748b;margin-right:6px;"></i>Implementation progress and financing</h3><span class="phase-chip">Later phase</span></div>
+  <div class="card-body" style="font-size:12.5px;color:#64748b;">Systematic monitoring of RBMP implementation (progress per measure, spending, interim reporting) belongs to Phase 3 of the WIS roadmap. The register above already holds the identifiers and links that this function will need.</div>
+</div>
+
+  </main>
+</div>
+<script src="../../assets/shell.js"></script>
+
+</body>
+</html>

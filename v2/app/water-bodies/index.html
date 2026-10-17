@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water Bodies Registry — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="water-bodies" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Water Bodies Registry</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-water"></i><div><b>Carried over from v1.</b> Water-body identifiers are now managed together with the other 7 entity types in <a href="../identifiers/" style="color:#1a56db;font-weight:600;">Permanent Identifiers</a>. Records are filtered by the river basin district and RBMP cycle selected in the header.</div></div>
+
+    
+<!-- ═══ HEADER STATS ═══ -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#1a56db;">89</div>
+    <div style="font-size:12px; color:#64748b;">River Water Bodies</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">4 river basins</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#0891b2;">14</div>
+    <div style="font-size:12px; color:#64748b;">Lake Water Bodies</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">Natural + Reservoirs</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#8b5cf6;">34</div>
+    <div style="font-size:12px; color:#64748b;">Groundwater Bodies</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">Alluvial + Karst</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#059669;">53%</div>
+    <div style="font-size:12px; color:#64748b;">At Good Status</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">WFD objective</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#d97706;">2027</div>
+    <div style="font-size:12px; color:#64748b;">Next Deadline</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">25 water bodies</div>
+  </div>
+  <div class="kpi-card" style="padding:16px;">
+    <div style="font-size:24px; font-weight:800; color:#ef4444;">2033</div>
+    <div style="font-size:12px; color:#64748b;">Extended Deadline</div>
+    <div style="font-size:10px; color:#94a3b8; margin-top:3px;">18 water bodies</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN CARD ═══ -->
+<div class="card">
+  <!-- Tabs -->
+  <div style="padding:0 20px;">
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab-group="wb" data-tab="list" onclick="switchTab('wb','list')"><i class="fas fa-list" style="margin-right:5px;"></i>Water Bodies Registry</button>
+      <button class="tab-btn" data-tab-group="wb" data-tab="status" onclick="switchTab('wb','status')"><i class="fas fa-chart-bar" style="margin-right:5px;"></i>Status Analysis</button>
+      <button class="tab-btn" data-tab-group="wb" data-tab="identifiers" onclick="switchTab('wb','identifiers')"><i class="fas fa-fingerprint" style="margin-right:5px;"></i>Identifier Management</button>
+    </div>
+  </div>
+
+  <!-- Tab: List -->
+  <div class="tab-panel active" data-panel-group="wb" data-panel="list">
+    <div class="filter-bar">
+      <div class="search-wrap" style="flex:1; max-width:280px;">
+        <i class="fas fa-search"></i>
+        <input class="search-input" id="wb-search" placeholder="Search water bodies…" oninput="filterTable('wb-search','wb-table')">
+      </div>
+      <select class="filter-select">
+        <option>All Basins</option>
+        <option>Vardar</option>
+        <option>Black Drim</option>
+        <option>Strumica</option>
+        <option>Bregalnica</option>
+      </select>
+      <select class="filter-select">
+        <option>All Types</option>
+        <option>River</option>
+        <option>Lake</option>
+        <option>Groundwater</option>
+      </select>
+      <select class="filter-select">
+        <option>All Statuses</option>
+        <option>High</option>
+        <option>Good</option>
+        <option>Moderate</option>
+        <option>Poor</option>
+        <option>Bad</option>
+      </select>
+      <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add WB</button>
+      <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table" id="wb-table">
+        <thead><tr>
+          <th>Permanent ID</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>River Basin</th>
+          <th>Dimension</th>
+          <th>Eco. Status</th>
+          <th>Chem. Status</th>
+          <th>WFD Goal</th>
+          <th>Pressures</th>
+          <th>Monitored</th>
+          <th>Actions</th>
+        </tr></thead>
+        <tbody>
+    <tr>
+      <td><span class="id-pill">MK-VAR-RW-001</span></td>
+      <td><strong style="color:#0f172a;">Vardar - Negotino</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Vardar</td>
+      <td>42.3 km</td>
+      <td><span class="eco-moderate">Moderate</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">2027</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Point source</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-RW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-RW-002</span></td>
+      <td><strong style="color:#0f172a;">Treska - Mavrovo</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Vardar</td>
+      <td>28.1 km</td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Achieved</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Hydro-morphology</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-RW-002')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-RW-003</span></td>
+      <td><strong style="color:#0f172a;">Crna Reka - Middle</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Vardar</td>
+      <td>67.4 km</td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="eco-moderate">Moderate</span></td>
+      <td><span class="badge badge-poor" style="font-size:10px;">2033</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Urban</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-RW-003')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-LW-001</span></td>
+      <td><strong style="color:#0f172a;">Dojran Lake</strong></td>
+      <td><span class="badge badge-published" style="font-size:10px;">Lake</span></td>
+      <td>Vardar</td>
+      <td>42.9 km²</td>
+      <td><span class="eco-moderate">Moderate</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">2027</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Water extraction</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-LW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-LW-002</span></td>
+      <td><strong style="color:#0f172a;">Ohrid Lake</strong></td>
+      <td><span class="badge badge-published" style="font-size:10px;">Lake</span></td>
+      <td>Black Drim</td>
+      <td>358 km²</td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Achieved</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Tourism</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Urban</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-LW-002')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-VAR-GW-001</span></td>
+      <td><strong style="color:#0f172a;">Pelagonia Alluvial</strong></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">Groundwater</span></td>
+      <td>Vardar</td>
+      <td>4100 km²</td>
+      <td>Q: Good</td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="badge badge-moderate" style="font-size:10px;">2027</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture - nitrates</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-VAR-GW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-BLA-RW-001</span></td>
+      <td><strong style="color:#0f172a;">Black Drim - Upper</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Black Drim</td>
+      <td>34.7 km</td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="eco-good">Good</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Achieved</span></td>
+      <td></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-BLA-RW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MK-STR-RW-001</span></td>
+      <td><strong style="color:#0f172a;">Strumica - Lower</strong></td>
+      <td><span class="badge badge-active" style="font-size:10px;">River</span></td>
+      <td>Strumica</td>
+      <td>22.8 km</td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="eco-poor">Poor</span></td>
+      <td><span class="badge badge-poor" style="font-size:10px;">2033</span></td>
+      <td><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Agriculture</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Industry</span><span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; margin-right:2px;">Urban</span></td>
+      <td><span class="badge badge-good" style="font-size:10px;">Yes</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="showWBDetails('MK-STR-RW-001')"><i class="fas fa-eye"></i></button>
+          <a href="../map/" class="btn btn-secondary btn-sm"><i class="fas fa-map-pin"></i></a>
+        </div>
+      </td>
+    </tr></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 20px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-size:11px; color:#64748b;">Showing 8 of 137 water bodies</span>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-secondary btn-sm">← Prev</button>
+        <button class="btn btn-secondary btn-sm" style="background:#1a56db; color:white; border-color:#1a56db;">1</button>
+        <button class="btn btn-secondary btn-sm">2</button>
+        <button class="btn btn-secondary btn-sm">3</button>
+        <button class="btn btn-secondary btn-sm">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Status Analysis -->
+  <div class="tab-panel" data-panel-group="wb" data-panel="status">
+    <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+      <div>
+        <h4 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 12px;">Overall Ecological Status</h4>
+        <canvas id="overallEcoChart" height="220"></canvas>
+      </div>
+      <div>
+        <h4 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 12px;">By River Basin</h4>
+        <canvas id="basinChart" height="220"></canvas>
+      </div>
+      <div>
+        <h4 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 12px;">WFD Deadline Distribution</h4>
+        <canvas id="deadlineChart" height="220"></canvas>
+        <div style="margin-top:12px; font-size:11px; color:#64748b; line-height:1.6;">
+          <div>● <strong>53%</strong> already at or above good status</div>
+          <div>● <strong>28%</strong> target: Good by 2027</div>
+          <div>● <strong>19%</strong> target: Good by 2033 (Art. 4(4))</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 20px 20px;">
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:14px;">
+        <div style="font-size:12px; font-weight:700; color:#1e40af; margin-bottom:8px;"><i class="fas fa-info-circle"></i> WFD Status Classification Note</div>
+        <div style="font-size:11px; color:#1e40af; line-height:1.6;">
+          Status classification follows the WFD Annex V biological quality elements, supported by physico-chemical and hydromorphological supporting elements.
+          Classification is based on the ICES approach using national boundary setting and intercalibration results agreed under EU WFD CIS process.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Identifiers -->
+  <div class="tab-panel" data-panel-group="wb" data-panel="identifiers">
+    <div style="padding:20px;">
+      <div class="alert alert-info" style="margin-bottom:16px;">
+        <i class="fas fa-fingerprint"></i>
+        <span>Permanent identifiers are immutable after assignment. They follow the INSPIRE WFD schema: <code style="background:#dbeafe; padding:1px 4px; border-radius:3px;">MK-{BASIN}-{TYPE}-{NUMBER}</code></span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="card" style="padding:16px; border:1px solid #e2e8f0;">
+          <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Identifier Schema</h4>
+          <div style="font-family:monospace; font-size:11px; background:#f8fafc; padding:12px; border-radius:7px; line-height:1.8;">
+            <div><span style="color:#1a56db;">MK</span> — Country code (ISO 3166-1)</div>
+            <div><span style="color:#059669;">VAR/BLA/STR/BRE</span> — Basin code</div>
+            <div><span style="color:#8b5cf6;">RW/LW/GW</span> — Water body type</div>
+            <div><span style="color:#f97316;">001..999</span> — Sequential number</div>
+            <div style="margin-top:6px; padding-top:6px; border-top:1px solid #e2e8f0;">
+              Example: <strong>MK-VAR-RW-001</strong>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:16px; border:1px solid #e2e8f0;">
+          <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Identifier Registry Stats</h4>
+          <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="stat-item"><div class="stat-val" style="color:#1a56db;">137</div><div class="stat-lbl">Total Assigned</div></div>
+            <div class="stat-item"><div class="stat-val" style="color:#059669;">137</div><div class="stat-lbl">Active</div></div>
+            <div class="stat-item"><div class="stat-val" style="color:#d97706;">0</div><div class="stat-lbl">Deprecated</div></div>
+            <div class="stat-item"><div class="stat-val" style="color:#64748b;">2</div><div class="stat-lbl">Pending</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DETAIL MODAL (hidden) ═══ -->
+<div id="wb-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center;" onclick="if(event.target===this)closeWBModal()">
+  <div style="background:white; border-radius:14px; width:640px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);" id="wb-modal-content">
+  </div>
+</div>
+
+<script>
+function showWBDetails(id) {
+  var wb = [{"id":"MK-VAR-RW-001","name":"Vardar - Negotino","type":"River","basin":"Vardar","length":42.3,"ecoStatus":"Moderate","chemStatus":"Good","wfd":"2027","pressures":["Agriculture","Point source"],"monitoring":true},{"id":"MK-VAR-RW-002","name":"Treska - Mavrovo","type":"River","basin":"Vardar","length":28.1,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":["Hydro-morphology"],"monitoring":true},{"id":"MK-VAR-RW-003","name":"Crna Reka - Middle","type":"River","basin":"Vardar","length":67.4,"ecoStatus":"Poor","chemStatus":"Moderate","wfd":"2033","pressures":["Agriculture","Urban"],"monitoring":true},{"id":"MK-VAR-LW-001","name":"Dojran Lake","type":"Lake","basin":"Vardar","area":42.9,"ecoStatus":"Moderate","chemStatus":"Good","wfd":"2027","pressures":["Water extraction"],"monitoring":true},{"id":"MK-VAR-LW-002","name":"Ohrid Lake","type":"Lake","basin":"Black Drim","area":358,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":["Tourism","Urban"],"monitoring":true},{"id":"MK-VAR-GW-001","name":"Pelagonia Alluvial","type":"Groundwater","basin":"Vardar","area":4100,"quanStatus":"Good","qualStatus":"Poor","wfd":"2027","pressures":["Agriculture - nitrates"],"monitoring":true},{"id":"MK-BLA-RW-001","name":"Black Drim - Upper","type":"River","basin":"Black Drim","length":34.7,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":[],"monitoring":true},{"id":"MK-STR-RW-001","name":"Strumica - Lower","type":"River","basin":"Strumica","length":22.8,"ecoStatus":"Poor","chemStatus":"Poor","wfd":"2033","pressures":["Agriculture","Industry","Urban"],"monitoring":true}].find(w => w.id === id);
+  if (!wb) return;
+  var ecoColor = { High: '#1a56db', Good: '#059669', Moderate: '#d97706', Poor: '#dc2626', Bad: '#7f1d1d' };
+  var eco = wb.ecoStatus || (wb.quanStatus + '/' + wb.qualStatus);
+  var col = ecoColor[wb.ecoStatus] || '#64748b';
+  document.getElementById('wb-modal-content').innerHTML = 
+    '<div style="padding:20px; border-bottom:1px solid #f1f5f9; background:linear-gradient(135deg, #1a56db08, #0891b208);">' +
+    '<div style="display:flex; align-items:start; justify-content:space-between;">' +
+    '<div><div style="font-size:16px; font-weight:800; color:#0f172a;">' + wb.name + '</div>' +
+    '<span class="id-pill" style="margin-top:4px; display:inline-block;">' + wb.id + '</span></div>' +
+    '<button onclick="closeWBModal()" style="border:none; background:#f1f5f9; border-radius:6px; width:28px; height:28px; cursor:pointer; font-size:14px;">✕</button>' +
+    '</div></div>' +
+    '<div style="padding:20px;">' +
+    '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">' +
+    '<div style="background:#f8fafc; padding:12px; border-radius:8px;"><div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">Ecological Status</div><div style="font-size:20px; font-weight:800; color:' + col + '; margin-top:3px;">' + eco + '</div></div>' +
+    '<div style="background:#f8fafc; padding:12px; border-radius:8px;"><div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">River Basin</div><div style="font-size:15px; font-weight:700; color:#0f172a; margin-top:3px;">' + wb.basin + '</div></div>' +
+    '</div>' +
+    '<table style="width:100%; border-collapse:collapse; font-size:12px;" class="data-table">' +
+    '<tr><td>Type</td><td>' + wb.type + '</td></tr>' +
+    '<tr><td>Dimension</td><td>' + (wb.length ? wb.length + ' km' : wb.area ? wb.area + ' km²' : '—') + '</td></tr>' +
+    '<tr><td>Chemical Status</td><td>' + (wb.chemStatus || wb.qualStatus || '—') + '</td></tr>' +
+    '<tr><td>WFD Objective</td><td>' + wb.wfd + '</td></tr>' +
+    '<tr><td>Pressures</td><td>' + ((wb.pressures || []).join(', ') || 'None identified') + '</td></tr>' +
+    '<tr><td>Monitored</td><td>' + (wb.monitoring ? 'Yes' : 'No') + '</td></tr>' +
+    '</table>' +
+    '<div style="display:flex; gap:8px; margin-top:16px;">' +
+    '<a href="../map/" class="btn btn-primary btn-sm"><i class="fas fa-map-pin"></i> View on Map</a>' +
+    '<a href="../monitoring/" class="btn btn-secondary btn-sm"><i class="fas fa-chart-line"></i> Monitoring Data</a>' +
+    '<a href="../pressures/" class="btn btn-secondary btn-sm"><i class="fas fa-industry"></i> Pressures</a>' +
+    '</div></div>';
+  document.getElementById('wb-modal').style.display = 'flex';
+}
+function closeWBModal() {
+  document.getElementById('wb-modal').style.display = 'none';
+}
+
+// Charts
+const overallCtx = document.getElementById('overallEcoChart').getContext('2d');
+new Chart(overallCtx, {
+  type: 'bar',
+  data: {
+    labels: ['High','Good','Moderate','Poor','Bad','N/A'],
+    datasets: [{ data: [12,42,31,16,5,17], backgroundColor: ['#1a56db','#31c48d','#faca15','#e74c3c','#7b1010','#9ca3af'], borderRadius: 4 }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{font:{size:10}}}, y:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}} } }
+});
+
+const basinCtx = document.getElementById('basinChart').getContext('2d');
+new Chart(basinCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Vardar','Black Drim','Strumica','Bregalnica'],
+    datasets: [
+      { label:'Good+', data:[48,14,5,10], backgroundColor:'#31c48d', borderRadius:3 },
+      { label:'<Good', data:[41,8,7,8], backgroundColor:'#e74c3c', borderRadius:3 }
+    ]
+  },
+  options: { responsive:true, scales:{ x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}}, y:{stacked:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}} }, plugins:{legend:{labels:{font:{size:10},boxWidth:10}}} }
+});
+
+const deadlineCtx = document.getElementById('deadlineChart').getContext('2d');
+new Chart(deadlineCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Achieved','2027','2033'],
+    datasets: [{ data:[73,25,19], backgroundColor:['#31c48d','#faca15','#e74c3c'], borderWidth:2, borderColor:'#fff' }]
+  },
+  options: { responsive:true, cutout:'60%', plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}} }
+});
+</script>
+
+  </main>
+</div>
+<script src="../../assets/shell.js"></script>
+
+</body>
+</html>

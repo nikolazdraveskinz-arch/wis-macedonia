@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water bodies — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../assets/wis.css">
+</head>
+<body data-base="../" data-active="explore" data-portal="public" style="background:#f1f5f9;">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">Water bodies of the Vardar RBD</h1>
+<p style="font-size:13px;color:#64748b;margin:0 0 18px;">Public view · RBMP 2028–2033 (in preparation) · placeholder values</p>
+<div class="card">
+  <div class="filter-bar">
+    <div class="search-wrap"><i class="fas fa-search"></i><input id="pw-q" class="search-input" placeholder="Search by name or identifier…" oninput="filterTable('pw-q','pw-table')"></div>
+    <select class="filter-select"><option>All categories</option><option>River</option><option>Lake</option><option>Groundwater</option></select>
+    <select class="filter-select"><option>All status classes</option><option>Good or better</option><option>Below good</option><option>Unknown</option></select>
+  </div>
+  <div class="table-container"><table class="data-table" id="pw-table">
+    <thead><tr><th>Identifier</th><th>Name</th><th>Category</th><th>Ecological status</th><th>Chemical status</th><th>Main pressures</th><th></th></tr></thead>
+    <tbody>
+      <tr><td><span class="id-pill">MK-VAR-RW-0014</span></td><td><b>Vardar – Gradsko to Negotino</b></td><td>River</td><td><span class="eco-moderate">Moderate</span></td><td><span class="eco-good">Good</span></td><td>Urban wastewater, agriculture</td><td><a class="btn btn-secondary btn-sm" href="#map">Map</a></td></tr>
+      <tr><td><span class="id-pill">MK-VAR-RW-0102</span></td><td><b>Treska – middle reach</b></td><td>River</td><td><span class="eco-good">Good</span></td><td><span class="eco-good">Good</span></td><td>Hydromorphology</td><td><a class="btn btn-secondary btn-sm" href="#map">Map</a></td></tr>
+      <tr><td><span class="id-pill">MK-VAR-RW-0201</span></td><td><b>Bregalnica – Shtip reach</b></td><td>River</td><td><span class="eco-poor">Poor</span></td><td style="color:#94a3b8;">Unknown</td><td>Abstraction, urban wastewater</td><td><a class="btn btn-secondary btn-sm" href="#map">Map</a></td></tr>
+      <tr><td><span class="id-pill">MK-VAR-LW-0003</span></td><td><b>Dojran Lake (national part)</b></td><td>Lake</td><td><span class="eco-moderate">Moderate</span></td><td><span class="eco-good">Good</span></td><td>Abstraction</td><td><a class="btn btn-secondary btn-sm" href="#map">Map</a></td></tr>
+      <tr><td><span class="id-pill">MK-VAR-GW-004</span></td><td><b>Polog alluvial aquifer</b></td><td>Groundwater</td><td style="color:#94a3b8;">n/a</td><td><span class="eco-poor">Poor</span></td><td>Agriculture (nitrates), industry</td><td><a class="btn btn-secondary btn-sm" href="#map">Map</a></td></tr>
+    </tbody></table></div>
+  <div class="meta-row" style="padding:12px 20px;border-top:1px solid #f1f5f9;"><span><b>Dataset:</b> DS-VAR-001 v1.4</span><span><b>Responsible:</b> MoEPP – Water Department</span><span><b>Licence:</b> CC BY 4.0</span><span><b>Last update:</b> 2026-09-30</span></div>
+</div>
+<div id="map" class="card" style="margin-top:18px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-map" style="color:#0891b2;margin-right:6px;"></i>Public map viewer</h3><span class="phase-chip chip-it3">Iteration 3</span></div>
+  <div class="card-body" style="font-size:13px;color:#64748b;">Generalised public layers, search by place or water-body identifier, and a "Comment here" action are added in iteration 3.</div></div>
+<div id="open-data" class="card" style="margin-top:18px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-download" style="color:#059669;margin-right:6px;"></i>Open data</h3></div>
+  <div class="card-body" style="font-size:13px;color:#475569;">
+    <p style="margin-top:0;">Public datasets can be downloaded as GeoJSON, GeoPackage, Shapefile or CSV, and used through the public WMS service. Restricted and internal datasets are available to registered technical users.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-secondary btn-sm" onclick="wisToast('GeoPackage downloaded (mockup)')"><i class="fas fa-download"></i>Water bodies (GPKG)</button><button class="btn btn-secondary btn-sm" onclick="wisToast('WMS URL copied (mockup)')"><i class="fas fa-link"></i>Public WMS</button><button class="btn btn-secondary btn-sm" onclick="wisToast('Metadata catalogue (mockup)')"><i class="fas fa-database"></i>Metadata catalogue</button></div>
+  </div></div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../assets/shell.js"></script>
+
+</body>
+</html>

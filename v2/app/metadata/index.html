@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metadata Governance — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="metadata" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Metadata Governance</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-database"></i><div><b>Carried over from v1.</b> Extended in iteration 4 (ToR Task 5) with RBMP cycle, reporting period and access level (public / restricted / internal) on every record.</div></div>
+
+    
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">47</div><div style="font-size:12px; color:#64748b;">Dataset Records</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">38</div><div style="font-size:12px; color:#64748b;">Published</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">9</div><div style="font-size:12px; color:#64748b;">Draft / Under Review</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#0891b2;">96.4%</div><div style="font-size:12px; color:#64748b;">Avg Quality Score</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">INSPIRE</div><div style="font-size:12px; color:#64748b;">Compliant</div></div>
+</div>
+
+<div class="card">
+  <div style="padding:0 20px;">
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab-group="meta" data-tab="catalog" onclick="switchTab('meta','catalog')"><i class="fas fa-database" style="margin-right:5px;"></i>Metadata Catalog</button>
+      <button class="tab-btn" data-tab-group="meta" data-tab="inspire" onclick="switchTab('meta','inspire')"><i class="fas fa-globe" style="margin-right:5px;"></i>INSPIRE Compliance</button>
+      <button class="tab-btn" data-tab-group="meta" data-tab="editor" onclick="switchTab('meta','editor')"><i class="fas fa-edit" style="margin-right:5px;"></i>Metadata Editor</button>
+    </div>
+  </div>
+
+  <!-- Catalog Tab -->
+  <div class="tab-panel active" data-panel-group="meta" data-panel="catalog">
+    <div class="filter-bar">
+      <div class="search-wrap" style="flex:1; max-width:260px;"><i class="fas fa-search"></i><input class="search-input" id="md-search" placeholder="Search metadata…" oninput="filterTable('md-search','md-table')"></div>
+      <select class="filter-select"><option>All Standards</option><option>INSPIRE WFD</option><option>INSPIRE EF</option><option>INSPIRE PS</option></select>
+      <select class="filter-select"><option>All Types</option><option>Vector</option><option>Raster</option><option>Tabular</option></select>
+      <select class="filter-select"><option>All Status</option><option>Published</option><option>Draft</option></select>
+      <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Record</button>
+      <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table" id="md-table">
+        <thead><tr>
+          <th>ID</th><th>Title / Institution</th><th>Type</th><th>CRS</th><th>Standard</th>
+          <th>Version</th><th>Updated</th><th>Quality</th><th>Status</th><th>License</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+    <tr>
+      <td><span class="id-pill">MD-MK-001</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">River Water Bodies - North Macedonia</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
+      </td>
+      <td style="font-size:11px;">Vector - Polygon/Polyline</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE WFD</span></td>
+      <td style="font-size:11px;">v3.2</td>
+      <td style="font-size:11px;">2024-01-15</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:98%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">98%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-002</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">Groundwater Bodies - North Macedonia</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
+      </td>
+      <td style="font-size:11px;">Vector - Polygon</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE WFD</span></td>
+      <td style="font-size:11px;">v2.1</td>
+      <td style="font-size:11px;">2024-01-15</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:96%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">96%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-003</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">Surface Water Monitoring Network</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP / HMS</div>
+      </td>
+      <td style="font-size:11px;">Vector - Point</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:4326</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE EF</span></td>
+      <td style="font-size:11px;">v4.0</td>
+      <td style="font-size:11px;">2024-03-01</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:99%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">99%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-004</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">Protected Areas - Drinking Water</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
+      </td>
+      <td style="font-size:11px;">Vector - Polygon</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE PS</span></td>
+      <td style="font-size:11px;">v1.5</td>
+      <td style="font-size:11px;">2023-09-20</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:94%; background:#d97706;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#d97706;">94%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="id-pill">MD-MK-005</span></td>
+      <td>
+        <div style="font-size:12px; font-weight:700; color:#0f172a;">DEM - Republic of North Macedonia 10m</div>
+        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Agency for Real Estate Cadastre</div>
+      </td>
+      <td style="font-size:11px;">Raster - GeoTIFF</td>
+      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
+      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE EL</span></td>
+      <td style="font-size:11px;">v2.0</td>
+      <td style="font-size:11px;">2023-06-01</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div class="progress-bar" style="width:60px; flex-shrink:0;">
+            <div class="progress-fill" style="width:97%; background:#059669;"></div>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#059669;">97%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
+      <td style="font-size:10px; color:#64748b;">Government Use</td>
+      <td>
+        <div style="display:flex; gap:3px;">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
+        </div>
+      </td>
+    </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INSPIRE Tab -->
+  <div class="tab-panel" data-panel-group="meta" data-panel="inspire">
+    <div style="padding:20px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+        <div>
+          <h4 style="font-size:13px; font-weight:700; margin:0 0 12px;">INSPIRE Annex Coverage</h4>
+          
+          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; color:#334155;">Annex I - Reference Data</span>
+              <span class="badge badge-good" style="font-size:10px;">Compliant</span>
+            </div>
+            <div class="progress-bar" style="height:8px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">12 datasets · 100% compliant</div>
+          </div>
+          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; color:#334155;">Annex II - Themes</span>
+              <span class="badge badge-moderate" style="font-size:10px;">Partial</span>
+            </div>
+            <div class="progress-bar" style="height:8px;">
+              <div class="progress-fill" style="width:75%; background:#d97706;"></div>
+            </div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">8 datasets · 75% compliant</div>
+          </div>
+          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; color:#334155;">Annex III - WFD/Water</span>
+              <span class="badge badge-good" style="font-size:10px;">Compliant</span>
+            </div>
+            <div class="progress-bar" style="height:8px;">
+              <div class="progress-fill" style="width:94%; background:#d97706;"></div>
+            </div>
+            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">27 datasets · 94% compliant</div>
+          </div>
+        </div>
+        <div>
+          <h4 style="font-size:13px; font-weight:700; margin:0 0 12px;">Metadata Elements Status</h4>
+          
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Resource Title</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Abstract / Description</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Responsible Party</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:97%; background:#d97706;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">97%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Spatial Extent (BBox)</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Temporal Extent</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:89%; background:#dc2626;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">89%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">CRS / Projection</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Data Lineage</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:84%; background:#dc2626;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">84%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Quality / Conformity</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:91%; background:#d97706;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">91%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Access Restrictions</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:100%; background:#059669;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Distribution URL</span>
+            <div class="progress-bar" style="flex:1; height:6px;">
+              <div class="progress-fill" style="width:96%; background:#d97706;"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">96%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor Tab -->
+  <div class="tab-panel" data-panel-group="meta" data-panel="editor">
+    <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Resource Title *</label>
+        <input type="text" placeholder="e.g. River Water Bodies - North Macedonia" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Abstract *</label>
+        <input type="text" placeholder="Description of the dataset..." style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Language</label>
+        <input type="text" placeholder="eng (ISO 639-2)" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Responsible Institution *</label>
+        <input type="text" placeholder="Ministry of Environment and Physical Planning" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Contact Email *</label>
+        <input type="email" placeholder="gis@moepp.gov.mk" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Update Frequency</label>
+        <input type="text" placeholder="Annually / Continuously" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Coordinate Reference System *</label>
+        <input type="text" placeholder="EPSG:6204 (MGI 1901)" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Bounding Box (W,S,E,N)</label>
+        <input type="text" placeholder="20.45, 40.85, 23.03, 42.37" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Temporal Extent From</label>
+        <input type="date" placeholder="" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Data Source / Lineage</label>
+        <input type="text" placeholder="Derived from national GIS survey 2021" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Quality Conformance</label>
+        <input type="text" placeholder="INSPIRE Spec WFD v1.0" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">License</label>
+        <input type="text" placeholder="CC BY 4.0" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+      </div>
+      <div style="grid-column:span 2; display:flex; gap:8px;">
+        <button class="btn btn-primary"><i class="fas fa-check"></i> Validate & Save</button>
+        <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+        <button class="btn btn-secondary"><i class="fas fa-code"></i> View XML</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </main>
+</div>
+<script src="../../assets/shell.js"></script>
+
+</body>
+</html>

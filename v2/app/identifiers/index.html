@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permanent Identifiers — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="identifiers" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-fingerprint" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Permanent Identifiers</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-fingerprint"></i><div><b>ToR Task 3.</b> Permanent, stable identifiers for every key RBMP entity, used as the link between spatial layers and attribute data (ToR Task 4) and across RBMP cycles. Identifiers can be created and edited only by authorised roles; they are never deleted, only retired, and every change is logged. The coding patterns shown are examples for agreement with MoEPP.</div></div>
+
+<div class="card">
+  <div class="card-header"><h3 class="card-title">Identifier types</h3><span style="font-size:11px;color:#94a3b8;">Pattern and owner per entity type</span></div>
+  <div class="table-container"><table class="data-table">
+    <thead><tr><th>Type</th><th>Entity</th><th>Coding pattern (proposal)</th><th>Example</th><th>Active IDs</th><th>Owner</th><th></th></tr></thead>
+    <tbody><tr><td><span class="badge badge-active">SWB</span></td><td><b>Surface water bodies</b></td><td><code style="font-size:11.5px;">MK-{RBD}-{CAT}-{NNNN}</code></td><td><span class="id-pill">MK-VAR-RW-0001</span></td><td>172</td><td>MoEPP – Water Dept.</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('SWB')">Manage</button></td></tr><tr><td><span class="badge badge-active">GWB</span></td><td><b>Groundwater bodies</b></td><td><code style="font-size:11.5px;">MK-{RBD}-GW-{NNN}</code></td><td><span class="id-pill">MK-VAR-GW-012</span></td><td>36</td><td>MoEPP – Water Dept.</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('GWB')">Manage</button></td></tr><tr><td><span class="badge badge-active">MON</span></td><td><b>Monitoring sites / stations</b></td><td><code style="font-size:11.5px;">MK_MON_{SW|GW|HY}_{NNNNN}</code></td><td><span class="id-pill">MK_MON_SW_00431</span></td><td>214</td><td>HMS / MoEPP</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('MON')">Manage</button></td></tr><tr><td><span class="badge badge-active">PRS</span></td><td><b>Pressures (point, diffuse, hydromorphological)</b></td><td><code style="font-size:11.5px;">MK_PRS_{PT|DF|HM}_{NNNN}</code></td><td><span class="id-pill">MK_PRS_PT_0412</span></td><td>538</td><td>MoEPP</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('PRS')">Manage</button></td></tr><tr><td><span class="badge badge-active">RSK</span></td><td><b>Impacts / risk assessment units</b></td><td><code style="font-size:11.5px;">MK_RSK_{NNNN}</code></td><td><span class="id-pill">MK_RSK_0057</span></td><td>96</td><td>MoEPP</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('RSK')">Manage</button></td></tr><tr><td><span class="badge badge-active">PRA</span></td><td><b>Protected areas</b></td><td><code style="font-size:11.5px;">MK_PRA_{TYPE}_{NNNN}</code></td><td><span class="id-pill">MK_PRA_DW_0019</span></td><td>61</td><td>MoEPP / Public Health Inst.</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('PRA')">Manage</button></td></tr><tr><td><span class="badge badge-active">MSR</span></td><td><b>Measures (PoM items)</b></td><td><code style="font-size:11.5px;">MK_MSR_{RBD}_{NNN}</code></td><td><span class="id-pill">MK_MSR_VAR_044</span></td><td>44</td><td>MoEPP</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('MSR')">Manage</button></td></tr><tr><td><span class="badge badge-active">RPU</span></td><td><b>Reporting units (RBD, sub-units)</b></td><td><code style="font-size:11.5px;">MK_RBD_{RBD} / MK_SU_{NN}</code></td><td><span class="id-pill">MK_RBD_VAR</span></td><td>5</td><td>MoEPP</td><td><button class="btn btn-secondary btn-sm" onclick="pickType('RPU')">Manage</button></td></tr></tbody></table></div>
+</div>
+
+<div class="card" style="margin-top:18px;">
+  <div class="card-header"><h3 class="card-title" id="id-title">Identifiers · Pressures (PRS)</h3>
+    <div style="display:flex;gap:6px;"><button class="btn btn-secondary btn-sm" onclick="wisToast('API: GET /api/v1/identifiers?type=PRS (mockup)')"><i class="fas fa-code"></i>API</button><button class="btn btn-primary btn-sm" onclick="wisToast('New identifier reserved: MK_PRS_PT_0413 (mockup)')"><i class="fas fa-plus"></i>New identifier</button></div></div>
+  <div class="table-container"><table class="data-table">
+    <thead><tr><th>Permanent ID</th><th>Name / description</th><th>Valid from (cycle)</th><th>Status</th><th>Linked spatial feature</th><th>Last change</th><th></th></tr></thead>
+    <tbody>
+      <tr><td><span class="id-pill">MK_PRS_PT_0412</span></td><td>UWWTP discharge – Veles</td><td>2028–2033</td><td><span class="badge qa-accepted">Active</span></td><td>DS-VAR-006 · point</td><td>2026-10-16 · Editor</td><td><button class="btn btn-secondary btn-sm">History</button></td></tr>
+      <tr><td><span class="id-pill">MK_PRS_PT_0398</span></td><td>Industrial discharge – Kavadarci</td><td>2028–2033</td><td><span class="badge qa-accepted">Active</span></td><td>DS-VAR-006 · point</td><td>2026-10-02 · Editor</td><td><button class="btn btn-secondary btn-sm">History</button></td></tr>
+      <tr><td><span class="id-pill">MK_PRS_HM_0077</span></td><td>Weir – Treska middle reach</td><td>2028–2033</td><td><span class="badge qa-accepted">Active</span></td><td>Hydromorph. layer · point</td><td>2026-09-21 · GIS Expert</td><td><button class="btn btn-secondary btn-sm">History</button></td></tr>
+      <tr><td><span class="id-pill">MK_PRS_PT_0101</span></td><td>Closed mine water outlet</td><td>2028–2033</td><td><span class="badge badge-inactive">Retired</span></td><td>— (kept for history)</td><td>2026-07-11 · Super admin</td><td><button class="btn btn-secondary btn-sm">History</button></td></tr>
+    </tbody></table></div>
+  <div class="alert alert-warn" style="margin:0 20px 20px;"><i class="fas fa-lock"></i><div>Deleting an identifier is not possible. Retiring one requires a reason, keeps it in the history, and blocks its re-use. Restoring a retired identifier is logged.</div></div>
+</div>
+
+  </main>
+</div>
+<script src="../../assets/shell.js"></script>
+<script>const IDT={"SWB": "Surface water bodies", "GWB": "Groundwater bodies", "MON": "Monitoring sites / stations", "PRS": "Pressures (point, diffuse, hydromorphological)", "RSK": "Impacts / risk assessment units", "PRA": "Protected areas", "MSR": "Measures (PoM items)", "RPU": "Reporting units (RBD, sub-units)"};
+function pickType(t){document.getElementById('id-title').textContent='Identifiers · '+IDT[t]+' ('+t+')';document.getElementById('id-title').scrollIntoView({behavior:'smooth',block:'center'});}
+</script>
+</body>
+</html>

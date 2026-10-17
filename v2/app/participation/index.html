@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Participation — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="participation" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Public Participation</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-users"></i><div><b>Carried over from v1.</b> Rebuilt in iteration 3: the three Art. 14 consultation stages with the 6-month rule, comments on a map point, water body or RBMP chapter, outcome and reason per comment, public log and consultation report.</div></div>
+
+    
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">23</div><div style="font-size:12px; color:#64748b;">Total Comments</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">2nd RBMP cycle</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">8</div><div style="font-size:12px; color:#64748b;">Pending Review</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">11</div><div style="font-size:12px; color:#64748b;">Responded</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#ef4444;">4</div><div style="font-size:12px; color:#64748b;">In Review</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">47%</div><div style="font-size:12px; color:#64748b;">Response Rate</div></div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 340px; gap:16px;">
+  <div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="padding:0 20px;">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab-group="pp" data-tab="comments" onclick="switchTab('pp','comments')"><i class="fas fa-comments" style="margin-right:5px;"></i>Public Comments</button>
+          <button class="tab-btn" data-tab-group="pp" data-tab="submit" onclick="switchTab('pp','submit')"><i class="fas fa-edit" style="margin-right:5px;"></i>Submit Comment</button>
+          <button class="tab-btn" data-tab-group="pp" data-tab="documents" onclick="switchTab('pp','documents')"><i class="fas fa-file-alt" style="margin-right:5px;"></i>RBMP Documents</button>
+        </div>
+      </div>
+
+      <!-- Comments Tab -->
+      <div class="tab-panel active" data-panel-group="pp" data-panel="comments">
+        <div class="filter-bar">
+          <div class="search-wrap" style="flex:1; max-width:260px;"><i class="fas fa-search"></i><input class="search-input" id="pp-search" placeholder="Search comments…"></div>
+          <select class="filter-select"><option>All Status</option><option>Pending</option><option>In Review</option><option>Responded</option></select>
+          <select class="filter-select"><option>All Basins</option><option>Vardar</option><option>Strumica</option><option>Black Drim</option></select>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export</button>
+        </div>
+        <div style="padding:16px 20px;">
+          
+    <div class="card" style="margin-bottom:12px; border-left:3px solid #d97706;">
+      <div style="padding:14px 16px;">
+        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a;">Strumica WWTP delays</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">
+              <i class="fas fa-user-circle" style="margin-right:3px;"></i>NGO representative · NGO Eco-Action
+              <span style="margin:0 6px;">·</span>
+              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-28
+            </div>
+          </div>
+          <span class="badge badge-moderate">In Review</span>
+        </div>
+        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
+          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
+          The construction of Strumica WWTP has been delayed significantly. We request a revised timeline and transparency on milestones.
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
+            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Strumica River Basin
+          </span>
+          <span class="id-pill">MK-STR-RW-001</span>
+          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
+        </div>
+        
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          
+          <button class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Respond</button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-tag"></i> Assign</button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px; border-left:3px solid #059669;">
+      <div style="padding:14px 16px;">
+        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a;">Dojran Lake water levels</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">
+              <i class="fas fa-user-circle" style="margin-right:3px;"></i>Association member · Fishermen Association Dojran
+              <span style="margin:0 6px;">·</span>
+              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-25
+            </div>
+          </div>
+          <span class="badge badge-good">Responded</span>
+        </div>
+        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
+          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
+          Water levels in Dojran Lake continue to decline despite stated measures. Requesting data on water extraction permits near the lake.
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
+            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Dojran Lake
+          </span>
+          <span class="id-pill">MK-VAR-LW-001</span>
+          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
+        </div>
+        
+        <div style="margin-top:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:7px; padding:10px;">
+          <div style="font-size:10px; font-weight:700; color:#065f46; margin-bottom:4px;"><i class="fas fa-reply"></i> Official Response — MEPP</div>
+          <div style="font-size:11px; color:#065f46; line-height:1.5;">Thank you for your comment. The water balance data for Dojran Lake has been updated. Current extraction volumes are within permitted limits. See attached report.</div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px; border-left:3px solid #94a3b8;">
+      <div style="padding:14px 16px;">
+        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a;">Agricultural discharge - Vardar lower reach</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">
+              <i class="fas fa-user-circle" style="margin-right:3px;"></i>Resident · Municipality Gevgelija
+              <span style="margin:0 6px;">·</span>
+              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-20
+            </div>
+          </div>
+          <span class="badge badge-pending">Pending</span>
+        </div>
+        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
+          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
+          Increased turbidity and odor in Vardar river at Gevgelija. Suspected connection to upstream agricultural activities.
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
+            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Vardar @ Gevgelija
+          </span>
+          <span class="id-pill">MK-VAR-RW-001</span>
+          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
+        </div>
+        
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          
+          <button class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Respond</button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-tag"></i> Assign</button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px; border-left:3px solid #d97706;">
+      <div style="padding:14px 16px;">
+        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#0f172a;">Ohrid Lake - Eutrophication Risk</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">
+              <i class="fas fa-user-circle" style="margin-right:3px;"></i>Researcher · UKIM Faculty of Science
+              <span style="margin:0 6px;">·</span>
+              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-15
+            </div>
+          </div>
+          <span class="badge badge-moderate">In Review</span>
+        </div>
+        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
+          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
+          Recent sampling indicates elevated phosphorus levels in the southern bay. We recommend immediate monitoring intensification.
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
+            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Ohrid Lake
+          </span>
+          <span class="id-pill">MK-VAR-LW-002</span>
+          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
+        </div>
+        
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          
+          <button class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Respond</button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-tag"></i> Assign</button>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
+        </div>
+      </div>
+    </div>
+        </div>
+      </div>
+
+      <!-- Submit Tab -->
+      <div class="tab-panel" data-panel-group="pp" data-panel="submit">
+        <div style="padding:20px;">
+          <div class="alert alert-info" style="margin-bottom:16px;">
+            <i class="fas fa-info-circle"></i>
+            <span>Public participation is open under WFD Article 14. All comments are reviewed by the competent authority (MEPP). Responses are published within 30 working days.</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            
+            <div>
+              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Full Name *</label>
+              <input type="text" placeholder="Your name" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Email *</label>
+              <input type="email" placeholder="your@email.com" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Organization</label>
+              <input type="text" placeholder="NGO / Municipality / Company" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Phone</label>
+              <input type="tel" placeholder="+389 2 XXX XXXX" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+            <div>
+              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Topic / Subject *</label>
+              <input type="text" placeholder="Brief topic of your comment" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Related Water Body</label>
+              <select class="filter-select" style="width:100%; padding:7px;"><option>Select (optional)…</option><option>MK-VAR-RW-001</option><option>MK-VAR-LW-002</option></select>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Comment Text *</label>
+            <textarea rows="5" placeholder="Enter your detailed comment here…" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px; resize:vertical;"></textarea>
+          </div>
+          <div style="margin-top:8px;">
+            <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Attach Supporting Document</label>
+            <div style="border:2px dashed #e2e8f0; padding:12px; border-radius:7px; text-align:center; background:#f8fafc; cursor:pointer;">
+              <i class="fas fa-paperclip" style="color:#94a3b8; margin-right:5px;"></i><span style="font-size:12px; color:#64748b;">PDF, DOC (max 10MB)</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Comment</button>
+            <button class="btn btn-secondary"><i class="fas fa-save"></i> Save Draft</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Tab -->
+      <div class="tab-panel" data-panel-group="pp" data-panel="documents">
+        <div style="padding:20px;">
+          
+          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600; color:#334155;">River Basin Management Plan 2019-2027 — Draft</div>
+              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2024-01-15 · 8.4 MB</div>
+            </div>
+            <span class="badge badge-moderate" style="font-size:10px;">Open for comment</span>
+            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600; color:#334155;">Environmental Report — WFD Strategic Assessment</div>
+              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2024-01-15 · 12.1 MB</div>
+            </div>
+            <span class="badge badge-moderate" style="font-size:10px;">Open for comment</span>
+            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600; color:#334155;">Programme of Measures 2022-2027</div>
+              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2023-11-01 · 5.2 MB</div>
+            </div>
+            <span class="badge badge-good" style="font-size:10px;">Published</span>
+            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600; color:#334155;">Monitoring Programme 2022-2027</div>
+              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2023-09-15 · 3.8 MB</div>
+            </div>
+            <span class="badge badge-good" style="font-size:10px;">Published</span>
+            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600; color:#334155;">Significant Water Management Issues</div>
+              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2023-06-01 · 2.1 MB</div>
+            </div>
+            <span class="badge badge-good" style="font-size:10px;">Published</span>
+            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title" style="font-size:12px;"><i class="fas fa-calendar" style="color:#1a56db; margin-right:5px;"></i>Consultation Timeline</span></div>
+      <div class="card-body" style="padding:12px 16px;">
+        <div class="timeline" style="padding-left:16px;">
+          
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#059669;"></div>
+            <div style="padding-top:2px;">
+              <div style="font-size:10px; font-weight:700; color:#059669;">15 Jan 2024</div>
+              <div style="font-size:11px; color:#334155; margin-top:1px; line-height:1.4;">Publication of draft RBMP 2nd Cycle documents</div>
+              
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#d97706;"></div>
+            <div style="padding-top:2px;">
+              <div style="font-size:10px; font-weight:700; color:#d97706;">15 Jan - 15 Apr 2024</div>
+              <div style="font-size:11px; color:#334155; margin-top:1px; line-height:1.4;">Public comment period (90 days)</div>
+              <span class="badge badge-moderate" style="font-size:9px; margin-top:3px; display:inline-flex;">IN PROGRESS</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#e2e8f0;"></div>
+            <div style="padding-top:2px;">
+              <div style="font-size:10px; font-weight:700; color:#94a3b8;">16 Apr - 30 Jun 2024</div>
+              <div style="font-size:11px; color:#94a3b8; margin-top:1px; line-height:1.4;">Analysis and response to comments</div>
+              
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#e2e8f0;"></div>
+            <div style="padding-top:2px;">
+              <div style="font-size:10px; font-weight:700; color:#94a3b8;">1 Jul 2024</div>
+              <div style="font-size:11px; color:#94a3b8; margin-top:1px; line-height:1.4;">Publication of final RBMP + response to comments</div>
+              
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#e2e8f0;"></div>
+            <div style="padding-top:2px;">
+              <div style="font-size:10px; font-weight:700; color:#94a3b8;">22 Dec 2027</div>
+              <div style="font-size:11px; color:#94a3b8; margin-top:1px; line-height:1.4;">RBMP submission to EC / WISE reporting</div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title" style="font-size:12px;"><i class="fas fa-chart-pie" style="color:#8b5cf6; margin-right:5px;"></i>Comments by Basin</span></div>
+      <div class="card-body" style="padding:14px 16px;">
+        <canvas id="commentsChart" height="160"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cCtx = document.getElementById('commentsChart').getContext('2d');
+new Chart(cCtx, {
+  type:'doughnut',
+  data:{labels:['Vardar','Strumica','Black Drim','Bregalnica'],datasets:[{data:[12,6,3,2],backgroundColor:['#1a56db','#f97316','#0891b2','#8b5cf6'],borderWidth:2,borderColor:'#fff'}]},
+  options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}}}
+});
+</script>
+
+  </main>
+</div>
+<script src="../../assets/shell.js"></script>
+
+</body>
+</html>
