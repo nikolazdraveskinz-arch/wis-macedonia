@@ -44,16 +44,17 @@
       ['monitoring', 'app/monitoring/', 'fa-satellite-dish', 'Monitoring Data'],
       ['pressures', 'app/pressures/', 'fa-industry', 'Pressures & Impacts'],
       ['measures', 'app/measures/', 'fa-tasks', 'Programme of Measures'],
-      ['permits', 'app/permits/', 'fa-file-contract', 'Water Book', 'it4']
+      ['permits', 'app/permits/', 'fa-file-contract', 'Water Book']
     ]],
     ['Participation', [
       ['participation', 'app/participation/', 'fa-users', 'Public Participation']
     ]],
     ['Data management', [
-      ['datasets', 'app/datasets/', 'fa-layer-group', 'Datasets & Imports', 'new'],
-      ['identifiers', 'app/identifiers/', 'fa-fingerprint', 'Permanent Identifiers', 'new'],
-      ['reference-data', 'app/reference-data/', 'fa-list-ul', 'Reference Data', 'new'],
-      ['metadata', 'app/metadata/', 'fa-database', 'Metadata', 'it4'],
+      ['datasets', 'app/datasets/', 'fa-layer-group', 'Datasets & Imports'],
+      ['identifiers', 'app/identifiers/', 'fa-fingerprint', 'Permanent Identifiers'],
+      ['reference-data', 'app/reference-data/', 'fa-list-ul', 'Reference Data'],
+      ['gis', 'app/gis/', 'fa-map-marked-alt', 'GIS Layers & Configurator'],
+      ['metadata', 'app/metadata/', 'fa-database', 'Metadata'],
       ['download', 'app/download/', 'fa-download', 'Data Access']
     ]],
     ['Administration', [
@@ -73,10 +74,10 @@
   /* Menu items visible per role (preview only; all others hidden) */
   const VISIBLE = {
     superadmin: null,
-    editor: ['dashboard','map','water-bodies','monitoring','pressures','measures','permits','participation','datasets','identifiers','reference-data','metadata','download','reporting'],
+    editor: ['gis','dashboard','map','water-bodies','monitoring','pressures','measures','permits','participation','datasets','identifiers','reference-data','metadata','download','reporting'],
     contributor: ['dashboard','map','water-bodies','monitoring','pressures','measures','datasets','download'],
-    approver: ['dashboard','map','water-bodies','monitoring','pressures','measures','permits','participation','datasets','identifiers','reference-data','metadata','download','reporting'],
-    gis: ['dashboard','map','water-bodies','monitoring','pressures','measures','datasets','identifiers','metadata','download'],
+    approver: ['gis','dashboard','map','water-bodies','monitoring','pressures','measures','permits','participation','datasets','identifiers','reference-data','metadata','download','reporting'],
+    gis: ['gis','dashboard','map','water-bodies','monitoring','pressures','measures','datasets','identifiers','metadata','download'],
     technical: ['dashboard','map','water-bodies','monitoring','pressures','measures','download'],
     external: []
   };
@@ -149,8 +150,8 @@
         ['explore', 'explore/', 'Water bodies'],
         ['map', 'explore/map/', 'Map'],
         ['participate', 'participate/', 'Have your say'],
-        ['documents', 'participate/#documents', 'RBMP documents'],
-        ['open-data', 'explore/#open-data', 'Open data']
+        ['dashboards', 'explore/dashboards/', 'Dashboards'],
+        ['permits', 'explore/permits/', 'Permits']
       ].map(([k, href, l]) => `<a href="${base}${href}" class="${k === active ? 'on' : ''}">${l}</a>`).join('');
       h.className = 'pub-header';
       h.innerHTML = `<div class="pub-header-inner">
@@ -177,6 +178,50 @@
         <div style="margin-top:8px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;"><a href="${base}about/contacts/" style="color:#1a56db;">Who is responsible · contacts</a><a href="${base}participate/request/" style="color:#1a56db;">Request background documents</a><a href="${base}about/privacy/" style="color:#1a56db;">Privacy notice</a><a href="${base}about/accessibility/" style="color:#1a56db;">Accessibility</a></div>
         <div style="margin-top:6px;font-size:10.5px;color:#94a3b8;">For reviewers: <a href="${base}screen-map/" style="color:#94a3b8;">screen map</a> · <a href="${base}../" style="color:#94a3b8;">mockup v1</a></div>`;
     }
+  }
+
+  /* ── Language layer (ToR Task 7 proposal): interface labels in MK / SQ / EN.
+        Draft translations of navigation and common labels, to be checked by translators;
+        page content stays in English in the mockup. ── */
+  const T = {
+    'Home': ['Почетна', 'Ballina'], 'Water bodies': ['Водни тела', 'Trupat ujorë'], 'Map': ['Карта', 'Harta'],
+    'Have your say': ['Кажете го вашето мислење', 'Jepni mendimin tuaj'], 'Dashboards': ['Прегледи', 'Panelet'], 'Permits': ['Дозволи', 'Lejet'],
+    'Register': ['Регистрација', 'Regjistrohu'], 'Sign in': ['Најава', 'Hyr'],
+    'Overview': ['Преглед', 'Përmbledhje'], 'RBMP datasets': ['Податоци за планот', 'Të dhënat e planit'], 'Participation': ['Учество', 'Pjesëmarrja'],
+    'Data management': ['Управување со податоци', 'Menaxhimi i të dhënave'], 'Administration': ['Администрација', 'Administrimi'], 'Later phases': ['Подоцнежни фази', 'Fazat e mëvonshme'], 'Public side': ['Јавен дел', 'Pjesa publike'],
+    'Dashboard': ['Контролна табла', 'Paneli'], 'Map Viewer': ['Прегледувач на карти', 'Shikuesi i hartës'], 'Water Bodies': ['Водни тела', 'Trupat ujorë'],
+    'Monitoring Data': ['Податоци од мониторинг', 'Të dhënat e monitorimit'], 'Pressures & Impacts': ['Притисоци и влијанија', 'Presionet dhe ndikimet'],
+    'Programme of Measures': ['Програма од мерки', 'Programi i masave'], 'Water Book': ['Водна книга', 'Libri i ujit'], 'Public Participation': ['Учество на јавноста', 'Pjesëmarrja e publikut'],
+    'Datasets & Imports': ['Збирки податоци и увоз', 'Grupet e të dhënave dhe importi'], 'Permanent Identifiers': ['Трајни идентификатори', 'Identifikuesit e përhershëm'],
+    'Reference Data': ['Референтни податоци', 'Të dhënat referuese'], 'GIS Layers & Configurator': ['ГИС слоеви и конфигуратор', 'Shtresat GIS dhe konfiguruesi'],
+    'Metadata': ['Метаподатоци', 'Metadatat'], 'Data Access': ['Пристап до податоци', 'Qasja në të dhëna'], 'Users & Roles': ['Корисници и улоги', 'Përdoruesit dhe rolet'],
+    'WISE Reporting': ['Известување кон WISE', 'Raportimi WISE'], 'View public portal': ['Јавен портал', 'Portali publik'], 'Help': ['Помош', 'Ndihmë']
+  };
+  function i18n() {
+    const lang = store('wis.lang') || 'en';
+    const sw = document.querySelector('.lang-switch');
+    if (sw) {
+      sw.innerHTML = [['mk', 'МК'], ['sq', 'SQ'], ['en', 'EN']].map(([k, l]) => `<span data-lang="${k}" class="${k === lang ? 'on' : ''}" style="cursor:pointer;" title="${{ mk: 'Македонски', sq: 'Shqip', en: 'English' }[k]}">${l}</span>`).join('');
+      sw.querySelectorAll('[data-lang]').forEach(x => x.onclick = () => { store('wis.lang', x.dataset.lang); location.reload(); });
+    }
+    const ctx = document.querySelector('.top-header .header-actions');
+    if (ctx && !document.querySelector('.top-header .lang-switch')) {
+      const d = document.createElement('div'); d.className = 'lang-switch'; ctx.insertBefore(d, ctx.firstChild);
+      d.innerHTML = [['mk', 'МК'], ['sq', 'SQ'], ['en', 'EN']].map(([k, l]) => `<span data-lang="${k}" class="${k === lang ? 'on' : ''}" style="cursor:pointer;">${l}</span>`).join('');
+      d.querySelectorAll('[data-lang]').forEach(x => x.onclick = () => { store('wis.lang', x.dataset.lang); location.reload(); });
+    }
+    if (lang === 'en') return;
+    const i = lang === 'mk' ? 0 : 1;
+    document.querySelectorAll('.nav-label, .nav-section-title, .pub-nav a, .pub-mnav a, .header-btn span').forEach(el => {
+      const k = el.textContent.trim(); if (T[k]) el.textContent = T[k][i];
+    });
+    document.documentElement.lang = lang;
+    const note = document.createElement('div');
+    note.style.cssText = 'background:#fef3c7;color:#92400e;font-size:12px;padding:6px 16px;text-align:center;';
+    note.textContent = lang === 'mk' ? 'Македонска верзија: преведени се менијата (нацрт-превод). Содржината на страниците ќе биде преведена во живиот систем.'
+      : 'Versioni shqip: janë përkthyer menytë (përkthim draft). Përmbajtja e faqeve do të përkthehet në sistemin real.';
+    const host = document.querySelector('.main-wrapper') || document.body;
+    host.insertBefore(note, host.firstChild);
   }
 
   /* ── Shared helpers used by page scripts ── */
@@ -211,4 +256,5 @@
   sidebar();
   contextBar();
   publicShell();
+  i18n();
 })();

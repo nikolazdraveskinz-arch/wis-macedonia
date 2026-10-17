@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Metadata Governance — WIS Macedonia</title>
+  <title>Metadata — WIS Macedonia</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -16,7 +16,7 @@
 <div class="main-wrapper">
   <header class="top-header">
     <div class="page-title-wrap">
-      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Metadata Governance</h1>
+      <h1><i class="fas fa-database" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Metadata</h1>
       <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
     </div>
     <div class="header-actions">
@@ -26,368 +26,44 @@
     </div>
   </header>
   <main class="content-area">
-<div class="phase-banner" style=""><i class="fas fa-database"></i><div><b>Carried over from v1.</b> Extended in iteration 4 (ToR Task 5) with RBMP cycle, reporting period and access level (public / restricted / internal) on every record.</div></div>
-
-    
-<!-- Stats -->
-<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">47</div><div style="font-size:12px; color:#64748b;">Dataset Records</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">38</div><div style="font-size:12px; color:#64748b;">Published</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">9</div><div style="font-size:12px; color:#64748b;">Draft / Under Review</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#0891b2;">96.4%</div><div style="font-size:12px; color:#64748b;">Avg Quality Score</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">INSPIRE</div><div style="font-size:12px; color:#64748b;">Compliant</div></div>
-</div>
+<div class="phase-banner" style=""><i class="fas fa-database"></i><div><b>ToR Task 5.</b> Every spatial dataset has an INSPIRE-compliant metadata record with the ToR minimum elements. New in this iteration: <b>RBMP cycle</b>, <b>reporting period</b> and <b>access level</b> (public / restricted / internal), which also drive what the portals, services and API show. Records can be published to the national SDI catalogue.</div></div>
 
 <div class="card">
-  <div style="padding:0 20px;">
-    <div class="tab-nav">
-      <button class="tab-btn active" data-tab-group="meta" data-tab="catalog" onclick="switchTab('meta','catalog')"><i class="fas fa-database" style="margin-right:5px;"></i>Metadata Catalog</button>
-      <button class="tab-btn" data-tab-group="meta" data-tab="inspire" onclick="switchTab('meta','inspire')"><i class="fas fa-globe" style="margin-right:5px;"></i>INSPIRE Compliance</button>
-      <button class="tab-btn" data-tab-group="meta" data-tab="editor" onclick="switchTab('meta','editor')"><i class="fas fa-edit" style="margin-right:5px;"></i>Metadata Editor</button>
-    </div>
-  </div>
-
-  <!-- Catalog Tab -->
-  <div class="tab-panel active" data-panel-group="meta" data-panel="catalog">
+  <div style="padding:0 20px;"><div class="tab-nav">
+    <button class="tab-btn active" data-tab-group="md" data-tab="cat" onclick="switchTab('md','cat')"><i class="fas fa-list" style="margin-right:5px;"></i>Catalogue</button>
+    <button class="tab-btn" data-tab-group="md" data-tab="ed" onclick="switchTab('md','ed')"><i class="fas fa-edit" style="margin-right:5px;"></i>Metadata editor</button>
+    <button class="tab-btn" data-tab-group="md" data-tab="xml" onclick="switchTab('md','xml')"><i class="fas fa-code" style="margin-right:5px;"></i>ISO 19139 / INSPIRE XML</button>
+  </div></div>
+  <div class="tab-panel active" data-panel-group="md" data-panel="cat">
     <div class="filter-bar">
-      <div class="search-wrap" style="flex:1; max-width:260px;"><i class="fas fa-search"></i><input class="search-input" id="md-search" placeholder="Search metadata…" oninput="filterTable('md-search','md-table')"></div>
-      <select class="filter-select"><option>All Standards</option><option>INSPIRE WFD</option><option>INSPIRE EF</option><option>INSPIRE PS</option></select>
-      <select class="filter-select"><option>All Types</option><option>Vector</option><option>Raster</option><option>Tabular</option></select>
-      <select class="filter-select"><option>All Status</option><option>Published</option><option>Draft</option></select>
-      <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Record</button>
-      <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export</button>
+      <div class="search-wrap"><i class="fas fa-search"></i><input id="md-q" class="search-input" placeholder="Search metadata…" oninput="filterTable('md-q','md-t')"></div>
+      <select class="filter-select"><option>All cycles</option><option>RBMP 2028–2033</option></select>
+      <select class="filter-select"><option>All access levels</option><option>Public</option><option>Restricted</option><option>Internal</option></select>
+      <button class="btn btn-primary" onclick="switchTab('md','ed')"><i class="fas fa-plus"></i>New record</button>
     </div>
-    <div class="table-container">
-      <table class="data-table" id="md-table">
-        <thead><tr>
-          <th>ID</th><th>Title / Institution</th><th>Type</th><th>CRS</th><th>Standard</th>
-          <th>Version</th><th>Updated</th><th>Quality</th><th>Status</th><th>License</th><th>Actions</th>
-        </tr></thead>
-        <tbody>
-    <tr>
-      <td><span class="id-pill">MD-MK-001</span></td>
-      <td>
-        <div style="font-size:12px; font-weight:700; color:#0f172a;">River Water Bodies - North Macedonia</div>
-        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
-      </td>
-      <td style="font-size:11px;">Vector - Polygon/Polyline</td>
-      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
-      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE WFD</span></td>
-      <td style="font-size:11px;">v3.2</td>
-      <td style="font-size:11px;">2024-01-15</td>
-      <td>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <div class="progress-bar" style="width:60px; flex-shrink:0;">
-            <div class="progress-fill" style="width:98%; background:#059669;"></div>
-          </div>
-          <span style="font-size:11px; font-weight:700; color:#059669;">98%</span>
-        </div>
-      </td>
-      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
-      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
-      <td>
-        <div style="display:flex; gap:3px;">
-          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td><span class="id-pill">MD-MK-002</span></td>
-      <td>
-        <div style="font-size:12px; font-weight:700; color:#0f172a;">Groundwater Bodies - North Macedonia</div>
-        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
-      </td>
-      <td style="font-size:11px;">Vector - Polygon</td>
-      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
-      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE WFD</span></td>
-      <td style="font-size:11px;">v2.1</td>
-      <td style="font-size:11px;">2024-01-15</td>
-      <td>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <div class="progress-bar" style="width:60px; flex-shrink:0;">
-            <div class="progress-fill" style="width:96%; background:#059669;"></div>
-          </div>
-          <span style="font-size:11px; font-weight:700; color:#059669;">96%</span>
-        </div>
-      </td>
-      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
-      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
-      <td>
-        <div style="display:flex; gap:3px;">
-          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td><span class="id-pill">MD-MK-003</span></td>
-      <td>
-        <div style="font-size:12px; font-weight:700; color:#0f172a;">Surface Water Monitoring Network</div>
-        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP / HMS</div>
-      </td>
-      <td style="font-size:11px;">Vector - Point</td>
-      <td style="font-size:11px; font-family:monospace;">EPSG:4326</td>
-      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE EF</span></td>
-      <td style="font-size:11px;">v4.0</td>
-      <td style="font-size:11px;">2024-03-01</td>
-      <td>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <div class="progress-bar" style="width:60px; flex-shrink:0;">
-            <div class="progress-fill" style="width:99%; background:#059669;"></div>
-          </div>
-          <span style="font-size:11px; font-weight:700; color:#059669;">99%</span>
-        </div>
-      </td>
-      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
-      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
-      <td>
-        <div style="display:flex; gap:3px;">
-          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td><span class="id-pill">MD-MK-004</span></td>
-      <td>
-        <div style="font-size:12px; font-weight:700; color:#0f172a;">Protected Areas - Drinking Water</div>
-        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">MEPP</div>
-      </td>
-      <td style="font-size:11px;">Vector - Polygon</td>
-      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
-      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE PS</span></td>
-      <td style="font-size:11px;">v1.5</td>
-      <td style="font-size:11px;">2023-09-20</td>
-      <td>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <div class="progress-bar" style="width:60px; flex-shrink:0;">
-            <div class="progress-fill" style="width:94%; background:#d97706;"></div>
-          </div>
-          <span style="font-size:11px; font-weight:700; color:#d97706;">94%</span>
-        </div>
-      </td>
-      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
-      <td style="font-size:10px; color:#64748b;">CC BY 4.0</td>
-      <td>
-        <div style="display:flex; gap:3px;">
-          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td><span class="id-pill">MD-MK-005</span></td>
-      <td>
-        <div style="font-size:12px; font-weight:700; color:#0f172a;">DEM - Republic of North Macedonia 10m</div>
-        <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Agency for Real Estate Cadastre</div>
-      </td>
-      <td style="font-size:11px;">Raster - GeoTIFF</td>
-      <td style="font-size:11px; font-family:monospace;">EPSG:6204</td>
-      <td><span class="badge badge-active" style="font-size:10px;">INSPIRE EL</span></td>
-      <td style="font-size:11px;">v2.0</td>
-      <td style="font-size:11px;">2023-06-01</td>
-      <td>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <div class="progress-bar" style="width:60px; flex-shrink:0;">
-            <div class="progress-fill" style="width:97%; background:#059669;"></div>
-          </div>
-          <span style="font-size:11px; font-weight:700; color:#059669;">97%</span>
-        </div>
-      </td>
-      <td><span class="badge badge-good" style="font-size:10px;">Published</span></td>
-      <td style="font-size:10px; color:#64748b;">Government Use</td>
-      <td>
-        <div style="display:flex; gap:3px;">
-          <button class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></button>
-        </div>
-      </td>
-    </tr></tbody>
-      </table>
-    </div>
+    <div class="table-container"><table class="data-table" id="md-t"><thead><tr><th>Record</th><th>Title / dataset</th><th>RBMP cycle</th><th>Reporting period</th><th>Access</th><th>Standard</th><th>Version</th><th>Completeness</th><th>Status</th></tr></thead><tbody><tr><td><span class="id-pill">MD-VAR-001</span></td><td><b>Surface water bodies – Vardar RBD</b><div style="font-size:11px;color:#94a3b8;">DS-VAR-001</div></td><td>2028–2033</td><td>2028–2033</td><td><span class="badge badge-good">Public</span></td><td>INSPIRE HY / WFD</td><td>v1.4</td><td>98%</td><td><span class="badge badge-published">Published</span></td></tr><tr><td><span class="id-pill">MD-VAR-002</span></td><td><b>Groundwater bodies – Vardar RBD</b><div style="font-size:11px;color:#94a3b8;">DS-VAR-002</div></td><td>2028–2033</td><td>2028–2033</td><td><span class="badge badge-good">Public</span></td><td>INSPIRE GE / WFD</td><td>v1.2</td><td>96%</td><td><span class="badge badge-published">Published</span></td></tr><tr><td><span class="id-pill">MD-VAR-003</span></td><td><b>Surface water monitoring sites</b><div style="font-size:11px;color:#94a3b8;">DS-VAR-003</div></td><td>2028–2033</td><td>2019–2025</td><td><span class="badge badge-good">Public</span></td><td>INSPIRE EF</td><td>v2.0</td><td>99%</td><td><span class="badge badge-published">Published</span></td></tr><tr><td><span class="id-pill">MD-VAR-004</span></td><td><b>Surface water quality results 2025</b><div style="font-size:11px;color:#94a3b8;">DS-VAR-004</div></td><td>2028–2033</td><td>2025</td><td><span class="badge qa-pending">Restricted</span></td><td>ISO 19115</td><td>2025.2</td><td>82%</td><td><span class="badge qa-draft">Draft</span></td></tr><tr><td><span class="id-pill">MD-VAR-006</span></td><td><b>Point-source pressures</b><div style="font-size:11px;color:#94a3b8;">DS-VAR-006</div></td><td>2028–2033</td><td>2023–2025</td><td><span class="badge badge-inactive">Internal</span></td><td>INSPIRE EF</td><td>v0.9</td><td>88%</td><td><span class="badge qa-draft">Under review</span></td></tr><tr><td><span class="id-pill">MD-VAR-008</span></td><td><b>Drinking-water protection zones</b><div style="font-size:11px;color:#94a3b8;">DS-VAR-008</div></td><td>2028–2033</td><td>2028–2033</td><td><span class="badge qa-pending">Restricted</span></td><td>INSPIRE AM</td><td>v1.0</td><td>94%</td><td><span class="badge badge-published">Published</span></td></tr><tr><td><span class="id-pill">MD-VAR-009</span></td><td><b>Programme of Measures register</b><div style="font-size:11px;color:#94a3b8;">DS-VAR-009</div></td><td>2028–2033</td><td>2028–2033</td><td><span class="badge badge-inactive">Internal</span></td><td>ISO 19115</td><td>v0.3</td><td>71%</td><td><span class="badge qa-draft">Draft</span></td></tr></tbody></table></div>
   </div>
-
-  <!-- INSPIRE Tab -->
-  <div class="tab-panel" data-panel-group="meta" data-panel="inspire">
-    <div style="padding:20px;">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
-        <div>
-          <h4 style="font-size:13px; font-weight:700; margin:0 0 12px;">INSPIRE Annex Coverage</h4>
-          
-          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <span style="font-size:11px; font-weight:700; color:#334155;">Annex I - Reference Data</span>
-              <span class="badge badge-good" style="font-size:10px;">Compliant</span>
-            </div>
-            <div class="progress-bar" style="height:8px;">
-              <div class="progress-fill" style="width:100%; background:#059669;"></div>
-            </div>
-            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">12 datasets · 100% compliant</div>
-          </div>
-          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <span style="font-size:11px; font-weight:700; color:#334155;">Annex II - Themes</span>
-              <span class="badge badge-moderate" style="font-size:10px;">Partial</span>
-            </div>
-            <div class="progress-bar" style="height:8px;">
-              <div class="progress-fill" style="width:75%; background:#d97706;"></div>
-            </div>
-            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">8 datasets · 75% compliant</div>
-          </div>
-          <div style="margin-bottom:10px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <span style="font-size:11px; font-weight:700; color:#334155;">Annex III - WFD/Water</span>
-              <span class="badge badge-good" style="font-size:10px;">Compliant</span>
-            </div>
-            <div class="progress-bar" style="height:8px;">
-              <div class="progress-fill" style="width:94%; background:#d97706;"></div>
-            </div>
-            <div style="font-size:10px; color:#94a3b8; margin-top:3px;">27 datasets · 94% compliant</div>
-          </div>
-        </div>
-        <div>
-          <h4 style="font-size:13px; font-weight:700; margin:0 0 12px;">Metadata Elements Status</h4>
-          
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Resource Title</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:100%; background:#059669;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Abstract / Description</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:100%; background:#059669;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Responsible Party</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:97%; background:#d97706;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">97%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Spatial Extent (BBox)</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:100%; background:#059669;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Temporal Extent</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:89%; background:#dc2626;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">89%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">CRS / Projection</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:100%; background:#059669;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Data Lineage</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:84%; background:#dc2626;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">84%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Quality / Conformity</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:91%; background:#d97706;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">91%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Access Restrictions</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:100%; background:#059669;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#059669; width:30px; text-align:right;">100%</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:11px; color:#475569; width:180px; flex-shrink:0;">Distribution URL</span>
-            <div class="progress-bar" style="flex:1; height:6px;">
-              <div class="progress-fill" style="width:96%; background:#d97706;"></div>
-            </div>
-            <span style="font-size:10px; font-weight:700; color:#d97706; width:30px; text-align:right;">96%</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Editor Tab -->
-  <div class="tab-panel" data-panel-group="meta" data-panel="editor">
-    <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-      
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Resource Title *</label>
-        <input type="text" placeholder="e.g. River Water Bodies - North Macedonia" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Abstract *</label>
-        <input type="text" placeholder="Description of the dataset..." style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Language</label>
-        <input type="text" placeholder="eng (ISO 639-2)" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Responsible Institution *</label>
-        <input type="text" placeholder="Ministry of Environment and Physical Planning" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Contact Email *</label>
-        <input type="email" placeholder="gis@moepp.gov.mk" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Update Frequency</label>
-        <input type="text" placeholder="Annually / Continuously" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Coordinate Reference System *</label>
-        <input type="text" placeholder="EPSG:6204 (MGI 1901)" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Bounding Box (W,S,E,N)</label>
-        <input type="text" placeholder="20.45, 40.85, 23.03, 42.37" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Temporal Extent From</label>
-        <input type="date" placeholder="" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Data Source / Lineage</label>
-        <input type="text" placeholder="Derived from national GIS survey 2021" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Quality Conformance</label>
-        <input type="text" placeholder="INSPIRE Spec WFD v1.0" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div>
-        <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">License</label>
-        <input type="text" placeholder="CC BY 4.0" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-      </div>
-      <div style="grid-column:span 2; display:flex; gap:8px;">
-        <button class="btn btn-primary"><i class="fas fa-check"></i> Validate & Save</button>
-        <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
-        <button class="btn btn-secondary"><i class="fas fa-code"></i> View XML</button>
-      </div>
-    </div>
-  </div>
+  <div class="tab-panel" data-panel-group="md" data-panel="ed"><div class="card-body">
+    <div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-id-card" style="color:#1a56db;margin-right:6px;"></i>1. Dataset identification</h3><span class=nav-new>NEW FIELDS</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Title *</label><input class="form-input" value="Surface water bodies – Vardar RBD"></div><div><label class="form-label">Unique dataset identifier *</label><input class="form-input" value="DS-VAR-001"></div><div><label class="form-label">Thematic category</label><select class="form-input"><option selected>Hydrography (INSPIRE Annex I)</option><option >Environmental monitoring facilities</option><option >Area management / restriction zones</option><option >Geology</option></select></div><div><label class="form-label">RBMP cycle *</label><select class="form-input"><option selected>RBMP 2028–2033</option><option >RBMP 2034–2039</option></select><div class=form-hint>New – ToR Task 5</div></div><div><label class="form-label">Description</label><textarea class="form-input" rows="2">River and lake water bodies delineated for the Vardar RBD.</textarea></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-globe-europe" style="color:#1a56db;margin-right:6px;"></i>2. Spatial and temporal extent</h3></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Bounding box (W, S, E, N)</label><input class="form-input" value="20.45, 40.85, 22.95, 42.35"></div><div><label class="form-label">Water-body scope</label><input class="form-input" value="All SWB in MK_RBD_VAR"><div class=form-hint>List or rule</div></div><div><label class="form-label">Reference period</label><input class="form-input" value="2028–2033"></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-project-diagram" style="color:#1a56db;margin-right:6px;"></i>3. Lineage and source</h3></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Origin / data provider</label><input class="form-input" value="MoEPP – Water Department (VRBSD)"></div><div><label class="form-label">Acquisition and processing</label><textarea class="form-input" rows="2">Delineation on 1:25 000 hydrography; typology System B</textarea></div><div><label class="form-label">QA procedure</label><input class="form-input" value="QA/QC accepted 2026-09-30 (SUB-2026-101)"></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-code-branch" style="color:#1a56db;margin-right:6px;"></i>4. Update and versioning</h3><span class=nav-new>NEW FIELDS</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Date of creation</label><input class="form-input" value="2025-03-12"></div><div><label class="form-label">Date of last update</label><input class="form-input" value="2026-09-30"></div><div><label class="form-label">Reporting period *</label><input class="form-input" value="2028–2033"><div class=form-hint>New – ToR Task 5 / Task 1</div></div><div><label class="form-label">Version</label><input class="form-input" value="v1.4"></div><div><label class="form-label">Update frequency</label><select class="form-input"><option selected>Per RBMP cycle</option><option >Annual</option><option >Continuous</option><option >As needed</option></select></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-cogs" style="color:#1a56db;margin-right:6px;"></i>5. Technical specification</h3></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Geometry type</label><input class="form-input" value="Line / polygon"></div><div><label class="form-label">Coordinate reference system</label><input class="form-input" value="EPSG:6316 (MGI 1901 / Balkans zone 7)"></div><div><label class="form-label">Mandatory attributes</label><input class="form-input" value="swb_id, category, type_code, natural_awb_hmwb"></div><div><label class="form-label">Linked code lists</label><input class="form-input" value="CL-001, CL-002"></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-check-double" style="color:#1a56db;margin-right:6px;"></i>6. Data quality</h3></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Completeness</label><input class="form-input" value="172 of 172 water bodies"></div><div><label class="form-label">Positional accuracy</label><input class="form-input" value="± 25 m"></div><div><label class="form-label">Known limitations</label><textarea class="form-input" rows="2">Lake boundaries from 2019 orthophoto</textarea></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-lock-open" style="color:#1a56db;margin-right:6px;"></i>7. Access and use</h3><span class=nav-new>NEW FIELDS</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Access level *</label><select class="form-input"><option selected>Public</option><option >Restricted</option><option >Internal</option></select><div class=form-hint>New – drives portal, services and API (GIS Configurator)</div></div><div><label class="form-label">Licence</label><select class="form-input"><option selected>CC BY 4.0</option><option >Government use only</option><option >Other – see constraints</option></select></div><div><label class="form-label">Data policy / constraints</label><input class="form-input" value="None"></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-building" style="color:#1a56db;margin-right:6px;"></i>8. Responsible organisation</h3></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><label class="form-label">Institution *</label><input class="form-input" value="MoEPP – Water Department"></div><div><label class="form-label">Contact e-mail *</label><input class="form-input" value="rbmp.vardar@example.mk"></div><div><label class="form-label">Role</label><select class="form-input"><option selected>Custodian</option><option >Owner</option><option >Distributor</option><option >Point of contact</option></select></div></div></div>
+    <div style="display:flex;gap:8px;"><button class="btn btn-primary" onclick="wisToast('Validated against INSPIRE metadata rules – 0 errors (mockup)')"><i class="fas fa-check"></i>Validate & save</button><button class="btn btn-secondary" onclick="wisToast('Record published to the national SDI catalogue (mockup)')"><i class="fas fa-share-square"></i>Publish to SDI catalogue</button><button class="btn btn-secondary" onclick="switchTab('md','xml')"><i class="fas fa-code"></i>View XML</button></div>
+  </div></div>
+  <div class="tab-panel" data-panel-group="md" data-panel="xml"><div class="card-body">
+<pre style="background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px;font-size:11.5px;overflow:auto;line-height:1.55;">&lt;gmd:MD_Metadata&gt;
+  &lt;gmd:fileIdentifier&gt;MD-VAR-001&lt;/gmd:fileIdentifier&gt;
+  &lt;gmd:identificationInfo&gt;
+    &lt;gmd:citation&gt;&lt;gmd:title&gt;Surface water bodies – Vardar RBD&lt;/gmd:title&gt;
+      &lt;gmd:identifier&gt;DS-VAR-001&lt;/gmd:identifier&gt;&lt;gmd:edition&gt;v1.4&lt;/gmd:edition&gt;&lt;/gmd:citation&gt;
+    &lt;gmd:extent&gt;&lt;gmd:temporalElement&gt;2028-01-01 / 2033-12-31&lt;/gmd:temporalElement&gt;&lt;/gmd:extent&gt;
+    &lt;gmd:resourceConstraints&gt;&lt;gmd:accessConstraints&gt;public&lt;/gmd:accessConstraints&gt;
+      &lt;gmd:useLimitation&gt;CC BY 4.0&lt;/gmd:useLimitation&gt;&lt;/gmd:resourceConstraints&gt;
+  &lt;/gmd:identificationInfo&gt;
+  &lt;!-- WIS extension --&gt;
+  &lt;wis:rbmpCycle&gt;2028-2033&lt;/wis:rbmpCycle&gt;
+  &lt;wis:reportingPeriod&gt;2028-2033&lt;/wis:reportingPeriod&gt;
+  &lt;wis:accessLevel&gt;public&lt;/wis:accessLevel&gt;
+&lt;/gmd:MD_Metadata&gt;</pre>
+    <p style="font-size:11.5px;color:#94a3b8;margin:0;">Simplified extract. Cycle, reporting period and access level are carried in the temporal extent and access constraints, plus a WIS extension block.</p>
+  </div></div>
 </div>
 
   </main>

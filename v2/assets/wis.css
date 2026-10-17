@@ -264,3 +264,6 @@
 }
 .header-btn span { white-space: nowrap; }
 @media (max-width: 900px) { .pub-header .logo-text-sub { display:none; } }
+.top-header .header-btn[title="Help"] span { display:none; }
+.top-header .lang-switch span { padding:4px 7px; font-size:10.5px; }
+@media (max-width: 1500px) { .ctx-label { display:none; } .ctx-select { max-width:190px; } }
