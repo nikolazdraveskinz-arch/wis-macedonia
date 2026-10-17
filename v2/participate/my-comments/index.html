@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My comments — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="participate" data-portal="public" style="background:#f1f5f9;">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<div style="font-size:12px;margin-bottom:8px;"><a href="../" style="color:#1a56db;">Have your say</a> › My comments</div>
+<h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">My comments</h1>
+<p style="font-size:13px;color:#64748b;margin:0 0 18px;">Signed in as <b>Ana P.</b> (registered external user, mockup). Each comment moves from <b>Received</b> to <b>Under review</b> to <b>Reviewed</b>, and then shows the outcome: incorporated, partly incorporated, not incorporated or out of scope, always with a reason.</p>
+<div class="card"><div class="card-header"><h3 class="card-title">Comment status</h3>
+  <label style="font-size:12px;display:flex;gap:6px;align-items:center;"><input type="checkbox" checked> E-mail me when the status changes</label></div>
+  <div id="list" class="card-body" style="display:grid;gap:12px;"></div></div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../../assets/shell.js"></script>
+<script src="../../assets/participation.js"></script>
+<script>
+function render(){
+ const mine = WIS.comments().filter(c=>c.mine);
+ const demo = WIS.comments().filter(c=>c.id==='PC-2026-0031'||c.id==='PC-2026-0115');
+ const list = mine.concat(mine.length?[]:demo);
+ const steps=['Received','Under review','Reviewed'];
+ document.getElementById('list').innerHTML = (mine.length?'':'<div class="alert alert-info"><i class="fas fa-info-circle"></i><div>You have not submitted a comment in this browser yet, so two example comments are shown. Submit one from a <a href="../stage/?s=3" style="font-weight:600;">stage page</a>, a <a href="../document/?d=RBMP" style="font-weight:600;">document</a> or the <a href="../../explore/map/" style="font-weight:600;">map</a> and it appears here.</div></div>')+
+ list.map(c=>{const i=steps.indexOf(c.status);return `<div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px;">
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;"><div><span class="id-pill">${c.id}</span> <span style="font-size:12px;color:#64748b;">Stage ${c.stage} · ${WIS.fmt(c.date)}</span></div>${WIS.statusBadge(c)}</div>
+  <div style="font-size:12px;color:#64748b;margin:6px 0;"><i class="fas ${WIS.targetIcon(c.target)}"></i> ${WIS.targetLabel(c.target)}</div>
+  <p style="font-size:13px;color:#334155;margin:4px 0 10px;">"${c.text}"</p>
+  <div style="display:flex;gap:6px;">${steps.map((s,j)=>`<div style="flex:1;text-align:center;font-size:11px;padding:5px;border-radius:6px;${j<=i?'background:#dbeafe;color:#1e40af;font-weight:600;':'background:#f1f5f9;color:#94a3b8;'}">${s}</div>`).join('')}<div style="flex:1;text-align:center;font-size:11px;padding:5px;border-radius:6px;${c.outcome?'background:#d1fae5;color:#065f46;font-weight:600;':'background:#f1f5f9;color:#94a3b8;'}">${c.outcome||'Outcome'}</div></div>
+  ${c.reason?`<div class="alert alert-success" style="margin-top:10px;"><i class="fas fa-reply"></i><div><b>Response from MoEPP:</b> ${c.reason}${c.change?`<br><span style="font-size:11.5px;">Changed in: ${c.change}</span>`:''}</div></div>`:''}
+ </div>`;}).join('');}
+render();
+</script>
+</body>
+</html>

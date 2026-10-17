@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public log — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="participate" data-portal="public" style="background:#f1f5f9;">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<div style="font-size:12px;margin-bottom:8px;"><a href="../" style="color:#1a56db;">Have your say</a> › Public log</div>
+<h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">Public log of comments and responses</h1>
+<p style="font-size:13px;color:#64748b;margin:0 0 18px;">Every comment received in any channel, with its outcome, the reason and what changed in the plan. Names are shown only where the commenter agreed.</p>
+<div class="stat-grid" id="kpi" style="margin-bottom:18px;"></div>
+<div class="card">
+  <div class="filter-bar">
+    <div class="search-wrap"><i class="fas fa-search"></i><input id="lq" class="search-input" placeholder="Search comments, references, places…" oninput="filterTable('lq','lt')"></div>
+    <select class="filter-select" id="fs"><option value="">All stages</option><option value="1">Stage 1</option><option value="2">Stage 2</option><option value="3">Stage 3</option></select>
+    <select class="filter-select" id="fo"><option value="">All outcomes</option><option>Incorporated</option><option>Partly incorporated</option><option>Not incorporated</option><option>Out of scope</option><option value="-">Being assessed</option></select>
+    <select class="filter-select" id="fw"><option value="">All stakeholder groups</option></select>
+    <button class="btn btn-secondary" onclick="wisToast('CSV of the public log downloaded (mockup)')"><i class="fas fa-download"></i>CSV</button>
+  </div>
+  <div class="table-container"><table class="data-table" id="lt"><thead><tr><th>Reference</th><th>Stage</th><th>From</th><th>About</th><th>Comment</th><th>Outcome</th><th>Reason and change</th></tr></thead><tbody id="lb"></tbody></table></div>
+</div>
+<div class="card" style="margin-top:18px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-file-download" style="color:#059669;margin-right:6px;"></i>Consultation reports</h3></div>
+  <div class="card-body" style="font-size:12.5px;color:#475569;">One report per closed stage summarises the consultation measures, the comments received, their results and the changes made to the plan. The report for the whole cycle becomes chapter 9 of the RBMP (WFD Annex VII A.9).
+  <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-secondary btn-sm" onclick="wisToast('Stage 1 report downloaded (mockup)')">Stage 1 report</button><button class="btn btn-secondary btn-sm" onclick="wisToast('Stage 2 report downloaded (mockup)')">Stage 2 report</button><button class="btn btn-secondary btn-sm" disabled>Stage 3 report (after closing)</button></div></div></div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../../assets/shell.js"></script>
+<script src="../../assets/participation.js"></script>
+<script>
+const P=new URLSearchParams(location.search); if(P.get('stage')) document.getElementById('fs').value=P.get('stage');
+const all=WIS.comments(); const groups=[...new Set(all.map(c=>c.who))];
+document.getElementById('fw').innerHTML+=groups.map(g=>`<option>${g}</option>`).join('');
+function render(){const s=fs.value,o=fo.value,w=fw.value;
+ const cs=all.filter(c=>(!s||c.stage==s)&&(!w||c.who===w)&&(!o||(o==='-'?!c.outcome:c.outcome===o)));
+ const k=x=>all.filter(c=>c.outcome===x).length;
+ document.getElementById('kpi').innerHTML=`<div class="stat-item"><div class="stat-val">${all.length}</div><div class="stat-lbl">Comments</div></div><div class="stat-item"><div class="stat-val">${groups.length}</div><div class="stat-lbl">Stakeholder groups</div></div><div class="stat-item"><div class="stat-val" style="color:#059669;">${k('Incorporated')}</div><div class="stat-lbl">Incorporated</div></div><div class="stat-item"><div class="stat-val" style="color:#d97706;">${k('Partly incorporated')}</div><div class="stat-lbl">Partly incorporated</div></div><div class="stat-item"><div class="stat-val" style="color:#dc2626;">${k('Not incorporated')}</div><div class="stat-lbl">Not incorporated</div></div><div class="stat-item"><div class="stat-val">${all.filter(c=>!c.outcome).length}</div><div class="stat-lbl">Being assessed</div></div>`;
+ document.getElementById('lb').innerHTML=cs.map(c=>`<tr id="${c.id}"><td><span class="id-pill">${c.id}</span><div style="font-size:11px;color:#94a3b8;">${WIS.fmt(c.date)}</div></td><td>${c.stage}</td><td>${c.org||c.who}<div style="font-size:11px;color:#94a3b8;">${c.who}</div></td><td style="font-size:12px;max-width:200px;"><i class="fas ${WIS.targetIcon(c.target)}" style="color:#64748b;"></i> ${WIS.targetLabel(c.target)}</td><td style="font-size:12.5px;max-width:280px;">${c.text}</td><td>${WIS.statusBadge(c)}</td><td style="font-size:12px;max-width:260px;">${c.reason||'<span style="color:#94a3b8;">Response due within 30 working days</span>'}${c.change?`<div style="font-size:11px;color:#059669;margin-top:2px;"><i class="fas fa-code-branch"></i> ${c.change}</div>`:''}</td></tr>`).join('');
+ if(location.hash){const r=document.querySelector(location.hash); if(r){r.style.background='#fef9c3'; r.scrollIntoView({block:'center'});}}}
+[fs,fo,fw].forEach(x=>x.onchange=render); render();
+</script>
+</body>
+</html>

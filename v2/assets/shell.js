@@ -37,7 +37,7 @@
   const NAV = [
     ['Overview', [
       ['dashboard', 'app/', 'fa-chart-line', 'Dashboard'],
-      ['map', 'app/map/', 'fa-map', 'Map Viewer', 'it3']
+      ['map', 'app/map/', 'fa-map', 'Map Viewer']
     ]],
     ['RBMP datasets', [
       ['water-bodies', 'app/water-bodies/', 'fa-water', 'Water Bodies'],
@@ -47,7 +47,7 @@
       ['permits', 'app/permits/', 'fa-file-contract', 'Water Book', 'it4']
     ]],
     ['Participation', [
-      ['participation', 'app/participation/', 'fa-users', 'Public Participation', 'it3']
+      ['participation', 'app/participation/', 'fa-users', 'Public Participation']
     ]],
     ['Data management', [
       ['datasets', 'app/datasets/', 'fa-layer-group', 'Datasets & Imports', 'new'],
@@ -111,8 +111,8 @@
       <nav>${nav}
         <div class="nav-section-title">Public side</div>
         <a href="${base}" class="nav-item"><i class="fas fa-globe nav-icon"></i><span class="nav-label">View public portal</span></a>
-        <a href="${base}screen-map/" class="nav-item ${active === 'screen-map' ? 'nav-item-active' : ''}"><i class="fas fa-sitemap nav-icon"></i><span class="nav-label">Screen map (BRD)</span></a>
       </nav>
+      <div style="padding:8px 18px 10px;font-size:10.5px;color:#64748b;border-top:1px solid #1e293b;">For reviewers: <a href="${base}screen-map/" style="color:#94a3b8;">screen map</a> · <a href="${base}../" style="color:#94a3b8;">mockup v1</a></div>
       <div class="sidebar-user" style="flex-direction:column;align-items:stretch;">
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="user-avatar">DM</div>
@@ -146,7 +146,7 @@
       const links = [
         ['home', '', 'Home'],
         ['explore', 'explore/', 'Water bodies'],
-        ['map', 'explore/#map', 'Map'],
+        ['map', 'explore/map/', 'Map'],
         ['participate', 'participate/', 'Have your say'],
         ['documents', 'participate/#documents', 'RBMP documents'],
         ['open-data', 'explore/#open-data', 'Open data']
@@ -168,8 +168,8 @@
     const f = document.getElementById('pub-footer');
     if (f) {
       f.className = 'pub-footer';
-      f.innerHTML = `Ministry of Environment and Physical Planning · Water Information System (WIS) · Mockup v2 – demonstrator, all data are placeholders ·
-        <a href="${base}screen-map/" style="color:#1a56db;">Screen map</a> · <a href="../" style="color:#1a56db;">Previous mockup (v1)</a>`;
+      f.innerHTML = `Ministry of Environment and Physical Planning · Water Information System (WIS) · Mockup v2 – demonstrator, all data are placeholders
+        <div style="margin-top:6px;font-size:10.5px;color:#94a3b8;">For reviewers: <a href="${base}screen-map/" style="color:#94a3b8;">screen map</a> · <a href="${base}../" style="color:#94a3b8;">mockup v1</a></div>`;
     }
   }
 

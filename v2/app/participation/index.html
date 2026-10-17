@@ -16,7 +16,7 @@
 <div class="main-wrapper">
   <header class="top-header">
     <div class="page-title-wrap">
-      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Public Participation</h1>
+      <h1><i class="fas fa-users" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Public Participation</h1>
       <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
     </div>
     <div class="header-actions">
@@ -26,365 +26,104 @@
     </div>
   </header>
   <main class="content-area">
-<div class="phase-banner" style=""><i class="fas fa-users"></i><div><b>Carried over from v1.</b> Rebuilt in iteration 3: the three Art. 14 consultation stages with the 6-month rule, comments on a map point, water body or RBMP chapter, outcome and reason per comment, public log and consultation report.</div></div>
+<div class="phase-banner" style=""><i class="fas fa-users"></i><div><b>ToR Task 7 + Article 14.</b> Manage the three consultation stages per RBMP cycle, process every comment to an outcome with a reason, and generate the consultation report (Annex VII A.9). Comments submitted on the public portal in this browser appear here; outcomes you record appear in the public log and in the commenter's "My comments".</div></div>
 
-    
-<!-- Stats -->
-<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#1a56db;">23</div><div style="font-size:12px; color:#64748b;">Total Comments</div><div style="font-size:10px; color:#94a3b8; margin-top:3px;">2nd RBMP cycle</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#d97706;">8</div><div style="font-size:12px; color:#64748b;">Pending Review</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#059669;">11</div><div style="font-size:12px; color:#64748b;">Responded</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#ef4444;">4</div><div style="font-size:12px; color:#64748b;">In Review</div></div>
-  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px; font-weight:800; color:#8b5cf6;">47%</div><div style="font-size:12px; color:#64748b;">Response Rate</div></div>
-</div>
+<div class="card">
+  <div style="padding:0 20px;"><div class="tab-nav">
+    <button class="tab-btn active" data-tab-group="p" data-tab="st" onclick="switchTab('p','st')"><i class="fas fa-flag" style="margin-right:5px;"></i>Consultation stages</button>
+    <button class="tab-btn" data-tab-group="p" data-tab="tr" onclick="switchTab('p','tr')"><i class="fas fa-inbox" style="margin-right:5px;"></i>Comment triage <span class="nav-badge" id="tr-n" style="margin-left:4px;"></span></button>
+    <button class="tab-btn" data-tab-group="p" data-tab="rp" onclick="switchTab('p','rp')"><i class="fas fa-file-alt" style="margin-right:5px;"></i>Consultation report</button>
+    <button class="tab-btn" data-tab-group="p" data-tab="nt" onclick="switchTab('p','nt')"><i class="fas fa-bell" style="margin-right:5px;"></i>Notifications</button>
+  </div></div>
 
-<div style="display:grid; grid-template-columns:1fr 340px; gap:16px;">
-  <div>
-    <div class="card" style="margin-bottom:16px;">
-      <div style="padding:0 20px;">
-        <div class="tab-nav">
-          <button class="tab-btn active" data-tab-group="pp" data-tab="comments" onclick="switchTab('pp','comments')"><i class="fas fa-comments" style="margin-right:5px;"></i>Public Comments</button>
-          <button class="tab-btn" data-tab-group="pp" data-tab="submit" onclick="switchTab('pp','submit')"><i class="fas fa-edit" style="margin-right:5px;"></i>Submit Comment</button>
-          <button class="tab-btn" data-tab-group="pp" data-tab="documents" onclick="switchTab('pp','documents')"><i class="fas fa-file-alt" style="margin-right:5px;"></i>RBMP Documents</button>
-        </div>
-      </div>
+  <div class="tab-panel active" data-panel-group="p" data-panel="st"><div class="card-body">
+    <div class="table-container"><table class="data-table"><thead><tr><th>Stage</th><th>Document(s)</th><th>Legal deadline</th><th>Published</th><th>Comments close</th><th>Duration</th><th>Checks</th><th>Status</th><th></th></tr></thead><tbody id="st-rows"></tbody></table></div>
+    <div class="card" id="st-edit" style="margin-top:16px;display:none;"></div>
+    <p style="font-size:11.5px;color:#94a3b8;">Legal deadlines are computed from the start of the plan period (1 Jan 2028): 3, 2 and 1 years before for stages 1, 2 and 3 (Art. 14(1)). Closing dates earlier than 6 months after opening are refused (Art. 14(2)).</p>
+  </div></div>
 
-      <!-- Comments Tab -->
-      <div class="tab-panel active" data-panel-group="pp" data-panel="comments">
-        <div class="filter-bar">
-          <div class="search-wrap" style="flex:1; max-width:260px;"><i class="fas fa-search"></i><input class="search-input" id="pp-search" placeholder="Search comments…"></div>
-          <select class="filter-select"><option>All Status</option><option>Pending</option><option>In Review</option><option>Responded</option></select>
-          <select class="filter-select"><option>All Basins</option><option>Vardar</option><option>Strumica</option><option>Black Drim</option></select>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Export</button>
-        </div>
-        <div style="padding:16px 20px;">
-          
-    <div class="card" style="margin-bottom:12px; border-left:3px solid #d97706;">
-      <div style="padding:14px 16px;">
-        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
-          <div>
-            <div style="font-size:13px; font-weight:700; color:#0f172a;">Strumica WWTP delays</div>
-            <div style="font-size:11px; color:#64748b; margin-top:2px;">
-              <i class="fas fa-user-circle" style="margin-right:3px;"></i>NGO representative · NGO Eco-Action
-              <span style="margin:0 6px;">·</span>
-              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-28
-            </div>
-          </div>
-          <span class="badge badge-moderate">In Review</span>
-        </div>
-        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
-          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
-          The construction of Strumica WWTP has been delayed significantly. We request a revised timeline and transparency on milestones.
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
-            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Strumica River Basin
-          </span>
-          <span class="id-pill">MK-STR-RW-001</span>
-          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
-        </div>
-        
-        <div style="display:flex; gap:6px; margin-top:10px;">
-          
-          <button class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Respond</button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-tag"></i> Assign</button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
-        </div>
-      </div>
+  <div class="tab-panel" data-panel-group="p" data-panel="tr">
+    <div class="filter-bar">
+      <select class="filter-select" id="tf-s"><option value="">All stages</option><option value="1">Stage 1</option><option value="2">Stage 2</option><option value="3">Stage 3</option></select>
+      <select class="filter-select" id="tf-o"><option value="open">To process</option><option value="">All</option><option value="done">With outcome</option></select>
+      <span style="font-size:11.5px;color:#64748b;">Response target: 30 working days</span>
     </div>
-    <div class="card" style="margin-bottom:12px; border-left:3px solid #059669;">
-      <div style="padding:14px 16px;">
-        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
-          <div>
-            <div style="font-size:13px; font-weight:700; color:#0f172a;">Dojran Lake water levels</div>
-            <div style="font-size:11px; color:#64748b; margin-top:2px;">
-              <i class="fas fa-user-circle" style="margin-right:3px;"></i>Association member · Fishermen Association Dojran
-              <span style="margin:0 6px;">·</span>
-              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-25
-            </div>
-          </div>
-          <span class="badge badge-good">Responded</span>
-        </div>
-        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
-          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
-          Water levels in Dojran Lake continue to decline despite stated measures. Requesting data on water extraction permits near the lake.
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
-            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Dojran Lake
-          </span>
-          <span class="id-pill">MK-VAR-LW-001</span>
-          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
-        </div>
-        
-        <div style="margin-top:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:7px; padding:10px;">
-          <div style="font-size:10px; font-weight:700; color:#065f46; margin-bottom:4px;"><i class="fas fa-reply"></i> Official Response — MEPP</div>
-          <div style="font-size:11px; color:#065f46; line-height:1.5;">Thank you for your comment. The water balance data for Dojran Lake has been updated. Current extraction volumes are within permitted limits. See attached report.</div>
-        </div>
-        <div style="display:flex; gap:6px; margin-top:10px;">
-          
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
-        </div>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:12px; border-left:3px solid #94a3b8;">
-      <div style="padding:14px 16px;">
-        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
-          <div>
-            <div style="font-size:13px; font-weight:700; color:#0f172a;">Agricultural discharge - Vardar lower reach</div>
-            <div style="font-size:11px; color:#64748b; margin-top:2px;">
-              <i class="fas fa-user-circle" style="margin-right:3px;"></i>Resident · Municipality Gevgelija
-              <span style="margin:0 6px;">·</span>
-              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-20
-            </div>
-          </div>
-          <span class="badge badge-pending">Pending</span>
-        </div>
-        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
-          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
-          Increased turbidity and odor in Vardar river at Gevgelija. Suspected connection to upstream agricultural activities.
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
-            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Vardar @ Gevgelija
-          </span>
-          <span class="id-pill">MK-VAR-RW-001</span>
-          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
-        </div>
-        
-        <div style="display:flex; gap:6px; margin-top:10px;">
-          
-          <button class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Respond</button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-tag"></i> Assign</button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
-        </div>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:12px; border-left:3px solid #d97706;">
-      <div style="padding:14px 16px;">
-        <div style="display:flex; align-items:start; justify-content:space-between; margin-bottom:8px;">
-          <div>
-            <div style="font-size:13px; font-weight:700; color:#0f172a;">Ohrid Lake - Eutrophication Risk</div>
-            <div style="font-size:11px; color:#64748b; margin-top:2px;">
-              <i class="fas fa-user-circle" style="margin-right:3px;"></i>Researcher · UKIM Faculty of Science
-              <span style="margin:0 6px;">·</span>
-              <i class="fas fa-calendar" style="margin-right:3px;"></i>2024-03-15
-            </div>
-          </div>
-          <span class="badge badge-moderate">In Review</span>
-        </div>
-        <div style="font-size:12px; color:#334155; line-height:1.6; background:#f8fafc; padding:10px; border-radius:7px;">
-          <i class="fas fa-quote-left" style="color:#e2e8f0; font-size:18px; margin-right:6px; float:left; line-height:1;"></i>
-          Recent sampling indicates elevated phosphorus levels in the southern bay. We recommend immediate monitoring intensification.
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-          <span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:4px;">
-            <i class="fas fa-map-pin" style="margin-right:3px;"></i>Ohrid Lake
-          </span>
-          <span class="id-pill">MK-VAR-LW-002</span>
-          <a href="../map/" style="font-size:10px; color:#1a56db; text-decoration:none;"><i class="fas fa-map"></i> View on Map</a>
-        </div>
-        
-        <div style="display:flex; gap:6px; margin-top:10px;">
-          
-          <button class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Respond</button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-tag"></i> Assign</button>
-          <button class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Archive</button>
-        </div>
-      </div>
-    </div>
-        </div>
-      </div>
-
-      <!-- Submit Tab -->
-      <div class="tab-panel" data-panel-group="pp" data-panel="submit">
-        <div style="padding:20px;">
-          <div class="alert alert-info" style="margin-bottom:16px;">
-            <i class="fas fa-info-circle"></i>
-            <span>Public participation is open under WFD Article 14. All comments are reviewed by the competent authority (MEPP). Responses are published within 30 working days.</span>
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            
-            <div>
-              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Full Name *</label>
-              <input type="text" placeholder="Your name" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-            </div>
-            <div>
-              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Email *</label>
-              <input type="email" placeholder="your@email.com" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-            </div>
-            <div>
-              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Organization</label>
-              <input type="text" placeholder="NGO / Municipality / Company" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-            </div>
-            <div>
-              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Phone</label>
-              <input type="tel" placeholder="+389 2 XXX XXXX" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-            </div>
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-            <div>
-              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Topic / Subject *</label>
-              <input type="text" placeholder="Brief topic of your comment" style="width:100%; padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px;">
-            </div>
-            <div>
-              <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Related Water Body</label>
-              <select class="filter-select" style="width:100%; padding:7px;"><option>Select (optional)…</option><option>MK-VAR-RW-001</option><option>MK-VAR-LW-002</option></select>
-            </div>
-          </div>
-          <div style="margin-top:12px;">
-            <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Comment Text *</label>
-            <textarea rows="5" placeholder="Enter your detailed comment here…" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px; resize:vertical;"></textarea>
-          </div>
-          <div style="margin-top:8px;">
-            <label style="font-size:11px; font-weight:600; color:#475569; display:block; margin-bottom:3px;">Attach Supporting Document</label>
-            <div style="border:2px dashed #e2e8f0; padding:12px; border-radius:7px; text-align:center; background:#f8fafc; cursor:pointer;">
-              <i class="fas fa-paperclip" style="color:#94a3b8; margin-right:5px;"></i><span style="font-size:12px; color:#64748b;">PDF, DOC (max 10MB)</span>
-            </div>
-          </div>
-          <div style="display:flex; gap:8px; margin-top:14px;">
-            <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Comment</button>
-            <button class="btn btn-secondary"><i class="fas fa-save"></i> Save Draft</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Documents Tab -->
-      <div class="tab-panel" data-panel-group="pp" data-panel="documents">
-        <div style="padding:20px;">
-          
-          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:12px; font-weight:600; color:#334155;">River Basin Management Plan 2019-2027 — Draft</div>
-              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2024-01-15 · 8.4 MB</div>
-            </div>
-            <span class="badge badge-moderate" style="font-size:10px;">Open for comment</span>
-            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
-          </div>
-          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:12px; font-weight:600; color:#334155;">Environmental Report — WFD Strategic Assessment</div>
-              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2024-01-15 · 12.1 MB</div>
-            </div>
-            <span class="badge badge-moderate" style="font-size:10px;">Open for comment</span>
-            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
-          </div>
-          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:12px; font-weight:600; color:#334155;">Programme of Measures 2022-2027</div>
-              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2023-11-01 · 5.2 MB</div>
-            </div>
-            <span class="badge badge-good" style="font-size:10px;">Published</span>
-            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
-          </div>
-          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:12px; font-weight:600; color:#334155;">Monitoring Programme 2022-2027</div>
-              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2023-09-15 · 3.8 MB</div>
-            </div>
-            <span class="badge badge-good" style="font-size:10px;">Published</span>
-            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
-          </div>
-          <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-            <div style="width:36px; height:36px; background:#fee2e2; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <i class="fas fa-file-pdf" style="color:#dc2626; font-size:16px;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:12px; font-weight:600; color:#334155;">Significant Water Management Issues</div>
-              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">2023-06-01 · 2.1 MB</div>
-            </div>
-            <span class="badge badge-good" style="font-size:10px;">Published</span>
-            <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i></a>
-          </div>
-        </div>
-      </div>
+    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:0;">
+      <div class="table-container" style="border-right:1px solid #f1f5f9;"><table class="data-table"><thead><tr><th>Ref.</th><th>About</th><th>From</th><th>Status</th></tr></thead><tbody id="tr-rows"></tbody></table></div>
+      <div id="tr-form" class="card-body" style="font-size:12.5px;color:#64748b;">Select a comment to assess it.</div>
     </div>
   </div>
 
-  <!-- Right panel -->
-  <div style="display:flex; flex-direction:column; gap:16px;">
-    <div class="card">
-      <div class="card-header"><span class="card-title" style="font-size:12px;"><i class="fas fa-calendar" style="color:#1a56db; margin-right:5px;"></i>Consultation Timeline</span></div>
-      <div class="card-body" style="padding:12px 16px;">
-        <div class="timeline" style="padding-left:16px;">
-          
-          <div class="timeline-item">
-            <div class="timeline-dot" style="background:#059669;"></div>
-            <div style="padding-top:2px;">
-              <div style="font-size:10px; font-weight:700; color:#059669;">15 Jan 2024</div>
-              <div style="font-size:11px; color:#334155; margin-top:1px; line-height:1.4;">Publication of draft RBMP 2nd Cycle documents</div>
-              
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot" style="background:#d97706;"></div>
-            <div style="padding-top:2px;">
-              <div style="font-size:10px; font-weight:700; color:#d97706;">15 Jan - 15 Apr 2024</div>
-              <div style="font-size:11px; color:#334155; margin-top:1px; line-height:1.4;">Public comment period (90 days)</div>
-              <span class="badge badge-moderate" style="font-size:9px; margin-top:3px; display:inline-flex;">IN PROGRESS</span>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot" style="background:#e2e8f0;"></div>
-            <div style="padding-top:2px;">
-              <div style="font-size:10px; font-weight:700; color:#94a3b8;">16 Apr - 30 Jun 2024</div>
-              <div style="font-size:11px; color:#94a3b8; margin-top:1px; line-height:1.4;">Analysis and response to comments</div>
-              
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot" style="background:#e2e8f0;"></div>
-            <div style="padding-top:2px;">
-              <div style="font-size:10px; font-weight:700; color:#94a3b8;">1 Jul 2024</div>
-              <div style="font-size:11px; color:#94a3b8; margin-top:1px; line-height:1.4;">Publication of final RBMP + response to comments</div>
-              
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot" style="background:#e2e8f0;"></div>
-            <div style="padding-top:2px;">
-              <div style="font-size:10px; font-weight:700; color:#94a3b8;">22 Dec 2027</div>
-              <div style="font-size:11px; color:#94a3b8; margin-top:1px; line-height:1.4;">RBMP submission to EC / WISE reporting</div>
-              
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="tab-panel" data-panel-group="p" data-panel="rp"><div class="card-body" id="rp"></div></div>
 
-    <div class="card">
-      <div class="card-header"><span class="card-title" style="font-size:12px;"><i class="fas fa-chart-pie" style="color:#8b5cf6; margin-right:5px;"></i>Comments by Basin</span></div>
-      <div class="card-body" style="padding:14px 16px;">
-        <canvas id="commentsChart" height="160"></canvas>
-      </div>
-    </div>
-  </div>
+  <div class="tab-panel" data-panel-group="p" data-panel="nt"><div class="card-body">
+    <p style="font-size:12.5px;color:#475569;margin-top:0;">Uses the existing GWDMS notifications module (action alerts, e-mail to users and groups, user-defined notifications).</p>
+    <div class="table-container"><table class="data-table"><thead><tr><th>Event</th><th>Recipients</th><th>Channel</th><th>Active</th></tr></thead><tbody>
+      <tr><td>Stage opens for comments</td><td>All registered users, subscribers of the RBD</td><td>E-mail + portal</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>30 days before a stage closes</td><td>All registered users</td><td>E-mail</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>New comment received</td><td>Assigned officer, participation coordinator</td><td>Portal</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>Comment not assessed after 20 working days</td><td>Assigned officer + supervisor</td><td>E-mail + portal</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>Outcome published</td><td>The commenter</td><td>E-mail</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>Consultation report published</td><td>All commenters of the stage</td><td>E-mail</td><td><input type="checkbox" checked></td></tr>
+    </tbody></table></div>
+  </div></div>
 </div>
-
-<script>
-const cCtx = document.getElementById('commentsChart').getContext('2d');
-new Chart(cCtx, {
-  type:'doughnut',
-  data:{labels:['Vardar','Strumica','Black Drim','Bregalnica'],datasets:[{data:[12,6,3,2],backgroundColor:['#1a56db','#f97316','#0891b2','#8b5cf6'],borderWidth:2,borderColor:'#fff'}]},
-  options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}}}
-});
-</script>
 
   </main>
 </div>
 <script src="../../assets/shell.js"></script>
-
+<script src="../../assets/participation.js"></script>
+<script>
+const SC={Open:'qa-accepted',Closed:'badge-inactive',Upcoming:'badge-active'};
+function stRows(){document.getElementById('st-rows').innerHTML=WIS.STAGES.map(s=>`<tr><td><b>${s.n}. ${s.title}</b><div style="font-size:11px;color:#94a3b8;">${s.art}</div></td><td style="font-size:12px;">${s.docs.map(k=>'<span class="id-pill">'+WIS.DOCS[k].id+'</span>').join('<br>')}</td><td>${WIS.fmt(s.legal)}</td><td>${WIS.fmt(s.opens)}</td><td>${WIS.fmt(s.closes)}</td><td>${s.months} months</td>
+ <td style="font-size:11.5px;">${s.sixOk?'<i class="fas fa-check" style="color:#059669;"></i> ≥ 6 months':'<i class="fas fa-times" style="color:#dc2626;"></i> < 6 months'}<br>${s.onTime?'<i class="fas fa-check" style="color:#059669;"></i> on time':'<i class="fas fa-exclamation-triangle" style="color:#d97706;"></i> after legal deadline'}</td><td><span class="badge ${SC[s.state]}">${s.state}</span></td><td><button class="btn btn-secondary btn-sm" onclick="edit(${s.n})">Edit</button></td></tr>`).join('');}
+function edit(n){const s=WIS.STAGES.find(x=>x.n===n),e=document.getElementById('st-edit');e.style.display='block';
+ e.innerHTML=`<div class="card-header"><h3 class="card-title">Edit stage ${n} · ${s.title}</h3></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+ <div><label class="form-label">Comments open</label><input type="date" class="form-input" id="e-o" value="${s.opens}"></div>
+ <div><label class="form-label">Comments close</label><input type="date" class="form-input" id="e-c" value="${s.closes}"><div class="form-hint" id="e-h"></div></div>
+ <div><label class="form-label">Legal deadline for publication</label><input class="form-input" value="${WIS.fmt(s.legal)}" disabled></div>
+ <div style="grid-column:span 3;display:flex;gap:8px;"><button class="btn btn-primary" id="e-save">Save</button><button class="btn btn-secondary" onclick="this.closest('#st-edit').style.display='none'">Cancel</button></div></div>`;
+ const chk=()=>{const o=new Date(document.getElementById('e-o').value),c=new Date(document.getElementById('e-c').value),min=WIS.addMonths(o,6),h=document.getElementById('e-h'),b=document.getElementById('e-save');
+  if(c<min){h.innerHTML=`<span style="color:#dc2626;font-weight:600;">Closing date must be at least 6 months after opening (WFD Art. 14(2)). Earliest allowed: ${WIS.fmt(min)}.</span>`;b.disabled=true;b.style.opacity=.5;}
+  else{h.innerHTML=`<span style="color:#059669;">${Math.round((c-o)/(864e5*30.44))} months – meets the 6-month minimum.</span>`;b.disabled=false;b.style.opacity=1;}};
+ ['e-o','e-c'].forEach(i=>document.getElementById(i).oninput=chk); chk();
+ document.getElementById('e-save').onclick=()=>wisToast('Stage dates saved; subscribers notified (mockup)');}
+function trRows(){const s=document.getElementById('tf-s').value,o=document.getElementById('tf-o').value;
+ const cs=WIS.comments().filter(c=>(!s||c.stage==s)&&(o===''||(o==='open'?!c.outcome:!!c.outcome))).sort((a,b)=>b.date.localeCompare(a.date));
+ document.getElementById('tr-n').textContent=WIS.comments().filter(c=>!c.outcome).length;
+ document.getElementById('tr-rows').innerHTML=cs.map(c=>`<tr style="cursor:pointer;" onclick="assess('${c.id}')"><td><span class="id-pill">${c.id}</span>${c.mine?' <span class="nav-new">NEW</span>':''}<div style="font-size:11px;color:#94a3b8;">${WIS.fmt(c.date)} · stage ${c.stage}</div></td><td style="font-size:12px;"><i class="fas ${WIS.targetIcon(c.target)}"></i> ${WIS.targetLabel(c.target)}</td><td style="font-size:12px;">${c.org||c.who}</td><td>${WIS.statusBadge(c)}</td></tr>`).join('')||'<tr><td colspan="4" style="color:#94a3b8;">Nothing to process.</td></tr>';}
+function assess(id){const c=WIS.comments().find(x=>x.id===id),f=document.getElementById('tr-form');
+ const links=Object.keys(WIS.DOCS).map(k=>WIS.DOCS[k].sections.map(s=>`<option>${WIS.DOCS[k].id} §${s[0]} ${s[1]}</option>`).join('')).join('')+WIS.MEASURES.map(m=>`<option>${m.id} · ${m.name}</option>`).join('');
+ f.innerHTML=`<div style="color:#0f172a;"><span class="id-pill">${c.id}</span> ${WIS.statusBadge(c)}</div>
+ <p style="font-size:13px;color:#334155;margin:8px 0;">"${c.text}"</p>
+ <div class="meta-row" style="margin-bottom:10px;"><span><b>From:</b> ${c.org||'—'} (${c.who})</span><span><b>About:</b> ${WIS.targetLabel(c.target)}</span></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+  <div><label class="form-label">Assigned to</label><select class="form-input"><option>Water Dept. – planning officer</option><option>Subproject 1 expert</option><option>Subproject 2 expert</option><option>Subproject 3 expert</option></select></div>
+  <div><label class="form-label">Status</label><select class="form-input" id="a-s">${['Received','Under review','Reviewed'].map(x=>`<option ${x===c.status?'selected':''}>${x}</option>`).join('')}</select></div>
+  <div><label class="form-label">Outcome</label><select class="form-input" id="a-o"><option value="">— not decided —</option>${['Incorporated','Partly incorporated','Not incorporated','Out of scope'].map(x=>`<option ${x===c.outcome?'selected':''}>${x}</option>`).join('')}</select></div>
+  <div><label class="form-label">Changed section or measure</label><select class="form-input" id="a-l"><option value="">—</option>${links}</select></div>
+ </div>
+ <label class="form-label" style="margin-top:10px;">Reason (published) *</label><textarea class="form-input" id="a-r" rows="3">${c.reason||''}</textarea>
+ <div class="form-hint" id="a-h">A reason is required for every outcome; a changed section or measure is required for "Incorporated" and "Partly incorporated".</div>
+ <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" onclick="saveA('${c.id}')"><i class="fas fa-check"></i>Save and publish</button><a class="btn btn-secondary" href="../../participate/log/#${c.id}" target="_blank">View in public log</a></div>`;}
+function saveA(id){const o=document.getElementById('a-o').value,r=document.getElementById('a-r').value.trim(),l=document.getElementById('a-l').value,s=document.getElementById('a-s').value,h=document.getElementById('a-h');
+ if(o&&!r){h.innerHTML='<span style="color:#dc2626;font-weight:600;">Add the reason before publishing an outcome.</span>';return;}
+ if((o==='Incorporated'||o==='Partly incorporated')&&!l){h.innerHTML='<span style="color:#dc2626;font-weight:600;">Select the section or measure that changed.</span>';return;}
+ WIS.editComment(id,{status:o?'Reviewed':s,outcome:o,reason:r,change:l});wisToast(id+': '+(o?'outcome published; commenter notified by e-mail':'status updated')+' (mockup)');trRows();assess(id);rpt();}
+function rpt(){const all=WIS.comments();const st=WIS.STAGES;
+ const row=n=>{const cs=all.filter(c=>c.stage===n),k=x=>cs.filter(c=>c.outcome===x).length;return `<tr><td><b>Stage ${n}</b></td><td>${cs.length}</td><td>${new Set(cs.map(c=>c.who)).size}</td><td>${k('Incorporated')}</td><td>${k('Partly incorporated')}</td><td>${k('Not incorporated')}</td><td>${k('Out of scope')}</td><td>${cs.filter(c=>!c.outcome).length}</td></tr>`;};
+ const groups=[...new Set(all.map(c=>c.who))].map(g=>`<tr><td>${g}</td><td>${all.filter(c=>c.who===g).length}</td></tr>`).join('');
+ const changed=all.filter(c=>c.change).map(c=>`<li><span class="id-pill">${c.id}</span> → ${c.change}</li>`).join('');
+ document.getElementById('rp').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;"><div><b style="font-size:15px;color:#0f172a;">Summary of public information and consultation – Vardar RBD, RBMP 2028–2033</b><div style="font-size:11.5px;color:#64748b;">Generated from the consultation records · becomes RBMP chapter 9 (WFD Annex VII A.9)</div></div>
+ <div style="display:flex;gap:6px;"><button class="btn btn-secondary btn-sm" onclick="wisToast('DOCX exported (mockup)')"><i class="fas fa-file-word"></i>DOCX</button><button class="btn btn-secondary btn-sm" onclick="wisToast('CSV exported (mockup)')"><i class="fas fa-file-csv"></i>CSV</button></div></div>
+ <div class="form-label" style="margin-top:14px;">1. Consultation measures</div>
+ <ul style="font-size:12.5px;color:#475569;margin:4px 0 0 18px;line-height:1.7;">${st.map(s=>`<li>Stage ${s.n} (${s.title}): published ${WIS.fmt(s.opens)}, written comments until ${WIS.fmt(s.closes)} (${s.months} months); portal, e-mail, post and public hearings.</li>`).join('')}</ul>
+ <div class="form-label" style="margin-top:14px;">2. Comments received and their results</div>
+ <div class="table-container"><table class="data-table"><thead><tr><th>Stage</th><th>Comments</th><th>Groups</th><th>Incorporated</th><th>Partly</th><th>Not incorporated</th><th>Out of scope</th><th>Pending</th></tr></thead><tbody>${[1,2,3].map(row).join('')}</tbody></table></div>
+ <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-top:14px;"><div><div class="form-label">3. Who took part</div><table class="data-table"><tbody>${groups}</tbody></table></div>
+ <div><div class="form-label">4. Changes made to the plan as a result</div><ul style="font-size:12.5px;color:#475569;margin:4px 0 0 18px;line-height:1.8;">${changed||'<li>None yet</li>'}</ul></div></div>`;}
+['tf-s','tf-o'].forEach(i=>document.getElementById(i).onchange=trRows);
+stRows();trRows();rpt();
+</script>
 </body>
 </html>

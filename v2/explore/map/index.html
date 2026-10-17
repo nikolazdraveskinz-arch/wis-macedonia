@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="map" data-portal="public" style="background:#f1f5f9;">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+<h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 10px;">Map of the Vardar River Basin</h1>
+<div style="display:grid;grid-template-columns:250px 1fr 300px;gap:14px;height:calc(100vh - 180px);min-height:560px;">
+  <div class="card" style="overflow:auto;"><div class="card-body" style="padding:12px 14px;">
+    <div class="search-wrap" style="margin-bottom:6px;"><i class="fas fa-search"></i><input id="msearch" class="search-input" style="width:100%;" placeholder="Place, water-body ID or lat, lon"></div>
+    <div class="form-hint">Press Enter. Try <b>Veles</b>, <b>MK-VAR-RW-0014</b> or <b>41.7, 21.8</b></div>
+    <div id="mlayers"></div>
+    <div class="form-label" style="margin:12px 0 4px;color:#64748b;text-transform:uppercase;font-size:10px;letter-spacing:.8px;">Ecological status</div>
+    <div style="font-size:11.5px;line-height:1.9;"><span style="color:#059669;">━</span> Good · <span style="color:#d97706;">━</span> Moderate · <span style="color:#dc2626;">━</span> Poor · <span style="color:#7c3aed;">▭</span> Groundwater</div>
+  </div></div>
+  <div class="card" style="overflow:hidden;"><div id="wmap" style="height:100%;"></div></div>
+  <div class="card" style="overflow:auto;"><div class="card-header"><h3 class="card-title">Feature information</h3></div>
+    <div class="card-body" id="minfo" style="font-size:12.5px;color:#64748b;">Click a water body, site, pressure, measure or comment on the map. Click anywhere else to comment on that point.
+    
+    </div></div>
+</div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../../assets/shell.js"></script>
+<script src="../../assets/participation.js"></script>
+<script src="../../assets/map.js"></script>
+<script>WIS.mapObj = initWisMap({mode:'public', el:'wmap', info:'minfo', layers:'mlayers', search:'msearch'});</script>
+</body>
+</html>

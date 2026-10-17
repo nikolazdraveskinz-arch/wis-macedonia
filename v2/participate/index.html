@@ -15,15 +15,51 @@
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
-<h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">Have your say on the Vardar River Basin Management Plan</h1>
-<p style="font-size:13px;color:#64748b;margin:0 0 18px;">Public consultation under Article 14 of the Water Framework Directive</p>
-<div class="alert alert-info"><i class="fas fa-tools"></i><div><b>Built in iteration 3.</b> This page becomes the consultation hub: three stage pages with countdown, comments on a map point, water body or chapter, "My comments" with status and outcome, and the public log of comments and responses.</div></div>
-<div id="documents" class="card" style="margin-top:18px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-file-alt" style="color:#7c3aed;margin-right:6px;"></i>RBMP documents</h3></div>
-  <div class="card-body" style="font-size:13px;color:#64748b;">Versioned documents with permanent links and section anchors are added in iteration 3, so that comments can refer to a specific chapter.</div></div>
+<h1 style="font-size:24px;font-weight:800;color:#0f172a;margin:0 0 4px;">Have your say on the Vardar River Basin Management Plan</h1>
+<p style="font-size:13.5px;color:#64748b;margin:0 0 20px;">The plan for 2028–2033 is prepared in three consultation stages. Each stage is open for written comments for at least six months (Water Framework Directive, Article 14). Every comment gets a reference number, an outcome and a reason, published in the public log.</p>
+<div id="stages" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;"></div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;">
+  <a href="../explore/map/" class="kpi-card" style="text-decoration:none;"><div class="kpi-icon" style="background:#cffafe;color:#0891b2;"><i class="fas fa-map-marker-alt"></i></div><div style="font-weight:700;margin-top:10px;color:#0f172a;">Comment on the map</div><div class="kpi-label">Click a river, lake, aquifer or any point and choose "Comment here"</div></a>
+  <a href="my-comments/" class="kpi-card" style="text-decoration:none;"><div class="kpi-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-inbox"></i></div><div style="font-weight:700;margin-top:10px;color:#0f172a;">My comments</div><div class="kpi-label">Status and outcome of what you submitted</div></a>
+  <a href="log/" class="kpi-card" style="text-decoration:none;"><div class="kpi-icon" style="background:#d1fae5;color:#059669;"><i class="fas fa-list-alt"></i></div><div style="font-weight:700;margin-top:10px;color:#0f172a;">Public log</div><div class="kpi-label">All comments, how they were taken into account, and the consultation reports</div></a>
+</div>
+
+<div id="documents" class="card" style="margin-top:20px;">
+  <div class="card-header"><h3 class="card-title"><i class="fas fa-file-alt" style="color:#7c3aed;margin-right:6px;"></i>RBMP documents</h3><span style="font-size:11px;color:#94a3b8;">Each version keeps a permanent link</span></div>
+  <div class="table-container"><table class="data-table"><thead><tr><th>Document</th><th>Permanent ID</th><th>Version</th><th>Published</th><th>Stage</th><th></th></tr></thead><tbody id="doc-rows"></tbody></table></div>
+</div>
+
+<div class="card" style="margin-top:20px;">
+  <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt" style="color:#0891b2;margin-right:6px;"></i>Meetings and events</h3><span style="font-size:11px;color:#94a3b8;">Organised by the River basin management subproject</span></div>
+  <div class="table-container"><table class="data-table"><thead><tr><th>Date</th><th>Event</th><th>Place</th><th>Material</th></tr></thead><tbody>
+    <tr><td>2026-11-12</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Shtip</td><td><a href="#" style="color:#1a56db;">Agenda</a></td></tr>
+    <tr><td>2026-10-22</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Veles</td><td><a href="#" style="color:#1a56db;">Agenda</a></td></tr>
+    <tr><td>2026-09-24</td><td><b>River Basin Council session</b></td><td>Skopje</td><td><a href="#" style="color:#1a56db;">Minutes</a> · <a href="#" style="color:#1a56db;">Presentation</a></td></tr>
+    <tr><td>2026-03-05</td><td><b>Stakeholder workshop – significant issues</b> (stage 2)</td><td>Kumanovo</td><td><a href="#" style="color:#1a56db;">Minutes</a></td></tr>
+  </tbody></table></div>
+</div>
 
 </main>
 <footer id="pub-footer"></footer>
 <script src="../assets/shell.js"></script>
-
+<script src="../assets/participation.js"></script>
+<script>
+const SC={Open:'qa-accepted',Closed:'badge-inactive',Upcoming:'badge-active'};
+document.getElementById('stages').innerHTML = WIS.STAGES.map(s=>{
+  const n = WIS.comments().filter(c=>c.stage===s.n).length;
+  const pct = s.state==='Open' ? Math.round(100*(1-s.daysLeft/(s.months*30.44))) : (s.state==='Closed'?100:0);
+  return `<div class="card" style="${s.state==='Open'?'border:2px solid #059669;':''}"><div class="card-body">
+    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:#64748b;font-weight:600;">STAGE ${s.n} · ${s.art}</span><span class="badge ${SC[s.state]}">${s.state}</span></div>
+    <div style="font-weight:800;font-size:16px;color:#0f172a;margin:6px 0 4px;">${s.title}</div>
+    <div style="font-size:12.5px;color:#475569;min-height:36px;">${s.lead}</div>
+    <div class="progress-bar" style="margin:12px 0 6px;"><div class="progress-fill" style="width:${pct}%;background:${s.state==='Open'?'#059669':'#94a3b8'};"></div></div>
+    <div class="meta-row"><span><b>Comments:</b> ${WIS.fmt(s.opens)} – ${WIS.fmt(s.closes)} (${s.months} months)</span></div>
+    ${s.state==='Open'?`<div style="font-size:22px;font-weight:800;color:#059669;margin-top:6px;">${s.daysLeft} days left</div>`:''}
+    <div class="meta-row" style="margin-top:4px;"><span><b>${n}</b> comments received</span></div>
+    <div style="display:flex;gap:6px;margin-top:12px;"><a href="stage/?s=${s.n}" class="btn ${s.state==='Open'?'btn-primary':'btn-secondary'} btn-sm">${s.state==='Open'?'Read and comment':'View documents and outcomes'}</a></div>
+  </div></div>`;}).join('');
+document.getElementById('doc-rows').innerHTML = Object.keys(WIS.DOCS).map(k=>{const d=WIS.DOCS[k];return `<tr><td><b>${d.title}</b></td><td><span class="id-pill">${d.id}</span></td><td>${d.ver}</td><td>${WIS.fmt(d.date)}</td><td>${d.stage}</td><td><a class="btn btn-secondary btn-sm" href="document/?d=${k}">Open</a></td></tr>`;}).join('');
+</script>
 </body>
 </html>
