@@ -180,13 +180,8 @@
         ['dashboards', 'explore/dashboards/', 'Dashboards'],
         ['permits', 'explore/permits/', 'Permits']
       ];
-      const nationalLinks = [
-        ['home', '', 'Home'],
-        ['aboutnwis', '#about', 'About NWIS'],
-        ['basins', '#basins', 'River basins'],
-        ['about', 'about/contacts/', 'Who is responsible']
-      ];
-      const links = (scope === 'basin' ? basinLinks : nationalLinks)
+      /* The national cover page and other national pages carry no portal menu: one enters a basin first. */
+      const links = (scope === 'basin' ? basinLinks : [])
         .map(([k, href, l]) => `<a href="${href[0] === '#' && active !== 'home' ? base + href : (href[0] === '#' ? href : base + href)}" class="${k === active ? 'on' : ''}">${l}</a>`).join('');
       h.className = 'pub-header';
       h.innerHTML = `<div class="pub-header-inner">
@@ -202,9 +197,9 @@
         <button class="header-btn" style="background:transparent;color:#94a3b8;border-color:#334155;" onclick="WIS.signOut()" title="Sign out"><i class="fas fa-sign-out-alt"></i></button>` :
         `<a href="${base}register/" class="header-btn pub-hide-sm" style="background:transparent;color:#e2e8f0;border-color:#334155;"><i class="fas fa-user-plus"></i><span>Register</span></a>
         <a href="${base}login/" class="header-btn header-btn-primary"><i class="fas fa-sign-in-alt"></i><span>Sign in</span></a>`}
-        <button class="header-btn pub-burger" style="background:transparent;color:#e2e8f0;border-color:#334155;" onclick="document.getElementById('pub-mnav').classList.toggle('open')" title="Menu"><i class="fas fa-bars"></i></button>
+        <button class="header-btn pub-burger" ${links ? '' : 'hidden'} style="background:transparent;color:#e2e8f0;border-color:#334155;" onclick="document.getElementById('pub-mnav').classList.toggle('open')" title="Menu"><i class="fas fa-bars"></i></button>
       </div>
-      <nav id="pub-mnav" class="pub-mnav">${links}</nav>`;
+      ${links ? `<nav id="pub-mnav" class="pub-mnav">${links}</nav>` : ''}`;
       if (scope === 'basin') {
         const strip = document.createElement('div');
         strip.className = 'basin-strip';

@@ -15,15 +15,23 @@
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
-<div class="nat-hero">
-  <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.6px;opacity:.8;">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
-  <h1 style="font-size:34px;font-weight:800;margin:8px 0 0;line-height:1.15;">National Water Information System – NWIS</h1>
-  <div class="mk-name" lang="mk">Национален Информативен Систем за Води – НИСВ</div>
-  <p style="font-size:15.5px;max-width:760px;opacity:.94;margin:18px 0 22px;line-height:1.55;">One national place for information on rivers, lakes and groundwater in North Macedonia. NWIS brings together water bodies, monitoring, pressures, measures, water permits and the river basin management plans of all four river basin districts – open to everyone, with secure tools for the institutions that manage water.</p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;">
-    <a href="#basins" class="btn" style="background:#fff;color:#1e429f;padding:11px 18px;font-size:13.5px;"><i class="fas fa-map-marked-alt"></i>Enter a river basin</a>
-    <a href="#about" class="btn" style="background:rgba(255,255,255,.14);color:#fff;padding:11px 18px;font-size:13.5px;border:1px solid rgba(255,255,255,.4);"><i class="fas fa-info-circle"></i>About NWIS</a>
-    <a href="login/" class="btn" style="background:rgba(255,255,255,.14);color:#fff;padding:11px 18px;font-size:13.5px;border:1px solid rgba(255,255,255,.4);"><i class="fas fa-lock"></i>Institutional sign-in</a>
+<div class="nat-hero nat-cover">
+  <div class="nat-cover-top">
+    <div>
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.6px;opacity:.8;">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+      <h1 style="font-size:34px;font-weight:800;margin:10px 0 0;line-height:1.15;">National Water Information System – NWIS</h1>
+      <div class="mk-name" lang="mk">Национален Информативен Систем за Води – НИСВ</div>
+      <p style="font-size:15.5px;max-width:620px;opacity:.94;margin:18px 0 0;line-height:1.6;">The national system for information on rivers, lakes and groundwater in North Macedonia. It brings together water bodies, monitoring, pressures, measures, water permits and the river basin management plans of all four river basin districts – open to everyone, with secure tools for the institutions that manage water.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;">
+        <a href="#about" class="btn" style="background:rgba(255,255,255,.14);color:#fff;padding:10px 16px;font-size:13px;border:1px solid rgba(255,255,255,.4);"><i class="fas fa-info-circle"></i>About NWIS</a>
+        <a href="login/" class="btn" style="background:rgba(255,255,255,.14);color:#fff;padding:10px 16px;font-size:13px;border:1px solid rgba(255,255,255,.4);"><i class="fas fa-lock"></i>Institutional sign-in</a>
+      </div>
+    </div>
+    <div id="nat-map"></div>
+  </div>
+  <div id="basins" style="margin-top:28px;">
+    <div style="font-size:13px;font-weight:700;letter-spacing:.4px;margin-bottom:10px;"><i class="fas fa-sign-in-alt" style="margin-right:6px;"></i>Enter a river basin district</div>
+    <div id="nat-basin-cards" class="nat-grid-4"></div>
   </div>
 </div>
 
@@ -62,14 +70,7 @@
   </div>
 </section>
 
-<section id="basins" class="nat-section">
-  <h2>River basin districts</h2>
-  <p class="lead">North Macedonia has four river basin districts. Each has the same structure in NWIS – basin home, water bodies, map, consultation, dashboards and permits – and you can choose the RBMP cycle inside each basin.</p>
-  <div class="nat-basins">
-    <div id="nat-map"></div>
-    <div id="nat-basin-cards" class="pub-grid-1" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
-  </div>
-</section>
+
 
 <section class="nat-section">
   <h2>The same structure in every river basin</h2>
@@ -104,28 +105,23 @@ const SHAPE = {
   STR: [[41.55,22.60],[41.62,22.90],[41.48,23.02],[41.35,22.98],[41.30,22.75],[41.35,22.75]],
   JMO: [[42.33,21.55],[42.32,21.75],[42.25,21.72],[42.25,21.56]]
 };
-const nm = L.map('nat-map', { scrollWheelZoom: false }).setView([41.6, 21.7], 8);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(nm);
+const nm = L.map('nat-map', { scrollWheelZoom: false, zoomControl: false }).setView([41.6, 21.7], 8);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(nm);
 const all = [];
 WIS.RBDS.forEach(r => {
   const pg = L.polygon(SHAPE[r.id], { color: r.color, weight: 2, fillColor: r.color, fillOpacity: .22 }).addTo(nm);
-  pg.bindTooltip(r.full + ' (schematic)', { sticky: true });
+  pg.bindTooltip(r.full + ' – click to enter', { sticky: true });
   pg.on('click', () => { location.href = 'basin/?rbd=' + r.id; });
   pg.on('mouseover', () => pg.setStyle({ fillOpacity: .4 })); pg.on('mouseout', () => pg.setStyle({ fillOpacity: .22 }));
   all.push(...SHAPE[r.id]);
 });
 nm.fitBounds(L.latLngBounds(all), { padding: [10, 10] });
 document.getElementById('nat-basin-cards').innerHTML = WIS.RBDS.map(r => `
-  <div class="basin-card" style="--c:${r.color};">
-    <h3>${r.full}</h3><div class="mk" lang="mk">Сливно подрачје ${r.mk}</div>
-    <dl><dt>Area</dt><dd>${r.area} (${r.share} of the territory)</dd><dt>Shared with</dt><dd>${r.shared}</dd><dt>Main waters</dt><dd>${r.rivers}</dd>
-    <dt>Current cycle</dt><dd>RBMP 2028–2033 · ${r.demo ? '<span class="badge qa-accepted">Example content</span>' : '<span class="badge badge-inactive">Structure only</span>'}</dd></dl>
-    <div style="margin-top:auto;display:flex;gap:6px;flex-wrap:wrap;">
-      <a href="basin/?rbd=${r.id}" class="btn btn-primary btn-sm"><i class="fas fa-sign-in-alt"></i>Enter ${r.name}</a>
-      <a href="explore/map/?rbd=${r.id}" class="btn btn-secondary btn-sm"><i class="fas fa-map"></i>Map</a>
-      <a href="participate/?rbd=${r.id}" class="btn btn-secondary btn-sm"><i class="fas fa-comments"></i>Have your say</a>
-    </div>
-  </div>`).join('');
+  <a href="basin/?rbd=${r.id}" class="basin-card" style="--c:${r.color};text-decoration:none;">
+    <h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div>
+    <dl><dt>Area</dt><dd>${r.area} (${r.share})</dd><dt>Shared with</dt><dd>${r.shared}</dd><dt>Main waters</dt><dd>${r.rivers}</dd></dl>
+    <span class="btn btn-primary btn-sm" style="margin-top:auto;align-self:flex-start;">Enter ${r.name} <i class="fas fa-arrow-right"></i></span>
+  </a>`).join('');
 </script>
 </body>
 </html>

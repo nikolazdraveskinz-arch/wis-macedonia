@@ -304,3 +304,13 @@
 .pub-nav a { white-space:nowrap; }
 @media (max-width: 1360px) { .pub-header .logo-text-sub { display:none; } }
 @media (max-width: 1180px) and (min-width: 769px) { .pub-nav a { padding-left:8px !important; padding-right:8px !important; font-size:12.5px; } }
+/* National cover page */
+.nat-cover { padding:40px; }
+.nat-cover-top { display:grid; grid-template-columns:1.25fr 1fr; gap:28px; align-items:stretch; }
+.nat-cover #nat-map { min-height:340px; border:0; border-radius:14px; box-shadow:0 8px 30px rgba(0,0,0,.25); }
+.nat-cover .basin-card { color:#0f172a; border-color:transparent; }
+.nat-cover .basin-card:hover { box-shadow:0 10px 28px rgba(0,0,0,.25); transform:translateY(-2px); }
+.nat-cover .basin-card dl { grid-template-columns:auto 1fr; }
+.pub-burger[hidden] { display:none !important; }
+@media (max-width: 1024px) { .nat-cover-top { grid-template-columns:1fr; } .nat-cover #nat-map { min-height:280px; } }
+@media (max-width: 640px) { .nat-cover { padding:22px; } .nat-cover h1 { font-size:26px !important; } }
