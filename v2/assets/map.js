@@ -25,9 +25,11 @@ window.initWisMap = function (opts) {
   function grp(name) { return groups[name] || (groups[name] = L.layerGroup().addTo(map)); }
 
   /* Water bodies */
+  const wbLayers = {};
   W.WBS.forEach(w => {
     const style = { color: ECO[w.eco] || ECO[w.chem], weight: 5, fillOpacity: .25, bubblingMouseEvents: false };
     const lyr = w.line ? L.polyline(w.line, style) : L.polygon(w.poly, Object.assign({}, style, { weight: 2, color: w.cat === 'Groundwater' ? '#7c3aed' : style.color }));
+    wbLayers[w.id] = lyr;
     lyr.addTo(grp(w.cat === 'River' ? 'River water bodies' : w.cat === 'Lake' ? 'Lake water bodies' : 'Groundwater bodies'));
     lyr.on('click', () => showInfo(`<div class="form-label" style="color:#64748b;">${w.cat} water body</div>
       <div style="font-weight:800;font-size:15px;color:#0f172a;">${w.name}</div><span class="id-pill">${w.id}</span>
@@ -35,7 +37,7 @@ window.initWisMap = function (opts) {
       <table class="data-table" style="font-size:12px;"><tr><td>Ecological status</td><td><b style="color:${ECO[w.eco]}">${w.eco}</b></td></tr><tr><td>Chemical status</td><td><b style="color:${ECO[w.chem]}">${w.chem}</b></td></tr>
       <tr><td>Reporting period</td><td>${W.cycle.period}</td></tr>${mode === 'internal' ? '<tr><td>Dataset / QA/QC</td><td>DS-VAR-001 v1.4 · accepted</td></tr><tr><td>Access level</td><td>Public</td></tr>' : ''}</table>
       <div class="form-label" style="margin-top:8px;">Documents and links</div>
-      ${docLinks([['Water body fact sheet (PDF)', '#'], ['Draft RBMP §2 Characterisation', W.base + 'participate/document/?d=RBMP#s2'], ['Draft RBMP §5 Monitoring and status', W.base + 'participate/document/?d=RBMP#s5']])}
+      ${docLinks([['Water body fact sheet', W.base + 'explore/water-body/?id=' + w.id], ['Draft RBMP §2 Characterisation', W.base + 'participate/document/?d=RBMP#s2'], ['Draft RBMP §5 Monitoring and status', W.base + 'participate/document/?d=RBMP#s5']])}
       ${actions({ kind: 'wb', wb: w.id })}`));
   });
   /* River network (hydrological features) */
@@ -78,6 +80,9 @@ window.initWisMap = function (opts) {
   drawComments();
   window.onCommentAdded = drawComments;
   map.fitBounds(L.latLngBounds(W.WBS.flatMap(w => w.line || w.poly)), { padding: [30, 30] });
+  const focus = new URLSearchParams(location.search).get('wb');
+  const fw = focus && W.WBS.find(w => w.id === focus);
+  if (fw) { map.fitBounds(L.latLngBounds(fw.line || fw.poly), { padding: [60, 60], maxZoom: 12 }); wbLayers[fw.id] && wbLayers[fw.id].fire('click'); }
 
   /* Layer control grouped by theme */
   const panel = document.getElementById(opts.layers);

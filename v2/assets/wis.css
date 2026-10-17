@@ -244,3 +244,23 @@
 .id-pill { white-space: nowrap; }
 .top-header .breadcrumb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
 @media (max-width: 1280px) { .ctx-label { display:none; } }
+.pub-burger { display:none; }
+.pub-mnav { display:none; background:#0f172a; padding:6px 16px 12px; }
+.pub-mnav a { display:block; color:#cbd5e1; text-decoration:none; padding:9px 6px; font-size:14px; border-top:1px solid #1e293b; }
+@media (max-width: 900px) {
+  .pub-nav { display:none !important; }
+  .pub-burger { display:flex; }
+  .pub-mnav.open { display:block; }
+  .pub-hide-sm, .lang-switch { display:none !important; }
+  .pub-header-inner { gap:10px; padding:0 14px; }
+  .pub-wrap { padding:18px 14px; }
+  .pub-grid-1 { grid-template-columns:1fr !important; }
+  .map-layout { grid-template-columns:1fr !important; height:auto !important; }
+  .map-layout > .card:nth-child(1) { order:2; max-height:260px; }
+  .map-layout > .card:nth-child(2) { order:1; height:62vh; }
+  .map-layout > .card:nth-child(3) { order:3; max-height:none; }
+  .pub-hero { padding:22px; }
+  .pub-hero h1 { font-size:22px !important; }
+}
+.header-btn span { white-space: nowrap; }
+@media (max-width: 900px) { .pub-header .logo-text-sub { display:none; } }

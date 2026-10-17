@@ -141,6 +141,7 @@
 
   /* ── Public portal header and footer ── */
   function publicShell() {
+    const signedIn = store('wis.signedIn') === '1';
     const h = document.getElementById('pub-header');
     if (h) {
       const links = [
@@ -161,14 +162,19 @@
         <div class="lang-switch" title="Language (Macedonian and Albanian planned)">
           <span class="planned" title="Macedonian – planned">МК</span><span class="planned" title="Albanian – planned">SQ</span><span class="on">EN</span>
         </div>
-        <a href="${base}register/" class="header-btn" style="background:transparent;color:#e2e8f0;border-color:#334155;"><i class="fas fa-user-plus"></i><span>Register</span></a>
-        <a href="${base}login/" class="header-btn header-btn-primary"><i class="fas fa-sign-in-alt"></i><span>Sign in</span></a>
-      </div>`;
+        ${signedIn ? `<a href="${base}participate/my-comments/" class="header-btn" style="background:transparent;color:#e2e8f0;border-color:#334155;"><i class="fas fa-user-circle"></i><span>Ana P.</span></a>
+        <button class="header-btn" style="background:transparent;color:#94a3b8;border-color:#334155;" onclick="WIS.signOut()" title="Sign out"><i class="fas fa-sign-out-alt"></i></button>` :
+        `<a href="${base}register/" class="header-btn pub-hide-sm" style="background:transparent;color:#e2e8f0;border-color:#334155;"><i class="fas fa-user-plus"></i><span>Register</span></a>
+        <a href="${base}login/" class="header-btn header-btn-primary"><i class="fas fa-sign-in-alt"></i><span>Sign in</span></a>`}
+        <button class="header-btn pub-burger" style="background:transparent;color:#e2e8f0;border-color:#334155;" onclick="document.getElementById('pub-mnav').classList.toggle('open')" title="Menu"><i class="fas fa-bars"></i></button>
+      </div>
+      <nav id="pub-mnav" class="pub-mnav">${links}</nav>`;
     }
     const f = document.getElementById('pub-footer');
     if (f) {
       f.className = 'pub-footer';
       f.innerHTML = `Ministry of Environment and Physical Planning · Water Information System (WIS) · Mockup v2 – demonstrator, all data are placeholders
+        <div style="margin-top:8px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;"><a href="${base}about/contacts/" style="color:#1a56db;">Who is responsible · contacts</a><a href="${base}participate/request/" style="color:#1a56db;">Request background documents</a><a href="${base}about/privacy/" style="color:#1a56db;">Privacy notice</a><a href="${base}about/accessibility/" style="color:#1a56db;">Accessibility</a></div>
         <div style="margin-top:6px;font-size:10.5px;color:#94a3b8;">For reviewers: <a href="${base}screen-map/" style="color:#94a3b8;">screen map</a> · <a href="${base}../" style="color:#94a3b8;">mockup v1</a></div>`;
     }
   }
@@ -188,6 +194,9 @@
       tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
     });
   };
+  window.WIS.signIn = function (go) { store('wis.signedIn', '1'); if (go) location.href = go; else location.reload(); };
+  window.WIS.signOut = function () { store('wis.signedIn', '0'); location.reload(); };
+  window.WIS.isSignedIn = function () { return store('wis.signedIn') === '1'; };
   window.wisToast = function (msg) {
     let t = document.getElementById('wis-toast');
     if (!t) {

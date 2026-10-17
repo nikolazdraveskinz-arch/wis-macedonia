@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request background documents — WIS Macedonia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css">
+</head>
+<body data-base="../../" data-active="participate" data-portal="public" style="background:#f1f5f9;">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<div style="font-size:12px;margin-bottom:8px;"><a href="../" style="color:#1a56db;">Have your say</a> › Request background documents</div>
+<div class="pub-grid-1" style="display:grid;grid-template-columns:1.4fr 1fr;gap:18px;">
+ <div>
+  <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">Request background documents and data</h1>
+  <p style="font-size:13px;color:#64748b;margin:0 0 16px;">Background documents and information used to prepare the draft plan are available on request (Water Framework Directive, Article 14(1)). Most datasets can already be downloaded under <a href="../../explore/#open-data" style="color:#1a56db;">Open data</a>; use this form for anything that is not published.</p>
+  <div class="card"><div class="card-body" style="display:grid;gap:12px;">
+   <div><label class="form-label">What do you need? *</label><select class="form-input"><option>Background study or report</option><option>Dataset not published on the portal</option><option>Monitoring data in more detail</option><option>Information on control measures (permits, abstractions, discharges)</option><option>Other information</option></select></div>
+   <div><label class="form-label">Related to (optional)</label><select class="form-input"><option>—</option><option>Draft RBMP · §3 Significant pressures and impacts</option><option>Draft RBMP · §5 Monitoring networks and status</option><option>Draft RBMP · §7 Economic analysis</option><option>SWMI overview</option><option>A water body</option></select></div>
+   <div><label class="form-label">Describe the request *</label><textarea class="form-input" rows="4" placeholder="e.g. the pressures and impacts study for the Bregalnica sub-basin, with its annexes"></textarea></div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div><label class="form-label">Name *</label><input class="form-input"></div><div><label class="form-label">E-mail *</label><input class="form-input" type="email"></div></div>
+   <div><label class="form-label">Preferred format</label><select class="form-input"><option>Electronic (PDF, GIS or spreadsheet)</option><option>Paper copy</option><option>Inspection at the Ministry</option></select></div>
+   <div style="font-size:11.5px;color:#64748b;">Requests are handled by the Ministry under the Law on Free Access to Public Information. You receive a reference number and can follow the request below. <a href="../../about/privacy/" style="color:#1a56db;">Privacy notice</a></div>
+   <button class="btn btn-primary" style="justify-content:center;padding:10px;" onclick="wisToast('Request BDR-2026-0019 registered; confirmation sent by e-mail (mockup)')"><i class="fas fa-paper-plane"></i>Send request</button>
+  </div></div>
+ </div>
+ <div>
+  <div class="card"><div class="card-header"><h3 class="card-title">Recent requests (public register)</h3></div>
+   <div class="table-container"><table class="data-table"><thead><tr><th>Ref.</th><th>Requested</th><th>Status</th></tr></thead><tbody>
+    <tr><td><span class="id-pill">BDR-2026-0018</span></td><td style="font-size:12px;">Pressures study – Bregalnica annexes</td><td><span class="badge badge-in-review">In progress</span></td></tr>
+    <tr><td><span class="id-pill">BDR-2026-0016</span></td><td style="font-size:12px;">GW monitoring results Polog 2015–2020</td><td><span class="badge qa-accepted">Provided</span></td></tr>
+    <tr><td><span class="id-pill">BDR-2026-0013</span></td><td style="font-size:12px;">Abstraction permits – Dojran catchment</td><td><span class="badge qa-accepted">Provided</span></td></tr>
+    <tr><td><span class="id-pill">BDR-2025-0009</span></td><td style="font-size:12px;">Classification method – benthic invertebrates</td><td><span class="badge qa-accepted">Provided</span></td></tr>
+   </tbody></table></div>
+   <p style="font-size:11.5px;color:#94a3b8;padding:0 20px 14px;margin:0;">Documents provided on request are also added to the document library, so others can find them.</p></div>
+  <div class="card" style="margin-top:18px;"><div class="card-body" style="font-size:12.5px;color:#475569;"><b>Contact point</b><br>Ministry of Environment and Physical Planning – Water Department<br><span class="id-pill">rbmp.vardar@example.mk</span><br><a href="../../about/contacts/" style="color:#1a56db;">All responsible institutions</a></div></div>
+ </div>
+</div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../../assets/shell.js"></script>
+
+</body>
+</html>

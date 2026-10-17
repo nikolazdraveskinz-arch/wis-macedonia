@@ -125,7 +125,44 @@
   }
 
   /* ── Comment modal (public side) ── */
+  function modal(html) {
+    let m = document.getElementById('wis-cm');
+    if (!m) { m = document.createElement('div'); m.id = 'wis-cm'; document.body.appendChild(m); }
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;';
+    m.innerHTML = html;
+    m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+    m.querySelectorAll('[data-close]').forEach(b => b.onclick = () => m.remove());
+    return m;
+  }
+  function signInGate(after) {
+    const m = modal(`<div class="card" style="width:min(460px,100%);"><div class="card-header"><h3 class="card-title"><i class="fas fa-user-lock" style="color:#1a56db;margin-right:6px;"></i>Sign in to comment</h3><button class="btn btn-secondary btn-sm" data-close>Close</button></div>
+      <div class="card-body" style="display:grid;gap:10px;font-size:13px;color:#475569;">
+        <p style="margin:0;">Reading is open to everyone. To comment, follow a consultation and track your comments, sign in or create a free account. You can also send comments by e-mail or post; they are registered in the same log.</p>
+        <a class="btn btn-primary" style="justify-content:center;padding:9px;" href="${W.base}login/?next=${encodeURIComponent(location.pathname + location.search)}"><i class="fas fa-sign-in-alt"></i>Sign in</a>
+        <a class="btn btn-secondary" style="justify-content:center;padding:9px;" href="${W.base}register/"><i class="fas fa-user-plus"></i>Create an account</a>
+        <button class="btn btn-secondary" style="justify-content:center;padding:9px;" id="gate-demo"><i class="fas fa-flask"></i>Mockup: continue as demo user (Ana P.)</button>
+      </div></div>`);
+    m.querySelector('#gate-demo').onclick = () => { try { localStorage.setItem('wis.signedIn', '1'); } catch (e) {} m.remove(); after(); };
+  }
+  function follow(scope) {
+    if (!W.isSignedIn()) return signInGate(() => follow(scope));
+    const m = modal(`<div class="card" style="width:min(480px,100%);"><div class="card-header"><h3 class="card-title"><i class="fas fa-bell" style="color:#d97706;margin-right:6px;"></i>Follow the consultation</h3><button class="btn btn-secondary btn-sm" data-close>Close</button></div>
+      <div class="card-body" style="display:grid;gap:8px;font-size:13px;">
+        <div class="form-label">Send me an e-mail when</div>
+        <label style="display:flex;gap:8px;"><input type="checkbox" checked> a consultation stage opens in the Vardar RBD</label>
+        <label style="display:flex;gap:8px;"><input type="checkbox" checked> 30 days before a stage closes</label>
+        <label style="display:flex;gap:8px;"><input type="checkbox" checked> a consultation report or a new plan version is published</label>
+        <label style="display:flex;gap:8px;"><input type="checkbox"> a public hearing or meeting is announced</label>
+        <div class="form-label" style="margin-top:6px;">Only about these topics (optional)</div>
+        <select class="form-input" multiple size="4">${SWMI.map(i => `<option>${i[0]} · ${i[1]}</option>`).join('')}</select>
+        <div class="form-hint">Also available as an RSS feed. You can unsubscribe from any e-mail.</div>
+        <button class="btn btn-primary" id="fl-save" style="justify-content:center;padding:9px;"><i class="fas fa-check"></i>Save</button>
+      </div></div>`);
+    m.querySelector('#fl-save').onclick = () => { m.remove(); (window.wisToast || alert)('You now follow the Vardar RBMP consultation (mockup).'); };
+  }
+
   function openComment(target, stageN) {
+    if (!W.isSignedIn()) return signInGate(() => openComment(target, stageN));
     const st = STAGES.find(s => s.n === (stageN || 3));
     let m = document.getElementById('wis-cm');
     if (!m) { m = document.createElement('div'); m.id = 'wis-cm'; document.body.appendChild(m); }
@@ -170,5 +207,5 @@
     };
   }
 
-  Object.assign(W, { STAGES, DOCS, SWMI, WBS, SITES, PRESSURES, MEASURES, comments, addComment, editComment, myIds, targetLabel, targetIcon, statusBadge, openComment, fmt, iso, addMonths, today });
+  Object.assign(W, { follow, signInGate, STAGES, DOCS, SWMI, WBS, SITES, PRESSURES, MEASURES, comments, addComment, editComment, myIds, targetLabel, targetIcon, statusBadge, openComment, fmt, iso, addMonths, today });
 })();
