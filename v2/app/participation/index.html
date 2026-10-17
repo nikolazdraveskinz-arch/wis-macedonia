@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Public Participation — WIS Macedonia</title>
+  <title>Public Participation — NWIS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -74,7 +74,7 @@
 <script src="../../assets/shell.js"></script>
 <script src="../../assets/participation.js"></script>
 <script>
-const SC={Open:'qa-accepted',Closed:'badge-inactive',Upcoming:'badge-active'};
+const SC={Open:'qa-accepted',Closed:'badge-inactive',Upcoming:'badge-active','Not started':'badge-inactive','Not published':'badge-inactive'};
 function stRows(){document.getElementById('st-rows').innerHTML=WIS.STAGES.map(s=>`<tr><td><b>${s.n}. ${s.title}</b><div style="font-size:11px;color:#94a3b8;">${s.art}</div></td><td style="font-size:12px;">${s.docs.map(k=>'<span class="id-pill">'+WIS.DOCS[k].id+'</span>').join('<br>')}</td><td>${WIS.fmt(s.legal)}</td><td>${WIS.fmt(s.opens)}</td><td>${WIS.fmt(s.closes)}</td><td>${s.months} months</td>
  <td style="font-size:11.5px;">${s.sixOk?'<i class="fas fa-check" style="color:#059669;"></i> ≥ 6 months':'<i class="fas fa-times" style="color:#dc2626;"></i> < 6 months'}<br>${s.onTime?'<i class="fas fa-check" style="color:#059669;"></i> on time':'<i class="fas fa-exclamation-triangle" style="color:#d97706;"></i> after legal deadline'}</td><td><span class="badge ${SC[s.state]}">${s.state}</span></td><td><button class="btn btn-secondary btn-sm" onclick="edit(${s.n})">Edit</button></td></tr>`).join('');}
 function edit(n){const s=WIS.STAGES.find(x=>x.n===n),e=document.getElementById('st-edit');e.style.display='block';

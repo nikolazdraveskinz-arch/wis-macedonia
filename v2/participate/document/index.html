@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RBMP document — WIS Macedonia</title>
+  <title>RBMP document — NWIS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="../../assets/wis.css">
 </head>
-<body data-base="../../" data-active="documents" data-portal="public" style="background:#f1f5f9;">
+<body data-base="../../" data-active="documents" data-portal="public" data-scope="basin" style="background:#f1f5f9;">
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
@@ -26,7 +26,10 @@
 <script src="../../assets/shell.js"></script>
 <script src="../../assets/participation.js"></script>
 <script>
-const k = new URLSearchParams(location.search).get('d')||'RBMP', d = WIS.DOCS[k]||WIS.DOCS.RBMP, st = WIS.STAGES.find(s=>s.n===d.stage);
+(function(){
+const k = new URLSearchParams(location.search).get('d')||'RBMP', d = WIS.DOCS[k]||WIS.DOCS.RBMP;
+if (!d) { document.querySelector('main').innerHTML = '<div class="card"><div class="empty-state"><i class="fas fa-file-alt"></i><div><b>No documents published yet for '+WIS.RBD.label+' · '+WIS.cycle.label+'.</b><br><a href="../" style="color:#1a56db;">Back to Have your say</a></div></div></div>'; return; }
+const st = WIS.STAGES.find(s=>s.n===d.stage);
 document.getElementById('crumb').innerHTML = `<a href="../stage/?s=${d.stage}" style="color:#1a56db;">Stage ${d.stage}</a> › ${d.id}`;
 document.getElementById('dhead').innerHTML = `<div style="font-size:11px;color:#64748b;font-weight:600;">DOCUMENT · STAGE ${d.stage}</div><h1 style="font-size:21px;font-weight:800;color:#0f172a;margin:4px 0 8px;">${d.title}</h1>
  <div class="meta-row"><span><b>Permanent ID:</b> <span class="id-pill">${d.id}</span></span><span><b>Version:</b> ${d.ver}</span><span><b>Published:</b> ${WIS.fmt(d.date)}</span><span><b>Language:</b> English (MK, SQ planned)</span><span><b>Permanent link:</b> <span class="id-pill">wis.moepp.gov.mk/doc/${d.id}/${d.ver.split(' ')[0]}</span></span></div>
@@ -39,6 +42,7 @@ function render(){document.getElementById('secs').innerHTML = d.sections.map(s=>
  <div class="card-body" style="font-size:13px;color:#475569;line-height:1.65;"><p style="margin:0;">Placeholder text of section ${s[0]}. In the live system the published text of the chapter appears here, with tables and maps, and each chapter has its own anchor (<span class="id-pill">#s${s[0]}</span>) so that comments, the public log and WISE references point to the exact section.</p></div></div>`;}).join('');
  if(location.hash){const el=document.querySelector(location.hash); if(el) el.scrollIntoView();}}
 render(); window.onCommentAdded = render;
+})();
 </script>
 </body>
 </html>

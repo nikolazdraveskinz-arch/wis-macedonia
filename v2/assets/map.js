@@ -1,7 +1,7 @@
-/* WIS mockup v2 – iteration 3: map viewer to ToR Task 7 specification (public and internal modes). */
+/* NWIS mockup v2 – map viewer to ToR Task 7 specification (public and internal modes). */
 window.initWisMap = function (opts) {
   const W = window.WIS, mode = opts.mode || 'public';
-  const map = L.map(opts.el, { zoomControl: true }).setView([41.72, 21.75], 8);
+  const map = L.map(opts.el, { zoomControl: true }).setView((W.RBD && W.RBD.centre) || [41.72, 21.75], (W.RBD && W.RBD.zoom) || 8);
   const base = {
     'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap contributors' }),
     'Topographic': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '© OpenTopoMap' })
@@ -41,7 +41,8 @@ window.initWisMap = function (opts) {
       ${actions({ kind: 'wb', wb: w.id })}`));
   });
   /* River network (hydrological features) */
-  L.polyline([[42.08, 21.30], [41.99, 21.42], [41.85, 21.62], [41.716, 21.776], [41.583, 21.950], [41.497, 22.090], [41.40, 22.25], [41.18, 22.52]], { color: '#60a5fa', weight: 2, dashArray: '4 4', interactive: false }).addTo(grp('River network (hydrology)'));
+  const isVar = !W.RBD || W.RBD.id === 'VAR';
+  if (isVar) L.polyline([[42.08, 21.30], [41.99, 21.42], [41.85, 21.62], [41.716, 21.776], [41.583, 21.950], [41.497, 22.090], [41.40, 22.25], [41.18, 22.52]], { color: '#60a5fa', weight: 2, dashArray: '4 4', interactive: false }).addTo(grp('River network (hydrology)'));
   /* Monitoring sites */
   W.SITES.forEach(s => L.circleMarker(s.ll, { radius: 7, color: '#0f172a', weight: 1.5, fillColor: '#38bdf8', fillOpacity: .9, bubblingMouseEvents: false }).addTo(grp('Monitoring sites'))
     .on('click', () => showInfo(`<div class="form-label" style="color:#64748b;">Monitoring site</div><div style="font-weight:800;font-size:15px;">${s.name}</div><span class="id-pill">${s.id}</span>
@@ -53,7 +54,7 @@ window.initWisMap = function (opts) {
       <table class="data-table" style="font-size:12px;margin-top:8px;"><tr><td>Type</td><td>${p.type}</td></tr><tr><td>Source</td><td>Pressures and impacts study (imported)</td></tr></table>
       ${docLinks([['Draft RBMP §3 Pressures and impacts', W.base + 'participate/document/?d=RBMP#s3']])}${actions({ kind: 'point', ll: p.ll, label: p.name })}`)));
   /* Protected area */
-  L.polygon([[41.98, 21.25], [42.03, 21.36], [41.95, 21.42], [41.91, 21.30]], { color: '#16a34a', weight: 1.5, fillOpacity: .12, dashArray: '3 3', bubblingMouseEvents: false }).addTo(grp('Protected areas'))
+  if (isVar) L.polygon([[41.98, 21.25], [42.03, 21.36], [41.95, 21.42], [41.91, 21.30]], { color: '#16a34a', weight: 1.5, fillOpacity: .12, dashArray: '3 3', bubblingMouseEvents: false }).addTo(grp('Protected areas'))
     .on('click', () => showInfo(`<div class="form-label" style="color:#64748b;">Protected area</div><div style="font-weight:800;font-size:15px;">Drinking-water protection zone – Rashche</div><span class="id-pill">MK_PRA_DW_0019</span>
       ${docLinks([['Draft RBMP §4 Register of protected areas', W.base + 'participate/document/?d=RBMP#s4']])}${actions({ kind: 'point', ll: [41.97, 21.33], label: 'Protection zone Rashche' })}`));
   /* Programme of Measures */
@@ -79,7 +80,7 @@ window.initWisMap = function (opts) {
   }
   drawComments();
   window.onCommentAdded = drawComments;
-  map.fitBounds(L.latLngBounds(W.WBS.flatMap(w => w.line || w.poly)), { padding: [30, 30] });
+  if (W.WBS.length) map.fitBounds(L.latLngBounds(W.WBS.flatMap(w => w.line || w.poly)), { padding: [30, 30] });
   const focus = new URLSearchParams(location.search).get('wb');
   const fw = focus && W.WBS.find(w => w.id === focus);
   if (fw) { map.fitBounds(L.latLngBounds(fw.line || fw.poly), { padding: [60, 60], maxZoom: 12 }); wbLayers[fw.id] && wbLayers[fw.id].fire('click'); }
@@ -96,7 +97,7 @@ window.initWisMap = function (opts) {
   panel.querySelectorAll('[data-b]').forEach(r => r.onchange = () => { Object.values(base).forEach(x => map.removeLayer(x)); base[r.dataset.b].addTo(map); });
 
   /* Search: water-body ID, place name or "lat, lon" */
-  const PLACES = { skopje: [41.998, 21.425], veles: [41.715, 21.775], tetovo: [42.010, 20.970], shtip: [41.745, 22.195], kavadarci: [41.433, 22.012], dojran: [41.21, 22.74], negotino: [41.484, 22.090], gevgelija: [41.14, 22.50] };
+  const PLACES = { skopje: [41.998, 21.425], veles: [41.715, 21.775], tetovo: [42.010, 20.970], shtip: [41.745, 22.195], kavadarci: [41.433, 22.012], dojran: [41.21, 22.74], negotino: [41.484, 22.090], gevgelija: [41.14, 22.50], strumica: [41.437, 22.643], radovish: [41.638, 22.464], ohrid: [41.117, 20.802], struga: [41.178, 20.678], debar: [41.524, 20.524], resen: [41.089, 21.012], kumanovo: [42.132, 21.714] };
   const s = document.getElementById(opts.search);
   s.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
@@ -107,7 +108,7 @@ window.initWisMap = function (opts) {
     if (w) { const pts = w.line || w.poly; map.fitBounds(L.latLngBounds(pts), { padding: [40, 40] }); return; }
     const p = Object.keys(PLACES).find(k => k.startsWith(ql));
     if (p) { map.setView(PLACES[p], 12); return; }
-    window.wisToast && wisToast('No match for "' + q + '" (try MK-VAR-RW-0014, Veles, or 41.7, 21.8)');
+    window.wisToast && wisToast('No match for "' + q + '" (try a water-body ID such as ' + ((W.WBS[0] && W.WBS[0].id) || 'MK-VAR-RW-0014') + ', a town, or 41.7, 21.8)');
   });
 
   /* Click on the map: comment on a point (public) or coordinates (internal) */

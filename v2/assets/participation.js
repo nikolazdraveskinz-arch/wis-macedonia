@@ -1,15 +1,20 @@
-/* WIS mockup v2 – iteration 3: shared participation data and behaviour.
+/* NWIS mockup v2 – shared participation and basin data.
    Demonstrator only. Comments a viewer adds are kept in that browser (localStorage). */
 (function () {
   const W = window.WIS || (window.WIS = {});
   const DAY = 864e5;
   const today = new Date(new Date().toISOString().slice(0, 10));
   function addMonths(d, m) { const x = new Date(d); x.setUTCMonth(x.getUTCMonth() + m); return x; }
-  function fmt(d) { return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  function fmt(d) { return d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'to be set'; }
   function iso(d) { return new Date(d).toISOString().slice(0, 10); }
 
-  /* ── Art. 14 stages for Vardar RBD, cycle 2028–2033 (period starts 1 Jan 2028) ── */
-  const STAGES = [
+  const RBD = (W.RBD && W.RBD.id) || 'VAR';
+  const CYC = (W.cycle && W.cycle.id) || 'C2028';
+  const ACTIVE = RBD === 'VAR' && CYC === 'C2028';   /* demonstration data: Vardar, RBMP 2028–2033 */
+  const startYear = CYC === 'C2034' ? 2034 : 2028;
+
+  /* ── Art. 14 stages (Vardar RBD, cycle 2028–2033: plan period starts 1 Jan 2028) ── */
+  let STAGES = [
     { n: 1, key: 'timetable', title: 'Timetable and work programme', art: 'Art. 14(1)(a)',
       lead: 'How and when the plan is prepared, and how the public will be consulted.',
       legal: '2024-12-31', opens: '2024-12-16', closes: '2025-06-16',
@@ -23,7 +28,9 @@
       legal: '2026-12-31', opens: '2026-09-01', closes: '2027-03-01',
       docs: ['RBMP', 'POM', 'SEA'] }
   ];
+  if (!ACTIVE) STAGES = STAGES.map(s => Object.assign({}, s, { legal: (startYear - 5 + s.n) + '-12-31', opens: null, closes: null, docs: [] }));
   STAGES.forEach(s => {
+    if (!s.opens) { s.state = new Date(s.legal) < today ? 'Not published' : 'Not started'; s.daysLeft = 0; s.months = 6; s.sixOk = true; s.onTime = true; return; }
     const o = new Date(s.opens), c = new Date(s.closes);
     s.state = today < o ? 'Upcoming' : (today <= c ? 'Open' : 'Closed');
     s.daysLeft = Math.max(0, Math.ceil((c - today) / DAY));
@@ -33,7 +40,7 @@
   });
 
   /* ── Documents (versioned, permanent IDs, section anchors) ── */
-  const DOCS = {
+  let DOCS = {
     TWP: { id: 'DOC-VAR-2028-TWP', title: 'Timetable and work programme, incl. statement of consultation measures', ver: 'v1.0', date: '2024-12-16', stage: 1, pages: 34,
       sections: [['1', 'Purpose and legal basis'], ['2', 'Planning steps and timetable 2024–2027'], ['3', 'Roles of institutions'], ['4', 'Consultation measures and channels'], ['5', 'How comments will be handled']] },
     SWMI: { id: 'DOC-VAR-2028-SWMI', title: 'Interim overview of significant water management issues', ver: 'v1.1', date: '2025-12-15', stage: 2, pages: 96,
@@ -46,7 +53,8 @@
       sections: [['1', 'Scope of the assessment'], ['2', 'Baseline environment'], ['3', 'Likely significant effects'], ['4', 'Alternatives considered'], ['5', 'Mitigation and monitoring']] }
   };
 
-  const SWMI = [
+  if (!ACTIVE) DOCS = {};
+  let SWMI = [
     ['S1', 'Urban wastewater', 'Most towns discharge wastewater with little or no treatment, causing organic and nutrient pollution downstream.', 'Which towns should be treated first?'],
     ['S2', 'Diffuse pollution from agriculture', 'Fertilisers and manure raise nitrate levels, especially in alluvial aquifers such as Polog and Ovche Pole.', 'Which farming practices could change, and with what support?'],
     ['S3', 'Hydromorphological alterations', 'Dams, weirs, gravel extraction and channelisation change flow and block fish migration.', 'Where should river continuity be restored first?'],
@@ -58,7 +66,7 @@
   ];
 
   /* ── Places used by map and comment targets ── */
-  const WBS = [
+  let WBS = [
     { id: 'MK-VAR-RW-0014', name: 'Vardar – Gradsko to Negotino', cat: 'River', eco: 'Moderate', chem: 'Good', line: [[41.583, 21.950], [41.540, 22.005], [41.497, 22.090]] },
     { id: 'MK-VAR-RW-0015', name: 'Vardar – Veles to Gradsko', cat: 'River', eco: 'Poor', chem: 'Good', line: [[41.716, 21.776], [41.660, 21.850], [41.583, 21.950]] },
     { id: 'MK-VAR-RW-0102', name: 'Treska – middle reach', cat: 'River', eco: 'Good', chem: 'Good', line: [[41.930, 21.240], [41.965, 21.300], [41.985, 21.360]] },
@@ -66,21 +74,37 @@
     { id: 'MK-VAR-LW-0003', name: 'Dojran Lake (national part)', cat: 'Lake', eco: 'Moderate', chem: 'Good', poly: [[41.235, 22.700], [41.235, 22.770], [41.185, 22.775], [41.180, 22.705]] },
     { id: 'MK-VAR-GW-004', name: 'Polog alluvial aquifer', cat: 'Groundwater', eco: 'n/a', chem: 'Poor', poly: [[42.080, 20.880], [42.090, 21.000], [41.960, 21.060], [41.930, 20.940]] }
   ];
-  const SITES = [
+  let SITES = [
     { id: 'MK_MON_SW_00431', name: 'Vardar – Gradsko', ll: [41.578, 21.955], wb: 'MK-VAR-RW-0014' },
     { id: 'MK_MON_SW_00447', name: 'Vardar – Demir Kapija', ll: [41.405, 22.245], wb: 'MK-VAR-RW-0015' },
     { id: 'MK_MON_GW_00112', name: 'Polog – piezometer P-12', ll: [42.010, 20.975], wb: 'MK-VAR-GW-004' },
     { id: 'MK_MON_HY_00019', name: 'Bregalnica – Shtip (flow)', ll: [41.742, 22.180], wb: 'MK-VAR-RW-0201' }
   ];
-  const PRESSURES = [
+  let PRESSURES = [
     { id: 'MK_PRS_PT_0412', name: 'Urban wastewater discharge – Veles', ll: [41.708, 21.790], type: 'Point – urban wastewater' },
     { id: 'MK_PRS_PT_0398', name: 'Industrial discharge – Kavadarci', ll: [41.433, 22.012], type: 'Point – industry' },
     { id: 'MK_PRS_HM_0077', name: 'Weir – Treska middle reach', ll: [41.968, 21.318], type: 'Hydromorphological – weir' }
   ];
-  const MEASURES = [
+  let MEASURES = [
     { id: 'MK_MSR_VAR_001', name: 'Construction of UWWTP Veles', ll: [41.700, 21.800], ktm: 'KTM1' },
     { id: 'MK_MSR_VAR_019', name: 'Fish passage at Treska weir', ll: [41.972, 21.325], ktm: 'KTM5' }
   ];
+
+  const OTHER = {
+    STR: [
+      { id: 'MK-STR-RW-0001', name: 'Strumica – upper reach', cat: 'River', eco: 'Moderate', chem: 'Good', line: [[41.455, 22.480], [41.445, 22.560], [41.437, 22.640]] },
+      { id: 'MK-STR-RW-0003', name: 'Strumica – Strumica to the border', cat: 'River', eco: 'Poor', chem: 'Poor', line: [[41.437, 22.640], [41.420, 22.760], [41.395, 22.860]] },
+      { id: 'MK-STR-GW-001', name: 'Strumica valley alluvial aquifer', cat: 'Groundwater', eco: 'n/a', chem: 'Poor', poly: [[41.470, 22.520], [41.470, 22.800], [41.390, 22.820], [41.395, 22.540]] }],
+    BDR: [
+      { id: 'MK-BDR-LW-0001', name: 'Ohrid Lake (national part)', cat: 'Lake', eco: 'Good', chem: 'Good', poly: [[41.170, 20.720], [41.120, 20.800], [40.980, 20.780], [40.930, 20.740], [41.030, 20.700]] },
+      { id: 'MK-BDR-LW-0002', name: 'Prespa Lake (national part)', cat: 'Lake', eco: 'Moderate', chem: 'Good', poly: [[41.050, 20.950], [41.000, 21.040], [40.900, 21.000], [40.930, 20.930]] },
+      { id: 'MK-BDR-RW-0004', name: 'Black Drim – Struga to the border', cat: 'River', eco: 'Moderate', chem: 'Good', line: [[41.178, 20.678], [41.300, 20.600], [41.420, 20.560], [41.524, 20.524]] }],
+    JMO: [
+      { id: 'MK-JMO-RW-0001', name: 'Binachka Morava – upper reach', cat: 'River', eco: 'Moderate', chem: 'Unknown', line: [[42.250, 21.560], [42.262, 21.600], [42.275, 21.640]] },
+      { id: 'MK-JMO-RW-0002', name: 'Binachka Morava – to the border', cat: 'River', eco: 'Good', chem: 'Good', line: [[42.275, 21.640], [42.290, 21.680], [42.305, 21.720]] }]
+  };
+  if (RBD !== 'VAR') { WBS = OTHER[RBD] || []; SITES = []; PRESSURES = []; MEASURES = []; }
+  if (!ACTIVE) SWMI = [];
 
   /* ── Seed comments (placeholders) ── */
   const SEED = [
@@ -100,7 +124,9 @@
   function comments() {
     const mine = store('wis.comments') || [];
     const edits = store('wis.commentEdits') || {};
-    return SEED.concat(mine).map(c => Object.assign({}, c, edits[c.id] || {}));
+    return SEED.map(c => Object.assign({ rbd: 'VAR', cyc: 'C2028' }, c)).concat(mine)
+      .filter(c => (c.rbd || 'VAR') === RBD && (c.cyc || 'C2028') === CYC)
+      .map(c => Object.assign({}, c, edits[c.id] || {}));
   }
   function addComment(c) { const mine = store('wis.comments') || []; mine.push(c); store('wis.comments', mine); }
   function editComment(id, patch) { const e = store('wis.commentEdits') || {}; e[id] = Object.assign(e[id] || {}, patch); store('wis.commentEdits', e); }
@@ -200,12 +226,12 @@
       const v = m.querySelector('#cm-target').value.split('|');
       const t = v[0] === 'point' ? target : v[0] === 'chapter' ? { kind: 'chapter', doc: v[1], sec: v[2] } : v[0] === 'swmi' ? { kind: 'swmi', issue: v[1] } : { kind: 'wb', wb: v[1] };
       const id = 'PC-' + today.getFullYear() + '-' + String(200 + myIds().length).padStart(4, '0');
-      addComment({ id, stage: st.n, who: 'Citizen', org: m.querySelector('#cm-pub').value === '1' ? 'Ana P.' : '', date: iso(today), target: t, text: txt, status: 'Received', outcome: '', reason: '', change: '', mine: true });
+      addComment({ id, rbd: RBD, cyc: CYC, stage: st.n, who: 'Citizen', org: m.querySelector('#cm-pub').value === '1' ? 'Ana P.' : '', date: iso(today), target: t, text: txt, status: 'Received', outcome: '', reason: '', change: '', mine: true });
       m.remove();
       (window.wisToast || alert)(`Comment ${id} received. Confirmation sent by e-mail (mockup). Follow it under "My comments".`);
       if (window.onCommentAdded) window.onCommentAdded();
     };
   }
 
-  Object.assign(W, { follow, signInGate, STAGES, DOCS, SWMI, WBS, SITES, PRESSURES, MEASURES, comments, addComment, editComment, myIds, targetLabel, targetIcon, statusBadge, openComment, fmt, iso, addMonths, today });
+  Object.assign(W, { ACTIVE, follow, signInGate, STAGES, DOCS, SWMI, WBS, SITES, PRESSURES, MEASURES, comments, addComment, editComment, myIds, targetLabel, targetIcon, statusBadge, openComment, fmt, iso, addMonths, today });
 })();

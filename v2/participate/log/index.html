@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Public log — WIS Macedonia</title>
+  <title>Public log — NWIS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="../../assets/wis.css">
 </head>
-<body data-base="../../" data-active="participate" data-portal="public" style="background:#f1f5f9;">
+<body data-base="../../" data-active="participate" data-portal="public" data-scope="basin" style="background:#f1f5f9;">
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
@@ -30,7 +30,7 @@
   <div class="table-container"><table class="data-table" id="lt"><thead><tr><th>Reference</th><th>Stage</th><th>From</th><th>About</th><th>Comment</th><th>Outcome</th><th>Reason and change</th></tr></thead><tbody id="lb"></tbody></table></div>
 </div>
 <div class="card" style="margin-top:18px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-file-download" style="color:#059669;margin-right:6px;"></i>Consultation reports</h3></div>
-  <div class="card-body" style="font-size:12.5px;color:#475569;">One report per closed stage summarises the consultation measures, the comments received, their results and the changes made to the plan. The report for the whole cycle becomes chapter 9 of the RBMP (WFD Annex VII A.9).
+  <div class="card-body" data-demo="consultation reports" style="font-size:12.5px;color:#475569;">One report per closed stage summarises the consultation measures, the comments received, their results and the changes made to the plan. The report for the whole cycle becomes chapter 9 of the RBMP (WFD Annex VII A.9).
   <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-secondary btn-sm" onclick="wisToast('Stage 1 report downloaded (mockup)')">Stage 1 report</button><button class="btn btn-secondary btn-sm" onclick="wisToast('Stage 2 report downloaded (mockup)')">Stage 2 report</button><button class="btn btn-secondary btn-sm" disabled>Stage 3 report (after closing)</button></div></div></div>
 
 </main>

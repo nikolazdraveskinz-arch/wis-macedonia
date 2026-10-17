@@ -1,4 +1,4 @@
-/* WIS Macedonia mockup v2 – shared shell (sidebar, context bar, public header).
+/* NWIS – National Water Information System, mockup v2 – shared shell (sidebar, context bar, public header, basin selector).
    Demonstrator only: all values are placeholders. */
 (function () {
   const body = document.body;
@@ -9,18 +9,40 @@
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
   /* ── Context: river basin district + RBMP cycle (ToR Task 1: reporting period) ── */
+  const scope = body.dataset.scope || (portal === 'internal' ? 'internal' : 'national');
+  /* The four river basin districts. Areas are approximate shares of the national territory (placeholders). */
   const RBDS = [
-    { id: 'MK_RBD_VAR', name: 'Vardar RBD', ready: true },
-    { id: 'MK_RBD_STR', name: 'Strumica RBD', ready: false },
-    { id: 'MK_RBD_BDR', name: 'Black Drim RBD', ready: false },
-    { id: 'MK_RBD_JMO', name: 'Južna Morava RBD', ready: false }
+    { id: 'VAR', code: 'MK_RBD_VAR', name: 'Vardar', mk: 'Вардар', area: '≈ 20,500 km²', share: '≈ 80%', shared: 'Greece (Axios)', rivers: 'Vardar, Treska, Pchinja, Bregalnica, Crna Reka; Dojran Lake', centre: [41.70, 21.75], zoom: 8, color: '#1a56db', demo: true },
+    { id: 'BDR', code: 'MK_RBD_BDR', name: 'Black Drim', mk: 'Црн Дрим', area: '≈ 3,350 km²', share: '≈ 13%', shared: 'Albania; Greece (Prespa)', rivers: 'Black Drim, Sateska, Radika; Ohrid and Prespa lakes', centre: [41.22, 20.75], zoom: 9, color: '#0891b2' },
+    { id: 'STR', code: 'MK_RBD_STR', name: 'Strumica', mk: 'Струмица', area: '≈ 1,650 km²', share: '≈ 6.5%', shared: 'Bulgaria (Struma)', rivers: 'Strumica, Turija, Vodochnica', centre: [41.43, 22.65], zoom: 10, color: '#059669' },
+    { id: 'JMO', code: 'MK_RBD_JMO', name: 'Južna Morava', mk: 'Јужна Морава', area: '≈ 45 km²', share: '< 1%', shared: 'Serbia, Kosovo', rivers: 'Binachka Morava (upper catchment)', centre: [42.28, 21.64], zoom: 11, color: '#d97706' }
   ];
+  RBDS.forEach(r => { r.label = r.name + ' RBD'; r.full = r.name + ' River Basin District'; });
   const CYCLES = [
     { id: 'C2028', label: 'RBMP 2028–2033', state: 'In preparation', period: '2028–2033' },
     { id: 'C2034', label: 'RBMP 2034–2039', state: 'Not started', period: '2034–2039' }
   ];
-  const cycle = CYCLES.find(c => c.id === store('wis.cycle')) || CYCLES[0];
-  window.WIS = { RBDS, CYCLES, cycle, base };
+  const qs = new URLSearchParams(location.search);
+  const qRbd = (qs.get('rbd') || '').toUpperCase();
+  if (RBDS.some(r => r.id === qRbd)) store('wis.rbd', qRbd);
+  const RBD = RBDS.find(r => r.id === store('wis.rbd')) || RBDS[0];
+  const qCyc = qs.get('cycle');
+  if (CYCLES.some(c => c.id === qCyc)) store('wis.cycle.' + RBD.id, qCyc);
+  const cycle = CYCLES.find(c => c.id === (store('wis.cycle.' + RBD.id) || store('wis.cycle'))) || CYCLES[0];
+  const DEMO = RBD.id === 'VAR' && cycle.id === 'C2028';
+  const lang = store('wis.lang') || 'en';
+  const BRAND = lang === 'mk' ? ['НИСВ', 'Национален Информативен Систем за Води'] : lang === 'sq' ? ['NWIS', 'Sistemi Kombëtar i Informacionit për Ujërat'] : ['NWIS', 'National Water Information System'];
+  window.WIS = { RBDS, CYCLES, cycle, base, RBD, DEMO, scope, BRAND };
+  function setBasin(id) { store('wis.rbd', id); go(); }
+  function setCycle(id) { store('wis.cycle.' + RBD.id, id); go(); }
+  function go() {
+    /* pages tied to one object (a water body, a document, a stage) fall back to the basin home */
+    const p = location.pathname;
+    if (/water-body|document|stage/.test(p)) { location.href = base + 'basin/'; return; }
+    const u = new URL(location.href); u.searchParams.delete('rbd'); u.searchParams.delete('cycle'); u.searchParams.delete('wb');
+    location.href = u.toString();
+  }
+  window.WIS.setBasin = setBasin; window.WIS.setCycle = setCycle;
 
   const ROLES = [
     ['superadmin', 'Super admin (MoEPP)'],
@@ -105,9 +127,9 @@
       <div class="sidebar-header">
         <div class="logo-block">
           <div class="logo-icon"><i class="fas fa-water" style="color:white;font-size:18px;"></i></div>
-          <div><div class="logo-text-main">WIS Macedonia</div><div class="logo-text-sub">Internal portal</div></div>
+          <div><div class="logo-text-main">${BRAND[0]}</div><div class="logo-text-sub">${BRAND[1]} · Internal portal</div></div>
         </div>
-        <div class="rbmp-pill"><i class="fas fa-circle" style="font-size:6px;"></i> Vardar RBD · ${cycle.label}</div>
+        <div class="rbmp-pill"><i class="fas fa-circle" style="font-size:6px;"></i> ${RBD.label} · ${cycle.label}</div>
       </div>
       <nav>${nav}
         <div class="nav-section-title">Public side</div>
@@ -130,14 +152,19 @@
   function contextBar() {
     const actions = document.querySelector('.top-header .header-actions');
     if (!actions || portal !== 'internal') return;
-    const rbdOpts = RBDS.map(r => `<option value="${r.id}" ${r.ready ? '' : 'disabled'}>${r.name}${r.ready ? '' : ' (not yet configured)'}</option>`).join('');
+    const rbdOpts = RBDS.map(r => `<option value="${r.id}" ${r.id === RBD.id ? 'selected' : ''}>${r.label}</option>`).join('');
     const cycOpts = CYCLES.map(c => `<option value="${c.id}" ${c.id === cycle.id ? 'selected' : ''}>${c.label} · ${c.state}</option>`).join('');
     const bar = document.createElement('div');
     bar.className = 'ctx-bar';
-    bar.innerHTML = `<span class="ctx-label">Basin</span><select class="ctx-select" title="River basin district">${rbdOpts}</select>
+    bar.innerHTML = `<span class="ctx-label">Basin</span><select class="ctx-select" id="rbd-select" title="River basin district">${rbdOpts}</select>
       <span class="ctx-label">Cycle</span><select class="ctx-select" id="cycle-select" title="RBMP cycle (reporting period, ToR Task 1)">${cycOpts}</select>`;
     actions.insertBefore(bar, actions.firstChild);
-    document.getElementById('cycle-select').addEventListener('change', e => { store('wis.cycle', e.target.value); location.reload(); });
+    document.getElementById('cycle-select').addEventListener('change', e => setCycle(e.target.value));
+    document.getElementById('rbd-select').addEventListener('change', e => setBasin(e.target.value));
+    if (!DEMO) {
+      const m = document.querySelector('.content-area');
+      if (m) m.insertAdjacentHTML('afterbegin', `<div class="alert alert-warn" style="margin-bottom:16px;"><i class="fas fa-layer-group"></i><div><b>${RBD.label} · ${cycle.label}.</b> Every screen works the same way for all four river basin districts and both cycles. In this mockup the example records shown are those of Vardar RBD, RBMP 2028–2033; in the live system the screen lists only records of the selected basin and cycle.</div></div>`);
+    }
   }
 
   /* ── Public portal header and footer ── */
@@ -145,19 +172,27 @@
     const signedIn = store('wis.signedIn') === '1';
     const h = document.getElementById('pub-header');
     if (h) {
-      const links = [
-        ['home', '', 'Home'],
+      const basinLinks = [
+        ['basin', 'basin/', 'Basin home'],
         ['explore', 'explore/', 'Water bodies'],
         ['map', 'explore/map/', 'Map'],
         ['participate', 'participate/', 'Have your say'],
         ['dashboards', 'explore/dashboards/', 'Dashboards'],
         ['permits', 'explore/permits/', 'Permits']
-      ].map(([k, href, l]) => `<a href="${base}${href}" class="${k === active ? 'on' : ''}">${l}</a>`).join('');
+      ];
+      const nationalLinks = [
+        ['home', '', 'Home'],
+        ['aboutnwis', '#about', 'About NWIS'],
+        ['basins', '#basins', 'River basins'],
+        ['about', 'about/contacts/', 'Who is responsible']
+      ];
+      const links = (scope === 'basin' ? basinLinks : nationalLinks)
+        .map(([k, href, l]) => `<a href="${href[0] === '#' && active !== 'home' ? base + href : (href[0] === '#' ? href : base + href)}" class="${k === active ? 'on' : ''}">${l}</a>`).join('');
       h.className = 'pub-header';
       h.innerHTML = `<div class="pub-header-inner">
         <a href="${base}" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
           <div class="logo-icon"><i class="fas fa-water" style="color:white;font-size:18px;"></i></div>
-          <div><div class="logo-text-main">WIS Macedonia</div><div class="logo-text-sub">Public portal · Vardar RBMP</div></div>
+          <div><div class="logo-text-main">${BRAND[0]}</div><div class="logo-text-sub">${BRAND[1]}</div></div>
         </a>
         <nav class="pub-nav" style="display:flex;gap:2px;flex:1;padding:0;">${links}</nav>
         <div class="lang-switch" title="Language (Macedonian and Albanian planned)">
@@ -170,13 +205,48 @@
         <button class="header-btn pub-burger" style="background:transparent;color:#e2e8f0;border-color:#334155;" onclick="document.getElementById('pub-mnav').classList.toggle('open')" title="Menu"><i class="fas fa-bars"></i></button>
       </div>
       <nav id="pub-mnav" class="pub-mnav">${links}</nav>`;
+      if (scope === 'basin') {
+        const strip = document.createElement('div');
+        strip.className = 'basin-strip';
+        strip.innerHTML = `<div class="basin-strip-inner">
+          <a href="${base}" class="basin-all"><i class="fas fa-th-large"></i><span>All river basins</span></a>
+          <div class="basin-tabs">${RBDS.map(r => `<button class="basin-tab ${r.id === RBD.id ? 'on' : ''}" data-rbd="${r.id}" title="${r.full}"><i class="fas fa-circle" style="color:${r.color};font-size:8px;"></i>${lang === 'mk' ? r.mk : r.name}</button>`).join('')}</div>
+          <label class="basin-cycle"><span>RBMP cycle</span><select id="pub-cycle">${CYCLES.map(c => `<option value="${c.id}" ${c.id === cycle.id ? 'selected' : ''}>${c.label} · ${c.state}</option>`).join('')}</select></label>
+        </div>`;
+        h.after(strip);
+        strip.querySelectorAll('[data-rbd]').forEach(b => b.onclick = () => setBasin(b.dataset.rbd));
+        strip.querySelector('#pub-cycle').onchange = e => setCycle(e.target.value);
+      }
     }
+    if (scope === 'basin') basinContent();
     const f = document.getElementById('pub-footer');
     if (f) {
       f.className = 'pub-footer';
-      f.innerHTML = `Ministry of Environment and Physical Planning · Water Information System (WIS) · Mockup v2 – demonstrator, all data are placeholders
+      f.innerHTML = `Ministry of Environment and Physical Planning · ${BRAND[1]} (${BRAND[0]}) · Mockup v2 – demonstrator, all data are placeholders
         <div style="margin-top:8px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;"><a href="${base}about/contacts/" style="color:#1a56db;">Who is responsible · contacts</a><a href="${base}participate/request/" style="color:#1a56db;">Request background documents</a><a href="${base}about/privacy/" style="color:#1a56db;">Privacy notice</a><a href="${base}about/accessibility/" style="color:#1a56db;">Accessibility</a></div>
         <div style="margin-top:6px;font-size:10.5px;color:#94a3b8;">For reviewers: <a href="${base}screen-map/" style="color:#94a3b8;">screen map</a> · <a href="${base}../" style="color:#94a3b8;">mockup v1</a></div>`;
+    }
+  }
+
+  /* ── Basin pages: same structure for every basin; names and cycle follow the selection ── */
+  function basinContent() {
+    const main = document.querySelector('main.pub-wrap');
+    if (!main) return;
+    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+    const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(n => {
+      let t = n.nodeValue, o = t;
+      if (RBD.id !== 'VAR') t = t.replace(/Vardar (River Basin District|River Basin Management Plan|River Basin Council|River Basin|RBD|RBMP)/g, RBD.name + ' $1');
+      if (cycle.id !== 'C2028') t = t.replace(/RBMP 2028–2033( \(in preparation\))?/g, cycle.label + ' (' + cycle.state.toLowerCase() + ')');
+      if (t !== o) n.nodeValue = t;
+    });
+    const empty = (el, what) => { el.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><div><b>No ${what || 'records'} published yet for ${RBD.label}${el.dataset.demoBasin ? '' : ' · ' + cycle.label}.</b><br>This section has the same structure in every river basin; it fills in when the competent authority publishes the data.</div></div>`; };
+    if (RBD.id !== 'VAR') main.querySelectorAll('[data-demo-basin]').forEach(el => empty(el, el.dataset.demoBasin));
+    if (!DEMO) {
+      main.querySelectorAll('[data-demo]').forEach(el => {
+        el.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><div><b>No ${el.dataset.demo || 'records'} published yet for ${RBD.label} · ${cycle.label}.</b><br>This section has the same structure in every river basin; it fills in when the competent authority publishes the data for this basin and cycle.</div></div>`;
+      });
+      main.insertAdjacentHTML('afterbegin', `<div class="alert alert-info" style="margin-bottom:16px;"><i class="fas fa-layer-group"></i><div><b>${RBD.full} · ${cycle.label}.</b> Same pages and tools as every river basin. In this mockup, full example content is loaded for Vardar RBD, RBMP 2028–2033; ${RBD.id === 'VAR' ? 'this cycle has not started yet, so only the water-body list is shown' : RBD.name + ' shows a few placeholder water bodies only'}.</div></div>`);
     }
   }
 
@@ -195,10 +265,11 @@
     'Datasets & Imports': ['Збирки податоци и увоз', 'Grupet e të dhënave dhe importi'], 'Permanent Identifiers': ['Трајни идентификатори', 'Identifikuesit e përhershëm'],
     'Reference Data': ['Референтни податоци', 'Të dhënat referuese'], 'GIS Layers & Configurator': ['ГИС слоеви и конфигуратор', 'Shtresat GIS dhe konfiguruesi'],
     'Metadata': ['Метаподатоци', 'Metadatat'], 'Data Access': ['Пристап до податоци', 'Qasja në të dhëna'], 'Users & Roles': ['Корисници и улоги', 'Përdoruesit dhe rolet'],
-    'WISE Reporting': ['Известување кон WISE', 'Raportimi WISE'], 'View public portal': ['Јавен портал', 'Portali publik'], 'Help': ['Помош', 'Ndihmë']
+    'WISE Reporting': ['Известување кон WISE', 'Raportimi WISE'], 'View public portal': ['Јавен портал', 'Portali publik'], 'Help': ['Помош', 'Ndihmë'],
+    'Basin home': ['Почетна на сливот', 'Ballina e pellgut'], 'About NWIS': ['За НИСВ', 'Rreth NWIS'], 'River basins': ['Речни сливови', 'Pellgjet lumore'],
+    'Who is responsible': ['Кој е надлежен', 'Kush është përgjegjës'], 'All river basins': ['Сите речни сливови', 'Të gjitha pellgjet'], 'RBMP cycle': ['Циклус на планот', 'Cikli i planit']
   };
   function i18n() {
-    const lang = store('wis.lang') || 'en';
     const sw = document.querySelector('.lang-switch');
     if (sw) {
       sw.innerHTML = [['mk', 'МК'], ['sq', 'SQ'], ['en', 'EN']].map(([k, l]) => `<span data-lang="${k}" class="${k === lang ? 'on' : ''}" style="cursor:pointer;" title="${{ mk: 'Македонски', sq: 'Shqip', en: 'English' }[k]}">${l}</span>`).join('');
@@ -212,10 +283,11 @@
     }
     if (lang === 'en') return;
     const i = lang === 'mk' ? 0 : 1;
-    document.querySelectorAll('.nav-label, .nav-section-title, .pub-nav a, .pub-mnav a, .header-btn span').forEach(el => {
+    document.querySelectorAll('.nav-label, .nav-section-title, .pub-nav a, .pub-mnav a, .header-btn span, .basin-all span, .basin-cycle span').forEach(el => {
       const k = el.textContent.trim(); if (T[k]) el.textContent = T[k][i];
     });
     document.documentElement.lang = lang;
+    if (lang === 'mk') { const fix = () => { if (document.title.includes('NWIS')) document.title = document.title.replace(/NWIS/g, 'НИСВ'); }; fix(); setTimeout(fix, 0); }
     const note = document.createElement('div');
     note.style.cssText = 'background:#fef3c7;color:#92400e;font-size:12px;padding:6px 16px;text-align:center;';
     note.textContent = lang === 'mk' ? 'Македонска верзија: преведени се менијата (нацрт-превод). Содржината на страниците ќе биде преведена во живиот систем.'
