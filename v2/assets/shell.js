@@ -135,7 +135,6 @@
         <div class="nav-section-title">Public side</div>
         <a href="${base}" class="nav-item"><i class="fas fa-globe nav-icon"></i><span class="nav-label">View public portal</span></a>
       </nav>
-      <div style="padding:8px 18px 10px;font-size:10.5px;color:#64748b;border-top:1px solid #1e293b;">For reviewers: <a href="${base}screen-map/" style="color:#94a3b8;">screen map</a> · <a href="${base}../" style="color:#94a3b8;">mockup v1</a></div>
       <div class="sidebar-user" style="flex-direction:column;align-items:stretch;">
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="user-avatar">DM</div>
