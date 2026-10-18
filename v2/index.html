@@ -137,7 +137,7 @@ const PHOTO = {
   STR: ['Strumica_(river)', 'Kolešino_Falls', 'Strumica'],
   JMO: ['Binačka_Morava', 'Lipkovo_Lake', 'Kumanovo']
 };
-const isPhoto = u => u && /\.(jpe?g|png|webp)(\/|$)/i.test(u) && !/(map|karte|locator|location|relief|flag|coat|grb|svg)/i.test(u);
+const isPhoto = u => !!u && /\.(jpe?g|png|webp)$/i.test(u.split('?')[0]) && !/(map|karte|locator|location|relief|flag|coat_of|grb|\.svg)/i.test(u);
 const strip = h => (h || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 async function basinPhoto(id) {
   for (const t of PHOTO[id]) {
@@ -149,21 +149,24 @@ async function basinPhoto(id) {
       const meta = await fetch('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=900&titles=File:' + encodeURIComponent(file)).then(r => r.json()).catch(() => null);
       const page = meta && meta.query && Object.values(meta.query.pages)[0], ii = page && page.imageinfo && page.imageinfo[0];
       const m = (ii && ii.extmetadata) || {};
-      const img = new Image();
-      img.alt = (sm.title || id) + ' – ' + strip(m.ImageDescription && m.ImageDescription.value).slice(0, 120);
-      img.loading = 'lazy';
-      img.src = (ii && ii.thumburl) || src;
-      await img.decode();
       const box = document.getElementById('ph-' + id);
+      const img = document.createElement('img');
+      img.alt = (sm.title || id) + ' – ' + strip(m.ImageDescription && m.ImageDescription.value).slice(0, 120);
+      img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
+      img.style.opacity = '0';
+      box.prepend(img);
+      const ok = await new Promise(res => { img.onload = () => res(true); img.onerror = () => res(false); img.src = (ii && ii.thumburl) || (sm.thumbnail && sm.thumbnail.source) || src; });
+      if (!ok) { img.remove(); continue; }
+      img.style.opacity = '1';
       box.querySelector('.basin-outline') && box.querySelector('.basin-outline').remove();
-      box.prepend(img); box.classList.add('has-photo');
+      box.classList.add('has-photo');
       const cr = box.querySelector('.basin-credit');
       const who = strip(m.Artist && m.Artist.value) || 'Wikimedia Commons', lic = strip(m.LicenseShortName && m.LicenseShortName.value);
       cr.textContent = 'Photo: ' + who.slice(0, 40) + (lic ? ' · ' + lic : '');
       cr.title = file + ' · Wikimedia Commons';
       cr.hidden = false;
       return;
-    } catch (e) { /* try the next article */ }
+    } catch (e) { console.warn('NWIS basin photo', id, t, e); }
   }
 }
 WIS.RBDS.forEach(r => basinPhoto(r.id));
