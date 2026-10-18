@@ -102,7 +102,6 @@
 document.getElementById('nat-basin-cards').innerHTML = WIS.RBDS.map(r => `
   <a href="basin/?rbd=${r.id}" class="basin-card" style="--c:${r.color};text-decoration:none;">
     <h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div>
-    <dl><dt>Area</dt><dd>${r.area} (${r.share})</dd><dt>Shared with</dt><dd>${r.shared}</dd><dt>Main waters</dt><dd>${r.rivers}</dd></dl>
     <span class="btn btn-primary btn-sm" style="margin-top:auto;align-self:flex-start;">Enter ${r.name} <i class="fas fa-arrow-right"></i></span>
   </a>`).join('');
 </script>
