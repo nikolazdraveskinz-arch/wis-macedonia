@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Water bodies — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -15,7 +17,7 @@
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
-<h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">Water bodies of the Vardar RBD</h1>
+<h1 style="font-size:22px;font-weight:800;color:#1E3A8A;margin:0 0 4px;">Water bodies of the Vardar RBD</h1>
 <p style="font-size:13px;color:#64748b;margin:0 0 18px;">Public view · RBMP 2028–2033 (in preparation) · placeholder values</p>
 <div class="card">
   <div class="filter-bar">
@@ -44,7 +46,7 @@
 const EC = { Good: 'eco-good', High: 'eco-good', Moderate: 'eco-moderate', Poor: 'eco-poor', Bad: 'eco-poor' };
 const PR = { 'MK-VAR-RW-0014': 'Urban wastewater, agriculture', 'MK-VAR-RW-0015': 'Urban wastewater, industry', 'MK-VAR-RW-0102': 'Hydromorphology', 'MK-VAR-RW-0201': 'Abstraction, urban wastewater', 'MK-VAR-LW-0003': 'Abstraction', 'MK-VAR-GW-004': 'Agriculture (nitrates), industry' };
 const cell = v => EC[v] ? `<span class="${EC[v]}">${v}</span>` : `<span style="color:#94a3b8;">${v}</span>`;
-document.getElementById('pw-body').innerHTML = WIS.WBS.length ? WIS.WBS.map(w => `<tr><td><span class="id-pill">${w.id}</span></td><td><a href="water-body/?id=${w.id}" style="color:#1a56db;font-weight:700;">${w.name}</a></td><td>${w.cat}</td><td>${cell(w.eco)}</td><td>${cell(w.chem)}</td><td>${PR[w.id] || '<span style="color:#94a3b8;">To be assessed</span>'}</td><td><a class="btn btn-secondary btn-sm" href="map/?wb=${w.id}">Map</a></td></tr>`).join('')
+document.getElementById('pw-body').innerHTML = WIS.WBS.length ? WIS.WBS.map(w => `<tr><td><span class="id-pill">${w.id}</span></td><td><a href="water-body/?id=${w.id}" style="color:#1D4ED8;font-weight:700;">${w.name}</a></td><td>${w.cat}</td><td>${cell(w.eco)}</td><td>${cell(w.chem)}</td><td>${PR[w.id] || '<span style="color:#94a3b8;">To be assessed</span>'}</td><td><a class="btn btn-secondary btn-sm" href="map/?wb=${w.id}">Map</a></td></tr>`).join('')
   : '<tr><td colspan="7" style="color:#94a3b8;text-align:center;padding:20px;">No water bodies published yet for this basin.</td></tr>';
 document.getElementById('pw-ds').textContent = 'DS-' + WIS.RBD.id + '-001 ' + (WIS.RBD.id === 'VAR' ? 'v1.4' : 'v0.1 (draft)');
 </script>

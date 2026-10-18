@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Water Bodies Registry — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -16,7 +18,7 @@
 <div class="main-wrapper">
   <header class="top-header">
     <div class="page-title-wrap">
-      <h1><i class="fas fa-water" style="color:#1a56db; font-size:16px; margin-right:8px;"></i>Water Bodies Registry</h1>
+      <h1><i class="fas fa-water" style="color:#1D4ED8; font-size:16px; margin-right:8px;"></i>Water Bodies Registry</h1>
       <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
     </div>
     <div class="header-actions">
@@ -26,13 +28,13 @@
     </div>
   </header>
   <main class="content-area">
-<div class="phase-banner" style=""><i class="fas fa-water"></i><div><b>Carried over from v1.</b> Water-body identifiers are now managed together with the other 7 entity types in <a href="../identifiers/" style="color:#1a56db;font-weight:600;">Permanent Identifiers</a>. Records are filtered by the river basin district and RBMP cycle selected in the header.</div></div>
+<div class="phase-banner" style=""><i class="fas fa-water"></i><div><b>Carried over from v1.</b> Water-body identifiers are now managed together with the other 7 entity types in <a href="../identifiers/" style="color:#1D4ED8;font-weight:600;">Permanent Identifiers</a>. Records are filtered by the river basin district and RBMP cycle selected in the header.</div></div>
 
     
 <!-- ═══ HEADER STATS ═══ -->
 <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; margin-bottom:20px;">
   <div class="kpi-card" style="padding:16px;">
-    <div style="font-size:24px; font-weight:800; color:#1a56db;">89</div>
+    <div style="font-size:24px; font-weight:800; color:#1D4ED8;">89</div>
     <div style="font-size:12px; color:#64748b;">River Water Bodies</div>
     <div style="font-size:10px; color:#94a3b8; margin-top:3px;">4 river basins</div>
   </div>
@@ -271,7 +273,7 @@
       <span style="font-size:11px; color:#64748b;">Showing 8 of 137 water bodies</span>
       <div style="display:flex; gap:6px;">
         <button class="btn btn-secondary btn-sm">← Prev</button>
-        <button class="btn btn-secondary btn-sm" style="background:#1a56db; color:white; border-color:#1a56db;">1</button>
+        <button class="btn btn-secondary btn-sm" style="background:#1D4ED8; color:white; border-color:#1D4ED8;">1</button>
         <button class="btn btn-secondary btn-sm">2</button>
         <button class="btn btn-secondary btn-sm">3</button>
         <button class="btn btn-secondary btn-sm">Next →</button>
@@ -322,7 +324,7 @@
         <div class="card" style="padding:16px; border:1px solid #e2e8f0;">
           <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Identifier Schema</h4>
           <div style="font-family:monospace; font-size:11px; background:#f8fafc; padding:12px; border-radius:7px; line-height:1.8;">
-            <div><span style="color:#1a56db;">MK</span> — Country code (ISO 3166-1)</div>
+            <div><span style="color:#1D4ED8;">MK</span> — Country code (ISO 3166-1)</div>
             <div><span style="color:#059669;">VAR/BLA/STR/BRE</span> — Basin code</div>
             <div><span style="color:#8b5cf6;">RW/LW/GW</span> — Water body type</div>
             <div><span style="color:#f97316;">001..999</span> — Sequential number</div>
@@ -334,7 +336,7 @@
         <div class="card" style="padding:16px; border:1px solid #e2e8f0;">
           <h4 style="font-size:12px; font-weight:700; color:#0f172a; margin:0 0 12px;">Identifier Registry Stats</h4>
           <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);">
-            <div class="stat-item"><div class="stat-val" style="color:#1a56db;">137</div><div class="stat-lbl">Total Assigned</div></div>
+            <div class="stat-item"><div class="stat-val" style="color:#1D4ED8;">137</div><div class="stat-lbl">Total Assigned</div></div>
             <div class="stat-item"><div class="stat-val" style="color:#059669;">137</div><div class="stat-lbl">Active</div></div>
             <div class="stat-item"><div class="stat-val" style="color:#d97706;">0</div><div class="stat-lbl">Deprecated</div></div>
             <div class="stat-item"><div class="stat-val" style="color:#64748b;">2</div><div class="stat-lbl">Pending</div></div>
@@ -355,11 +357,11 @@
 function showWBDetails(id) {
   var wb = [{"id":"MK-VAR-RW-001","name":"Vardar - Negotino","type":"River","basin":"Vardar","length":42.3,"ecoStatus":"Moderate","chemStatus":"Good","wfd":"2027","pressures":["Agriculture","Point source"],"monitoring":true},{"id":"MK-VAR-RW-002","name":"Treska - Mavrovo","type":"River","basin":"Vardar","length":28.1,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":["Hydro-morphology"],"monitoring":true},{"id":"MK-VAR-RW-003","name":"Crna Reka - Middle","type":"River","basin":"Vardar","length":67.4,"ecoStatus":"Poor","chemStatus":"Moderate","wfd":"2033","pressures":["Agriculture","Urban"],"monitoring":true},{"id":"MK-VAR-LW-001","name":"Dojran Lake","type":"Lake","basin":"Vardar","area":42.9,"ecoStatus":"Moderate","chemStatus":"Good","wfd":"2027","pressures":["Water extraction"],"monitoring":true},{"id":"MK-VAR-LW-002","name":"Ohrid Lake","type":"Lake","basin":"Black Drim","area":358,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":["Tourism","Urban"],"monitoring":true},{"id":"MK-VAR-GW-001","name":"Pelagonia Alluvial","type":"Groundwater","basin":"Vardar","area":4100,"quanStatus":"Good","qualStatus":"Poor","wfd":"2027","pressures":["Agriculture - nitrates"],"monitoring":true},{"id":"MK-BLA-RW-001","name":"Black Drim - Upper","type":"River","basin":"Black Drim","length":34.7,"ecoStatus":"Good","chemStatus":"Good","wfd":"Achieved","pressures":[],"monitoring":true},{"id":"MK-STR-RW-001","name":"Strumica - Lower","type":"River","basin":"Strumica","length":22.8,"ecoStatus":"Poor","chemStatus":"Poor","wfd":"2033","pressures":["Agriculture","Industry","Urban"],"monitoring":true}].find(w => w.id === id);
   if (!wb) return;
-  var ecoColor = { High: '#1a56db', Good: '#059669', Moderate: '#d97706', Poor: '#dc2626', Bad: '#7f1d1d' };
+  var ecoColor = { High: '#1D4ED8', Good: '#059669', Moderate: '#d97706', Poor: '#dc2626', Bad: '#7f1d1d' };
   var eco = wb.ecoStatus || (wb.quanStatus + '/' + wb.qualStatus);
   var col = ecoColor[wb.ecoStatus] || '#64748b';
   document.getElementById('wb-modal-content').innerHTML = 
-    '<div style="padding:20px; border-bottom:1px solid #f1f5f9; background:linear-gradient(135deg, #1a56db08, #0891b208);">' +
+    '<div style="padding:20px; border-bottom:1px solid #f1f5f9; background:linear-gradient(135deg, #1D4ED808, #0891b208);">' +
     '<div style="display:flex; align-items:start; justify-content:space-between;">' +
     '<div><div style="font-size:16px; font-weight:800; color:#0f172a;">' + wb.name + '</div>' +
     '<span class="id-pill" style="margin-top:4px; display:inline-block;">' + wb.id + '</span></div>' +
@@ -395,7 +397,7 @@ new Chart(overallCtx, {
   type: 'bar',
   data: {
     labels: ['High','Good','Moderate','Poor','Bad','N/A'],
-    datasets: [{ data: [12,42,31,16,5,17], backgroundColor: ['#1a56db','#31c48d','#faca15','#e74c3c','#7b1010','#9ca3af'], borderRadius: 4 }]
+    datasets: [{ data: [12,42,31,16,5,17], backgroundColor: ['#1D4ED8','#31c48d','#faca15','#e74c3c','#7b1010','#9ca3af'], borderRadius: 4 }]
   },
   options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{font:{size:10}}}, y:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}} } }
 });

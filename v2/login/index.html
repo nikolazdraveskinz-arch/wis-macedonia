@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign in — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -17,13 +19,13 @@
 
 <div style="max-width:440px;margin:20px auto;">
 <div class="card"><div class="card-body" style="display:grid;gap:12px;">
-  <h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0;">Sign in</h1>
+  <h1 style="font-size:20px;font-weight:800;color:#1E3A8A;margin:0;">Sign in</h1>
   <p style="font-size:12.5px;color:#64748b;margin:0;">One sign-in for registered public users and institutional staff. What you see after signing in depends on your role.</p>
   <div><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="name@example.org"></div>
   <div><label class="form-label">Password</label><input class="form-input" type="password"></div>
   <button class="btn btn-primary" style="justify-content:center;padding:10px;" onclick="WIS.signIn(new URLSearchParams(location.search).get('next')||'../participate/')"><i class="fas fa-sign-in-alt"></i>Sign in</button>
   <button class="btn btn-secondary" style="justify-content:center;padding:10px;" onclick="wisToast('Redirect to the national eID service (mockup)')"><i class="fas fa-id-card"></i>Sign in with national eID</button>
-  <div style="font-size:12px;color:#64748b;text-align:center;">No account? <a href="../register/" style="color:#1a56db;font-weight:600;">Register</a> · <a href="#" style="color:#1a56db;">Forgot password</a></div>
+  <div style="font-size:12px;color:#64748b;text-align:center;">No account? <a href="../register/" style="color:#1D4ED8;font-weight:600;">Register</a> · <a href="#" style="color:#1D4ED8;">Forgot password</a></div>
   <div style="border-top:1px solid #f1f5f9;padding-top:10px;">
     <div class="form-label">Mockup shortcuts</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
