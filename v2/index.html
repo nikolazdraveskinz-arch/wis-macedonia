@@ -99,9 +99,34 @@
 <footer id="pub-footer"></footer>
 <script src="assets/shell.js"></script>
 <script>
+const SHAPE = {
+  VAR: [[42.25,21.05],[42.33,21.55],[42.30,22.30],[42.05,22.75],[41.75,22.85],[41.55,22.60],[41.35,22.75],[41.13,22.70],[41.12,22.20],[41.10,21.60],[41.25,21.20],[41.55,20.95],[41.95,20.75],[42.15,20.85]],
+  BDR: [[41.75,20.60],[41.55,20.95],[41.25,21.20],[41.10,21.10],[40.86,21.05],[40.88,20.95],[40.92,20.75],[41.10,20.66],[41.35,20.48],[41.60,20.45]],
+  STR: [[41.55,22.60],[41.62,22.90],[41.48,23.02],[41.35,22.98],[41.30,22.75],[41.35,22.75]],
+  JMO: [[42.33,21.55],[42.32,21.75],[42.25,21.72],[42.25,21.56]]
+};
+/* small basin silhouette, drawn from the schematic outline (no map service needed) */
+function outline(id, color) {
+  const pts = SHAPE[id], lats = pts.map(p => p[0]), lons = pts.map(p => p[1]);
+  const x0 = Math.min(...lons), x1 = Math.max(...lons), y0 = Math.min(...lats), y1 = Math.max(...lats);
+  const k = Math.cos(41.6 * Math.PI / 180), w = (x1 - x0) * k, h = y1 - y0, S = 52 / Math.max(w, h);
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + (4 + (p[1] - x0) * k * S + (52 - w * S) / 2).toFixed(1) + ' ' + (4 + (y1 - p[0]) * S + (52 - h * S) / 2).toFixed(1)).join(' ') + 'Z';
+  return `<svg class="basin-outline" viewBox="0 0 60 60" aria-hidden="true"><path d="${d}" fill="${color}" fill-opacity=".18" stroke="${color}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+}
+/* consultation status: example dates exist for Vardar only (stage 3 · draft RBMP) */
+function consult(id) {
+  if (id !== 'VAR') return '<span class="basin-st basin-st-none"><i class="fas fa-clock"></i>Consultation not yet published</span>';
+  const t = new Date(new Date().toISOString().slice(0, 10)), o = new Date('2026-09-01'), c = new Date('2027-03-01');
+  if (t < o) return '<span class="basin-st basin-st-soon"><i class="fas fa-calendar"></i>Draft RBMP · opens 1 Sep 2026</span>';
+  if (t > c) return '<span class="basin-st basin-st-none"><i class="fas fa-check"></i>Draft RBMP consultation closed</span>';
+  return `<span class="basin-st basin-st-open"><i class="fas fa-comments"></i>Draft RBMP open · ${Math.ceil((c - t) / 864e5)} days left</span>`;
+}
+const CYC = WIS.CYCLES[0];
 document.getElementById('nat-basin-cards').innerHTML = WIS.RBDS.map(r => `
   <a href="basin/?rbd=${r.id}" class="basin-card" style="--c:${r.color};text-decoration:none;">
-    <h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div>
+    <div class="basin-card-top"><div><h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div></div>${outline(r.id, r.color)}</div>
+    <div class="basin-cycle-line"><i class="fas fa-book-open"></i>${CYC.label} · ${CYC.state}</div>
+    ${consult(r.id)}
     <span class="btn btn-primary btn-sm" style="margin-top:auto;align-self:flex-start;">Enter ${r.name} <i class="fas fa-arrow-right"></i></span>
   </a>`).join('');
 </script>

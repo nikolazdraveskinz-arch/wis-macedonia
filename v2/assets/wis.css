@@ -420,3 +420,13 @@ body { background: #F9FAFB; color: #1F2937; font-family: 'Inter', system-ui, -ap
 .alert { border-radius: 12px; }
 .eco-high { color: #2563EB; } .eco-good { color: #16A34A; }
 a { color: inherit; }
+/* cover basin cards: outline, cycle, consultation status */
+.basin-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.basin-outline { width: 60px; height: 60px; flex: none; margin: -4px -4px 0 0; }
+.basin-cycle-line { font-size: 12px; color: #4B5563; display: flex; align-items: center; gap: 6px; }
+.basin-cycle-line i { color: #14B8A6; }
+.basin-st { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.basin-st-open { background: #CCFBF1; color: #115E59; }
+.basin-st-soon { background: #DBEAFE; color: #1E3A8A; }
+.basin-st-none { background: #F3F4F6; color: #6B7280; }
+.basin-card-top h3 { line-height: 1.2; } .basin-card-top .mk { margin-top: 3px; }
