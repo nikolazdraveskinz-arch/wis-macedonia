@@ -124,11 +124,49 @@ function consult(id) {
 const CYC = WIS.CYCLES[0];
 document.getElementById('nat-basin-cards').innerHTML = WIS.RBDS.map(r => `
   <a href="basin/?rbd=${r.id}" class="basin-card" style="--c:${r.color};text-decoration:none;">
-    <div class="basin-card-top"><div><h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div></div>${outline(r.id, r.color)}</div>
+    <div class="basin-photo" id="ph-${r.id}" style="--c:${r.color};">${outline(r.id, r.color)}<span class="basin-credit" hidden></span></div>
+    <div class="basin-card-top"><div><h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div></div></div>
     <div class="basin-cycle-line"><i class="fas fa-book-open"></i>${CYC.label} · ${CYC.state}</div>
     ${consult(r.id)}
     <span class="btn btn-primary btn-sm" style="margin-top:auto;align-self:flex-start;">Enter ${r.name} <i class="fas fa-arrow-right"></i></span>
   </a>`).join('');
+/* Basin photos: lead image of a representative Wikipedia article (Wikimedia Commons), with author and licence */
+const PHOTO = {
+  VAR: ['Vardar', 'Veles,_North_Macedonia', 'Matka_Canyon'],
+  BDR: ['Lake_Ohrid', 'Black_Drin', 'Struga'],
+  STR: ['Strumica_(river)', 'Kolešino_Falls', 'Strumica'],
+  JMO: ['Binačka_Morava', 'Lipkovo_Lake', 'Kumanovo']
+};
+const isPhoto = u => u && /\.(jpe?g|png|webp)(\/|$)/i.test(u) && !/(map|karte|locator|location|relief|flag|coat|grb|svg)/i.test(u);
+const strip = h => (h || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+async function basinPhoto(id) {
+  for (const t of PHOTO[id]) {
+    try {
+      const sm = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(t)).then(r => r.ok ? r.json() : null);
+      const src = sm && (sm.originalimage || sm.thumbnail) && (sm.originalimage || sm.thumbnail).source;
+      if (!isPhoto(src)) continue;
+      const file = decodeURIComponent(src.split('/').pop().replace(/^\d+px-/, ''));
+      const meta = await fetch('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=900&titles=File:' + encodeURIComponent(file)).then(r => r.json()).catch(() => null);
+      const page = meta && meta.query && Object.values(meta.query.pages)[0], ii = page && page.imageinfo && page.imageinfo[0];
+      const m = (ii && ii.extmetadata) || {};
+      const img = new Image();
+      img.alt = (sm.title || id) + ' – ' + strip(m.ImageDescription && m.ImageDescription.value).slice(0, 120);
+      img.loading = 'lazy';
+      img.src = (ii && ii.thumburl) || src;
+      await img.decode();
+      const box = document.getElementById('ph-' + id);
+      box.querySelector('.basin-outline') && box.querySelector('.basin-outline').remove();
+      box.prepend(img); box.classList.add('has-photo');
+      const cr = box.querySelector('.basin-credit');
+      const who = strip(m.Artist && m.Artist.value) || 'Wikimedia Commons', lic = strip(m.LicenseShortName && m.LicenseShortName.value);
+      cr.textContent = 'Photo: ' + who.slice(0, 40) + (lic ? ' · ' + lic : '');
+      cr.title = file + ' · Wikimedia Commons';
+      cr.hidden = false;
+      return;
+    } catch (e) { /* try the next article */ }
+  }
+}
+WIS.RBDS.forEach(r => basinPhoto(r.id));
 </script>
 </body>
 </html>
