@@ -18,18 +18,17 @@
 <main class="pub-wrap">
 
 <div class="nat-hero nat-cover">
-  <div class="nat-cover-top">
+  <div class="nat-cover-top" style="grid-template-columns:1fr;">
     <div>
       <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.6px;opacity:.8;">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
       <h1 style="font-size:34px;font-weight:800;margin:10px 0 0;line-height:1.15;">National Water Information System – NWIS</h1>
       <div class="mk-name" lang="mk">Национален Информативен Систем за Води – НИСВ</div>
-      <p style="font-size:15.5px;max-width:620px;opacity:.94;margin:18px 0 0;line-height:1.6;">The national system for information on rivers, lakes and groundwater in North Macedonia. It brings together water bodies, monitoring, pressures, measures, water permits and the river basin management plans of all four river basin districts – open to everyone, with secure tools for the institutions that manage water.</p>
+      <p style="font-size:15.5px;max-width:820px;opacity:.94;margin:18px 0 0;line-height:1.6;">The national system for information on rivers, lakes and groundwater in North Macedonia. It brings together water bodies, monitoring, pressures, measures, water permits and the river basin management plans of all four river basin districts – open to everyone, with secure tools for the institutions that manage water.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;">
         <a href="#about" class="btn" style="background:rgba(255,255,255,.14);color:#fff;padding:10px 16px;font-size:13px;border:1px solid rgba(255,255,255,.4);"><i class="fas fa-info-circle"></i>About NWIS</a>
         <a href="login/" class="btn" style="background:rgba(255,255,255,.14);color:#fff;padding:10px 16px;font-size:13px;border:1px solid rgba(255,255,255,.4);"><i class="fas fa-lock"></i>Institutional sign-in</a>
       </div>
     </div>
-    <div id="nat-map"></div>
   </div>
   <div id="basins" style="margin-top:28px;">
     <div style="font-size:13px;font-weight:700;letter-spacing:.4px;margin-bottom:10px;"><i class="fas fa-sign-in-alt" style="margin-right:6px;"></i>Enter a river basin district</div>
@@ -100,24 +99,6 @@
 <footer id="pub-footer"></footer>
 <script src="assets/shell.js"></script>
 <script>
-const BOX = { VAR: [[41.10, 20.85], [42.37, 22.95]], BDR: [[40.85, 20.45], [41.75, 21.15]], STR: [[41.25, 22.25], [41.65, 23.00]], JMO: [[42.22, 21.52], [42.32, 21.75]] };
-const SHAPE = {
-  VAR: [[42.25,21.05],[42.33,21.55],[42.30,22.30],[42.05,22.75],[41.75,22.85],[41.55,22.60],[41.35,22.75],[41.13,22.70],[41.12,22.20],[41.10,21.60],[41.25,21.20],[41.55,20.95],[41.95,20.75],[42.15,20.85]],
-  BDR: [[41.75,20.60],[41.55,20.95],[41.25,21.20],[41.10,21.10],[40.86,21.05],[40.88,20.95],[40.92,20.75],[41.10,20.66],[41.35,20.48],[41.60,20.45]],
-  STR: [[41.55,22.60],[41.62,22.90],[41.48,23.02],[41.35,22.98],[41.30,22.75],[41.35,22.75]],
-  JMO: [[42.33,21.55],[42.32,21.75],[42.25,21.72],[42.25,21.56]]
-};
-const nm = L.map('nat-map', { scrollWheelZoom: false, zoomControl: false }).setView([41.6, 21.7], 8);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(nm);
-const all = [];
-WIS.RBDS.forEach(r => {
-  const pg = L.polygon(SHAPE[r.id], { color: r.color, weight: 2, fillColor: r.color, fillOpacity: .22 }).addTo(nm);
-  pg.bindTooltip(r.full + ' – click to enter', { sticky: true });
-  pg.on('click', () => { location.href = 'basin/?rbd=' + r.id; });
-  pg.on('mouseover', () => pg.setStyle({ fillOpacity: .4 })); pg.on('mouseout', () => pg.setStyle({ fillOpacity: .22 }));
-  all.push(...SHAPE[r.id]);
-});
-nm.fitBounds(L.latLngBounds(all), { padding: [10, 10] });
 document.getElementById('nat-basin-cards').innerHTML = WIS.RBDS.map(r => `
   <a href="basin/?rbd=${r.id}" class="basin-card" style="--c:${r.color};text-decoration:none;">
     <h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div>
