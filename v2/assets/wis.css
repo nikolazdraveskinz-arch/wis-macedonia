@@ -884,3 +884,8 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
   .map-stage #wmap { top: 0 !important; }
 }
 @media (prefers-reduced-motion: reduce) { .mtb-btn, .map-status { transition: none; } }
+
+/* home: larger basin photos in "Enter a river basin district" */
+.basin-card .basin-photo { height: auto; aspect-ratio: 4 / 3; max-width: none; }
+.basin-card .basin-photo .basin-outline { width: 120px; height: 120px; }
+@media (max-width: 640px) { .basin-card .basin-photo { aspect-ratio: 16 / 10; } }
