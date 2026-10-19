@@ -704,3 +704,11 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
   .rj-node { box-shadow: 0 0 0 4px var(--site-bg); }
 }
 @media (prefers-reduced-motion: reduce) { .pf-btn, .aim-card, .basin-card, .kpi-card { transition: none; } }
+/* medium widths: keep the basin menu, language switch and buttons on one row */
+@media (max-width: 1280px) and (min-width: 901px) {
+  .pub-header-inner { gap: 12px; }
+  .pub-nav { min-width: 0; }
+  .pub-nav a { padding: 8px 7px !important; font-size: 13px; }
+  .pub-header .logo-text-sub { display: none; }
+}
+@media (max-width: 1120px) and (min-width: 901px) { .pub-header .pub-hide-sm { display: none !important; } }
