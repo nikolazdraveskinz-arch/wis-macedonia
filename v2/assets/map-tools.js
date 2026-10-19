@@ -6,6 +6,8 @@ window.initWisMapTools = function (map, opts) {
   const info = M.info, toast = m => (window.wisToast || alert)(m);
   const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const settings = { coord: 'dec', hoverCoords: true };
+  const internal = M.mode === 'internal';
+  const idle = opts.idle || 'Click a water body, site, pressure, measure or comment on the map. Click anywhere else to comment on that point.';
 
   /* ───────── toolbar ───────── */
   const GROUPS = [
@@ -16,6 +18,9 @@ window.initWisMapTools = function (map, opts) {
     ['Measure', [['dist', 'fa-ruler', 'Measure length', 1], ['area', 'fa-ruler-combined', 'Measure area', 1], ['clearmeas', 'fa-times-circle', 'Clear measurements']]],
     ['Data', [['table', 'fa-table', 'Attribute table', 2], ['print', 'fa-print', 'Print / export map'], ['set', 'fa-cog', 'Settings']]]
   ];
+  /* opts.tools: optional list of tool keys to show (the internal portal uses a reduced staff set) */
+  if (opts.tools) GROUPS.forEach(g => { g[1] = g[1].filter(t => opts.tools.includes(t[0])); });
+  for (let i = GROUPS.length - 1; i >= 0; i--) if (!GROUPS[i][1].length) GROUPS.splice(i, 1);
   /* kind 1 = map mode (one at a time), 2 = on/off panel, none = one-off action */
   const KIND = {}; GROUPS.forEach(g => g[1].forEach(t => KIND[t[0]] = t[3] || 0));
   const bar = document.createElement('div');
@@ -79,7 +84,7 @@ window.initWisMapTools = function (map, opts) {
     if (last && last.z === v.z && last.c.distanceTo(v.c) < 1) return;
     hist.splice(hi + 1); hist.push(v); hi = hist.length - 1; navState();
   });
-  function navState() { btn('prev').disabled = hi <= 0; btn('next').disabled = hi >= hist.length - 1; }
+  function navState() { const p = btn('prev'), n = btn('next'); if (p) p.disabled = hi <= 0; if (n) n.disabled = hi >= hist.length - 1; }
   function go(d) { const v = hist[hi + d]; if (!v) return; hi += d; nav = true; map.setView(v.c, v.z); navState(); }
 
   /* ───────── drawing (zoom rectangle, polygon identify, measuring) ───────── */
@@ -224,10 +229,13 @@ window.initWisMapTools = function (map, opts) {
     pressed('table', on); stage.classList.toggle('table-on', on);
     if (!on) { drawer && drawer.remove(); drawer = null; setTimeout(() => map.invalidateSize(), 50); return; }
     drawer = document.createElement('section'); drawer.className = 'map-drawer'; drawer.setAttribute('aria-label', 'Attribute table');
-    const LAY = { 'Water bodies': W.WBS.map(w => ({ Identifier: w.id, Name: w.name, Category: w.cat, 'Ecological status': w.eco, 'Chemical status': w.chem, _l: M.wbLayers[w.id] })),
-      'Monitoring sites': W.SITES.map(s => ({ Identifier: s.id, Name: s.name, 'Water body': s.wb, _ll: s.ll })),
-      'Pressures': W.PRESSURES.map(p => ({ Identifier: p.id, Name: p.name, Type: p.type, _ll: p.ll })),
-      'Programme of Measures': W.MEASURES.map(m => ({ Identifier: m.id, Name: m.name, 'Key type of measure': m.ktm, _ll: m.ll })) };
+    /* internal portal: staff also see the source dataset and its access level (placeholders, as in the metadata catalogue) */
+    const staff = (ds, acc) => internal ? { Dataset: ds, Access: acc } : {};
+    const LAY = { 'Water bodies': W.WBS.map(w => Object.assign({ Identifier: w.id, Name: w.name, Category: w.cat, 'Ecological status': w.eco, 'Chemical status': w.chem }, staff('DS-VAR-001', 'Public'), { _l: M.wbLayers[w.id] })),
+      'Monitoring sites': W.SITES.map(s => Object.assign({ Identifier: s.id, Name: s.name, 'Water body': s.wb }, staff('DS-VAR-003', 'Public'), { _ll: s.ll })),
+      'Pressures': W.PRESSURES.map(p => Object.assign({ Identifier: p.id, Name: p.name, Type: p.type }, staff('DS-VAR-006', 'Internal'), { _ll: p.ll })),
+      'Programme of Measures': W.MEASURES.map(m => Object.assign({ Identifier: m.id, Name: m.name, 'Key type of measure': m.ktm }, staff('DS-VAR-009', 'Internal'), { _ll: m.ll })) };
+    const accBadge = v => `<span class="badge ${v === 'Public' ? 'badge-good' : 'badge-inactive'}">${v}</span>`;
     drawer.innerHTML = `<div class="map-drawer-h"><b><i class="fas fa-table"></i> Attribute table</b>
       <select id="at-layer" class="filter-select" aria-label="Layer">${Object.keys(LAY).map(k => `<option>${k}</option>`).join('')}</select>
       <div class="search-wrap" style="flex:0 1 240px;"><i class="fas fa-search"></i><input id="at-q" class="search-input" style="width:100%;min-width:0;" placeholder="Filter rows"></div>
@@ -241,7 +249,7 @@ window.initWisMapTools = function (map, opts) {
       const data = LAY[$('at-layer').value], cols = Object.keys(data[0] || {}).filter(c => c[0] !== '_'), t = $('at-q').value.trim().toLowerCase();
       rows = data.filter(r => !t || cols.some(c => String(r[c]).toLowerCase().includes(t)));
       $('at-h').innerHTML = '<tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr>';
-      $('at-b').innerHTML = rows.map((r, i) => '<tr data-i="' + i + '" tabindex="0">' + cols.map(c => `<td>${c === 'Identifier' ? `<span class="id-pill">${r[c]}</span>` : r[c]}</td>`).join('') + '</tr>').join('');
+      $('at-b').innerHTML = rows.map((r, i) => '<tr data-i="' + i + '" tabindex="0">' + cols.map(c => `<td>${c === 'Identifier' || c === 'Dataset' ? `<span class="id-pill">${r[c]}</span>` : c === 'Access' ? accBadge(r[c]) : r[c]}</td>`).join('') + '</tr>').join('');
       $('at-n').textContent = `${rows.length} of ${data.length} rows`;
       $('at-b').querySelectorAll('tr').forEach(tr => tr.onclick = tr.onkeydown = e => {
         if (e.type === 'keydown' && e.key !== 'Enter') return;
@@ -255,7 +263,7 @@ window.initWisMapTools = function (map, opts) {
       const data = LAY[$('at-layer').value], cols = Object.keys(data[0] || {}).filter(c => c[0] !== '_');
       const csv = [cols.join(',')].concat(rows.map(r => cols.map(c => `"${String(r[c]).replace(/"/g, '""')}"`).join(','))).join('\r\n');
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
-      a.download = `NWIS_${W.RBD.id}_${$('at-layer').value.replace(/\W+/g, '_')}.csv`; document.body.appendChild(a); a.click(); a.remove();
+      a.download = `NWIS_${internal ? 'internal_' : ''}${W.RBD.id}_${$('at-layer').value.replace(/\W+/g, '_')}.csv`; document.body.appendChild(a); a.click(); a.remove();
       toast('CSV exported: ' + rows.length + ' rows (placeholder data)');
     };
     render(); setTimeout(() => map.invalidateSize(), 50);
@@ -265,7 +273,7 @@ window.initWisMapTools = function (map, opts) {
   function print() {
     let t = document.querySelector('.map-print-title');
     if (!t) { t = document.createElement('div'); t.className = 'map-print-title'; stage.parentNode.insertBefore(t, stage); }
-    t.innerHTML = `<b>NWIS · Map of the ${W.RBD.full}</b><span>${W.cycle.label} · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} · ${status.querySelector('#ms-scale').textContent} · placeholder data</span>`;
+    t.innerHTML = `<b>NWIS · ${internal ? 'Internal map viewer · ' : 'Map of the '}${W.RBD.full}</b><span>${internal ? 'For official use · ' : ''}${W.cycle.label} · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} · ${status.querySelector('#ms-scale').textContent} · placeholder data</span>`;
     setTimeout(() => window.print(), 50);
   }
   function settingsPanel() {
@@ -290,7 +298,7 @@ window.initWisMapTools = function (map, opts) {
       ov: () => toggleOverview(!ov),
       grat: () => { gratOn = !gratOn; pressed('grat', gratOn); gratOn ? gratLayer.addTo(map) : map.removeLayer(gratLayer); drawGrat(); },
       search: searchPanel,
-      clearsel: () => { highlight(null); selLayer.clearLayers(); found = []; map.closePopup(); M.showInfo('Click a water body, site, pressure, measure or comment on the map. Click anywhere else to comment on that point.'); },
+      clearsel: () => { highlight(null); selLayer.clearLayers(); found = []; map.closePopup(); M.showInfo(idle); },
       clearmeas: () => { measLayer.clearLayers(); stopDrawing(); },
       table: () => toggleTable(!drawer),
       print, set: settingsPanel

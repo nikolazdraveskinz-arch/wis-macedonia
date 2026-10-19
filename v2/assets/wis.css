@@ -889,3 +889,18 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
 .basin-card .basin-photo { height: auto; aspect-ratio: 4 / 3; max-width: none; }
 .basin-card .basin-photo .basin-outline { width: 120px; height: 120px; }
 @media (max-width: 640px) { .basin-card .basin-photo { aspect-ratio: 16 / 10; } }
+
+/* ═══ Internal portal map: same floating-panel stage and toolbar, inside the portal frame ═══ */
+.map-stage-internal { height: calc(100vh - var(--header-height, 64px) - 48px); min-height: 540px; border: 1px solid var(--site-border); border-radius: 12px; overflow: hidden; background: #e8eef0; box-shadow: var(--t-shadow); }
+.map-stage-internal .map-panel { border-radius: 12px; }
+.map-stage-internal .map-panel-left { width: 260px; }
+.map-stage-internal .map-panel-right { width: 300px; }
+.map-stage-internal .leaflet-top.leaflet-left { left: 280px; }
+.map-stage-internal.panels-off .leaflet-top.leaflet-left { left: 0; }
+.map-stage-internal .map-status { left: 292px; }
+.map-stage-internal.panels-off .map-status { left: 12px; }
+.mtb-toggle { flex: none; margin-left: 10px; padding: 5px 10px; font-size: 12px; }
+.mtb-hint + .mtb-toggle { margin-left: 10px; }
+@media (max-width: 1280px) { .mtb-toggle span { display: none; } }
+@media (max-width: 900px) { .map-stage-internal { height: auto; border-radius: 12px; } .mtb-toggle { display: none; } }
+@media print { .content-area { padding: 0 !important; } .sidebar, #wis-sidebar, .top-header { display: none !important; } .main-wrapper { margin-left: 0 !important; } .map-stage-internal { border: 0; border-radius: 0; box-shadow: none; } }

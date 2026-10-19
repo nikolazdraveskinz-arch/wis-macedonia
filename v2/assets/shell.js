@@ -104,7 +104,7 @@
     external: []
   };
   /* internal screens that cover the whole country rather than one river basin district */
-  const NATIONAL = portal === 'internal' && ['reporting', 'users', 'reference-data', 'identifiers'].includes(active);
+  const NATIONAL = portal === 'internal' && ['reporting', 'users', 'reference-data', 'identifiers', 'metadata'].includes(active);
   function sidebar() {
     const el = document.getElementById('wis-sidebar');
     if (!el) return;
@@ -306,7 +306,7 @@
   window.filterTable = function (inputId, tableId) {
     const val = document.getElementById(inputId).value.toLowerCase();
     document.querySelectorAll('#' + tableId + ' tbody tr').forEach(tr => {
-      tr.style.display = tr.textContent.toLowerCase().includes(val) ? '' : 'none';
+      tr.style.display = tr.textContent.toLowerCase().includes(val) && !tr.dataset.basinOff ? '' : 'none';
     });
   };
   window.WIS.signIn = function (go) { store('wis.signedIn', '1'); if (go) location.href = go; else location.reload(); };
