@@ -1,0 +1,17 @@
+start
+VAR Vardar summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Vardar_Skopje_2.jpg/3840px-Vardar_Skopje_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+VAR Veles,_North_Macedonia summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Veles_X17.jpg/3840px-Veles_X17.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+VAR Matka_Canyon summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Matka_Canyon_Skopje_3.jpg/3840px-Matka_Canyon_Skopje_3.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+NO PHOTO for VAR
+BDR Lake_Ohrid summary src: https://upload.wikimedia.org/wikipedia/commons/f/f0/Lake_Ohrid%2C_Macedonia-Albania_viewed_from_a_NASA_satellite.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled
+BDR Black_Drin summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Ura_e_Skavic%C3%ABs.JPG/3840px-Ura_e_Skavic%C3%ABs.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+BDR Struga summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Aerial_view_of_Struga%2C_Lake_Ohrid_%26_Black_Drin_%287%29.jpg/3840px-Aerial_view_of_Struga%2C_Lake_Ohrid_%26_Black_Drin_%287%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+NO PHOTO for BDR
+STR Strumica_(river) summary src: https://upload.wikimedia.org/wikipedia/commons/4/4b/Strumeshnitsa-river-2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled
+STR Kolešino_Falls summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Kole%C5%A1ino_Waterfall_2018_%281%29.jpg/3840px-Kole%C5%A1ino_Waterfall_2018_%281%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+STR Strumica summary src: https://upload.wikimedia.org/wikipedia/commons/c/c1/%D0%9F%D0%BB%D0%BE%D1%88%D1%82%D0%B0%D0%B4_%D0%93%D0%BE%D1%86%D0%B5_%D0%94%D0%B5%D0%BB%D1%87%D0%B5%D0%B2_%D0%A1%D1%82%D1%80%D1%83%D0%BC%D0%B8%D1%86%D0%B0_%282%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled
+NO PHOTO for STR
+JMO Binačka_Morava summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Vitia.JPG/3840px-Vitia.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+JMO Lipkovo_Lake summary src: null
+JMO Kumanovo summary src: https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/%D0%9A%D1%83%D0%BC%D0%B0%D0%BD%D0%BE%D0%B2%D0%BE.jpg/3840px-%D0%9A%D1%83%D0%BC%D0%B0%D0%BD%D0%BE%D0%B2%D0%BE.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail
+NO PHOTO for JMO
