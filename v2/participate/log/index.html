@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019e">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019f">
 </head>
 <body data-base="../../" data-active="participate" data-portal="public" data-scope="basin">
 <header id="pub-header"></header>
@@ -40,8 +40,8 @@
 
 </main>
 <footer id="pub-footer"></footer>
-<script src="../../assets/shell.js?v=20261019e"></script>
-<script src="../../assets/participation.js?v=20261019e"></script>
+<script src="../../assets/shell.js?v=20261019f"></script>
+<script src="../../assets/participation.js?v=20261019f"></script>
 <script>WIS.riverStrip('rj-strip', { here: 'mouth', selected: +(new URLSearchParams(location.search).get('stage')) || null, link: function(n){ return n<=3 ? '?stage='+n : '../#st'+n; } });</script>
 <script>
 const P=new URLSearchParams(location.search); if(P.get('stage')) document.getElementById('fs').value=P.get('stage');

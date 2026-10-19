@@ -80,10 +80,21 @@ window.initWisMap = function (opts) {
   }
   drawComments();
   window.onCommentAdded = drawComments;
-  if (W.WBS.length) map.fitBounds(L.latLngBounds(W.WBS.flatMap(w => w.line || w.poly)), { padding: [30, 30] });
   const focus = new URLSearchParams(location.search).get('wb');
   const fw = focus && W.WBS.find(w => w.id === focus);
-  if (fw) { map.fitBounds(L.latLngBounds(fw.line || fw.poly), { padding: [60, 60], maxZoom: 12 }); wbLayers[fw.id] && wbLayers[fw.id].fire('click'); }
+  /* start view: fit the basin's water bodies (or the focused one); re-fit once the page layout has settled,
+     because a fit made while the map box still has no size jumps to the maximum zoom */
+  function startView() {
+    map.invalidateSize();
+    if (fw) map.fitBounds(L.latLngBounds(fw.line || fw.poly), { padding: [60, 60], maxZoom: 12 });
+    else if (W.WBS.length) map.fitBounds(L.latLngBounds(W.WBS.flatMap(w => w.line || w.poly)), { padding: [30, 30], maxZoom: 11 });
+  }
+  startView();
+  if (fw) wbLayers[fw.id] && wbLayers[fw.id].fire('click');
+  let moved = false; map.once('dragstart zoomstart', () => { moved = true; });
+  const settle = () => { if (!moved) startView(); else map.invalidateSize(); };
+  if (document.readyState === 'complete') setTimeout(settle, 0); else addEventListener('load', settle, { once: true });
+  document.fonts && document.fonts.ready.then(() => setTimeout(settle, 50));
 
   /* Layer control grouped by theme */
   const panel = document.getElementById(opts.layers);
