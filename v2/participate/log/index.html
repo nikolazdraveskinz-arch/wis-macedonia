@@ -17,9 +17,12 @@
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
-<div style="font-size:12px;margin-bottom:8px;"><a href="../" style="color:#1a6b82;">Have your say</a> › Public log</div>
-<h1 style="font-size:22px;font-weight:800;color:#0d4a5e;margin:0 0 4px;">Public log of comments and responses</h1>
-<p style="font-size:13px;color:#64748b;margin:0 0 18px;">Every comment received in any channel, with its outcome, the reason and what changed in the plan. Names are shown only where the commenter agreed.</p>
+<div class="rj-crumb"><a href="../">Have your say</a> › Public log</div>
+<section class="rj-source rj-head"><div class="rj-head-grid single"><div>
+  <div class="rj-eyebrow">River mouth · every comment and its outcome</div>
+  <h1 class="rj-h1">Public log of comments and responses</h1>
+  <p class="rj-lead">Every comment received in any channel, with its outcome, the reason and what changed in the plan. Names are shown only where the commenter agreed.</p>
+</div></div><div id="rj-strip"></div></section>
 <div class="stat-grid" id="kpi" style="margin-bottom:18px;"></div>
 <div class="card">
   <div class="filter-bar">
@@ -39,6 +42,7 @@
 <footer id="pub-footer"></footer>
 <script src="../../assets/shell.js"></script>
 <script src="../../assets/participation.js"></script>
+<script>WIS.riverStrip('rj-strip', { here: 'mouth', selected: +(new URLSearchParams(location.search).get('stage')) || null, link: function(n){ return n<=3 ? '?stage='+n : '../#st'+n; } });</script>
 <script>
 const P=new URLSearchParams(location.search); if(P.get('stage')) document.getElementById('fs').value=P.get('stage');
 const all=WIS.comments(); const groups=[...new Set(all.map(c=>c.who))];

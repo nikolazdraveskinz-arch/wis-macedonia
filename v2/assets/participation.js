@@ -233,5 +233,48 @@
     };
   }
 
-  Object.assign(W, { ACTIVE, follow, signInGate, STAGES, DOCS, SWMI, WBS, SITES, PRESSURES, MEASURES, comments, addComment, editComment, myIds, targetLabel, targetIcon, statusBadge, openComment, fmt, iso, addMonths, today });
+  /* ── River strip: the River Journey in miniature, shown at the top of every inner "Have your say" page.
+       here: 'source' | 1–5 | 'mouth' · counts: { n: number } · link: n => url (optional override) ── */
+  function riverStrip(host, opts) {
+    host = typeof host === 'string' ? document.getElementById(host) : host;
+    if (!host) return;
+    opts = opts || {};
+    const base = (W.base || '../../') + 'participate/';
+    const short = { 1: 'Timetable', 2: 'Significant issues', 3: 'Draft plan', 4: 'Measures', 5: 'Monitoring' };
+    const stState = n => n <= 3 ? (STAGES.find(s => s.n === n) || {}).state : (n === 4 ? 'Planned' : 'Ongoing');
+    const stLine = n => { const s = STAGES.find(x => x.n === n), st = stState(n);
+      return st === 'Open' && s ? `Open · ${s.daysLeft} days left` : st; };
+    const cls = st => ({ Open: 'st-open', Closed: 'st-closed', Ongoing: 'st-ongoing' }[st] || 'st-later');
+    const link = opts.link || (n => n <= 3 ? `${base}stage/?s=${n}` : `${base}#st${n}`);
+    const pts = [{ k: 'source', dot: '<i class="fas fa-folder-open"></i>', lbl: 'Source', sub: 'Background studies', href: `${base}request/`, end: true }]
+      .concat([1, 2, 3, 4, 5].map(n => ({ k: n, dot: n, lbl: short[n], sub: stLine(n), href: link(n), cls: cls(stState(n)) })))
+      .concat([{ k: 'mouth', dot: '<i class="fas fa-inbox"></i>', lbl: 'Mouth', sub: 'Your comments · public log', href: `${base}log/`, end: true }]);
+    const counts = opts.counts || {};
+    host.innerHTML = `<nav class="rjs-scroll" aria-label="Where you are on the river"><div class="rjs">
+      <svg aria-hidden="true" preserveAspectRatio="none"></svg>
+      ${pts.map(p => { const here = p.k === opts.here;
+        return `<a class="rjs-node ${p.end ? 'end' : ''} ${p.cls || ''} ${here ? 'here' : ''} ${opts.selected === p.k ? 'sel' : ''}" href="${p.href}" ${here ? 'aria-current="page"' : ''}>
+          ${here ? '<span class="rjs-here">You are here</span>' : ''}
+          <span class="rjs-dot">${p.dot}${counts[p.k] ? `<span class="rjs-count" title="${counts[p.k]} of your comments">${counts[p.k]}</span>` : ''}</span>
+          <span class="rjs-lbl">${p.lbl}</span><span class="rjs-st">${p.sub}</span></a>`; }).join('')}
+    </div></nav>`;
+    const strip = host.querySelector('.rjs'), svg = strip.querySelector('svg');
+    function draw() {
+      const Wd = strip.clientWidth, cy = 34, col = Wd / pts.length; if (!Wd) return;
+      const top = [], bot = [], mid = [];
+      for (let x = col / 2 - 6; x <= Wd - col / 2 + 6; x += 6) {
+        const t = (x - col / 2) / (Wd - col), y = cy + Math.sin(Math.PI * (x / col - 0.5)) * 5, w = 5 + Math.max(0, t) * 22;
+        top.push([x, y - w / 2]); bot.push([x, y + w / 2]); mid.push([x, y]);
+      }
+      svg.setAttribute('viewBox', `0 0 ${Wd} 68`);
+      svg.innerHTML = `<defs><linearGradient id="rjsg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#BAE6FD"/><stop offset=".5" stop-color="#2a8fa8"/><stop offset="1" stop-color="#0d4a5e"/></linearGradient></defs>
+        <polygon points="${top.concat(bot.reverse()).map(p => p.map(v => v.toFixed(1)).join(',')).join(' ')}" fill="url(#rjsg)" opacity=".85"/>
+        <path class="rj-flow" d="M${mid.map(p => p.map(v => v.toFixed(1)).join(',')).join(' L')}" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="5 18"/>`;
+    }
+    draw(); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw);
+    const sc = host.querySelector('.rjs-scroll'), h = host.querySelector('.rjs-node.here');
+    if (sc && h && sc.scrollWidth > sc.clientWidth) sc.scrollLeft = h.offsetLeft - (sc.clientWidth - h.offsetWidth) / 2;
+  }
+
+  Object.assign(W, { ACTIVE, riverStrip, follow, signInGate, STAGES, DOCS, SWMI, WBS, SITES, PRESSURES, MEASURES, comments, addComment, editComment, myIds, targetLabel, targetIcon, statusBadge, openComment, fmt, iso, addMonths, today });
 })();

@@ -17,9 +17,12 @@
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
-<div style="font-size:12px;margin-bottom:8px;"><a href="../" style="color:#1a6b82;">Have your say</a> › My comments</div>
-<h1 style="font-size:22px;font-weight:800;color:#0d4a5e;margin:0 0 4px;">My comments</h1>
-<p style="font-size:13px;color:#64748b;margin:0 0 18px;">Signed in as <b>Ana P.</b> (registered external user, mockup). Each comment moves from <b>Received</b> to <b>Under review</b> to <b>Reviewed</b>, and then shows the outcome: incorporated, partly incorporated, not incorporated or out of scope, always with a reason.</p>
+<div class="rj-crumb"><a href="../">Have your say</a> › My comments</div>
+<section class="rj-source rj-head"><div class="rj-head-grid single"><div>
+  <div class="rj-eyebrow">River mouth · where your voice arrives</div>
+  <h1 class="rj-h1">My comments</h1>
+  <p class="rj-lead">Signed in as <b>Ana P.</b> (registered external user, mockup). Each comment moves from <b>Received</b> to <b>Under review</b> to <b>Reviewed</b>, and then shows the outcome: incorporated, partly incorporated, not incorporated or out of scope, always with a reason.</p>
+</div></div><div id="rj-strip"></div></section>
 <div class="card"><div class="card-header"><h3 class="card-title">Comment status</h3>
   <label style="font-size:12px;display:flex;gap:6px;align-items:center;"><input type="checkbox" checked> E-mail me when the status changes</label></div>
   <div id="list" class="card-body" style="display:grid;gap:12px;"></div></div>
@@ -28,6 +31,8 @@
 <footer id="pub-footer"></footer>
 <script src="../../assets/shell.js"></script>
 <script src="../../assets/participation.js"></script>
+<script>var _myc = {}; (function(){ var m = WIS.comments().filter(function(c){return c.mine;}); (m.length ? m : WIS.comments().filter(function(c){return c.id==='PC-2026-0031'||c.id==='PC-2026-0115';})).forEach(function(c){ _myc[c.stage] = (_myc[c.stage]||0)+1; }); })();
+WIS.riverStrip('rj-strip', { here: 'mouth', counts: _myc });</script>
 <script>
 function render(){
  const mine = WIS.comments().filter(c=>c.mine);
