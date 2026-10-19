@@ -808,3 +808,13 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
   .map-stage .leaflet-top.leaflet-left { left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .map-panel, .map-stage .leaflet-top.leaflet-left { transition: none; } }
+
+/* internal portal: basin chip in its own colour, national chip on country-wide screens */
+.ctx-chip { display: inline-flex; align-items: center; gap: 7px; border-radius: 20px; font-family: var(--font-heading); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.ctx-basin { border: 2px solid var(--c); background: color-mix(in srgb, var(--c) 10%, #fff); padding: 1px 4px 1px 10px; cursor: pointer; }
+.ctx-basin .ctx-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.ctx-basin .ctx-select { border: 0; background: transparent; padding: 4px 4px; font-weight: 700; color: var(--site-brand); max-width: none; }
+.ctx-basin .ctx-select:focus { box-shadow: none; }
+.ctx-basin:focus-within { outline: 2px solid var(--site-accent); outline-offset: 2px; }
+.ctx-national { border: 2px solid var(--site-brand); background: var(--site-brand); color: #fff; padding: 5px 12px; }
+.ctx-national i { color: var(--site-accent); }

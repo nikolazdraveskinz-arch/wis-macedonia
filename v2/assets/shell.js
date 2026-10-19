@@ -103,6 +103,8 @@
     technical: ['dashboard','map','water-bodies','monitoring','pressures','measures','download'],
     external: []
   };
+  /* internal screens that cover the whole country rather than one river basin district */
+  const NATIONAL = portal === 'internal' && ['reporting', 'users', 'reference-data', 'identifiers'].includes(active);
   function sidebar() {
     const el = document.getElementById('wis-sidebar');
     if (!el) return;
@@ -129,7 +131,7 @@
           <div class="logo-icon"><i class="fas fa-water" style="color:white;font-size:18px;"></i></div>
           <div><div class="logo-text-main">${BRAND[0]}</div><div class="logo-text-sub">${BRAND[1]} · Internal portal</div></div>
         </div>
-        <div class="rbmp-pill"><i class="fas fa-circle" style="font-size:6px;"></i> ${RBD.label} · ${cycle.label}</div>
+        <div class="rbmp-pill">${NATIONAL ? '<i class="fas fa-globe-europe" style="font-size:10px;"></i> All basins · national' : `<i class="fas fa-circle" style="font-size:7px;color:${RBD.color === '#0d4a5e' ? '#7dd4e8' : RBD.color};"></i> ${RBD.label}`} · ${cycle.label}</div>
       </div>
       <nav>${nav}
         <div class="nav-section-title">Public side</div>
@@ -155,12 +157,16 @@
     const cycOpts = CYCLES.map(c => `<option value="${c.id}" ${c.id === cycle.id ? 'selected' : ''}>${c.label} · ${c.state}</option>`).join('');
     const bar = document.createElement('div');
     bar.className = 'ctx-bar';
-    bar.innerHTML = `<span class="ctx-label">Basin</span><select class="ctx-select" id="rbd-select" title="River basin district">${rbdOpts}</select>
+    /* national screens work for the whole country; every other screen works for one basin, shown as a chip in its colour */
+    const basinCtl = NATIONAL
+      ? `<span class="ctx-chip ctx-national" title="This screen covers all four river basin districts"><i class="fas fa-globe-europe"></i>All basins · national</span>`
+      : `<label class="ctx-chip ctx-basin" style="--c:${RBD.color};" title="River basin district you are working in"><span class="ctx-dot"></span><select class="ctx-select" id="rbd-select" aria-label="River basin district">${rbdOpts}</select></label>`;
+    bar.innerHTML = `<span class="ctx-label">Basin</span>${basinCtl}
       <span class="ctx-label">Cycle</span><select class="ctx-select" id="cycle-select" title="RBMP cycle (reporting period, ToR Task 1)">${cycOpts}</select>`;
     actions.insertBefore(bar, actions.firstChild);
     document.getElementById('cycle-select').addEventListener('change', e => setCycle(e.target.value));
-    document.getElementById('rbd-select').addEventListener('change', e => setBasin(e.target.value));
-    if (!DEMO) {
+    if (!NATIONAL) document.getElementById('rbd-select').addEventListener('change', e => setBasin(e.target.value));
+    if (!DEMO && !NATIONAL) {
       const m = document.querySelector('.content-area');
       if (m) m.insertAdjacentHTML('afterbegin', `<div class="alert alert-warn" style="margin-bottom:16px;"><i class="fas fa-layer-group"></i><div><b>${RBD.label} · ${cycle.label}.</b> Every screen works the same way for all four river basin districts and both cycles. In this mockup the example records shown are those of Vardar RBD, RBMP 2028–2033; in the live system the screen lists only records of the selected basin and cycle.</div></div>`);
     }

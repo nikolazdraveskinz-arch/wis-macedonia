@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../assets/wis.css?v=20261019g">
+  <link rel="stylesheet" href="../assets/wis.css?v=20261019h">
 </head>
 <body data-base="../" data-active="explore" data-portal="public" data-scope="basin">
 <header id="pub-header"></header>
@@ -43,8 +43,8 @@
 
 </main>
 <footer id="pub-footer"></footer>
-<script src="../assets/shell.js?v=20261019g"></script>
-<script src="../assets/participation.js?v=20261019g"></script><script>
+<script src="../assets/shell.js?v=20261019h"></script>
+<script src="../assets/participation.js?v=20261019h"></script><script>
 const EC = { Good: 'eco-good', High: 'eco-good', Moderate: 'eco-moderate', Poor: 'eco-poor', Bad: 'eco-poor' };
 const PR = { 'MK-VAR-RW-0014': 'Urban wastewater, agriculture', 'MK-VAR-RW-0015': 'Urban wastewater, industry', 'MK-VAR-RW-0102': 'Hydromorphology', 'MK-VAR-RW-0201': 'Abstraction, urban wastewater', 'MK-VAR-LW-0003': 'Abstraction', 'MK-VAR-GW-004': 'Agriculture (nitrates), industry' };
 const cell = v => EC[v] ? `<span class="${EC[v]}">${v}</span>` : `<span style="color:#94a3b8;">${v}</span>`;
