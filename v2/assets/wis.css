@@ -746,3 +746,25 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
 .rjs-count { position: absolute; top: -6px; right: -10px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--site-brand); color: #fff; font-size: 10.5px; line-height: 20px; border: 2px solid #fff; }
 @media (max-width: 900px) { .rj-head-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .rjs-dot { transition: none; } }
+
+/* Have your say banners: same dark teal gradient as the basin home banner (.pub-hero) */
+.rj-source { background: var(--grad-hero); border-radius: 16px; box-shadow: 0 10px 30px #0d4a5e33; color: #fff; }
+.rj-source .rj-eyebrow { color: var(--site-accent); }
+.rj-source .rj-h1 { color: #fff; }
+.rj-source .rj-lead, .rj-source > .rj-source-grid .rj-lead { color: #ffffffd9; }
+.rj-source .rj-lead b { color: #fff; }
+.rj-source > .rj-source-grid .btn-secondary, .rj-source .rj-head-grid > div:first-child .btn-secondary { color: #fff; border-color: #fff; background: transparent; }
+.rj-source > .rj-source-grid .btn-secondary:hover, .rj-source .rj-head-grid > div:first-child .btn-secondary:hover { color: var(--site-brand); background: #fff; }
+.rj-source .meta-row { color: #ffffffb3; }
+.rj-source .meta-row b { color: #fff; }
+/* river strip on the dark banner */
+.rj-source .rjs-dot { box-shadow: 0 0 0 5px #ffffff1f; }
+.rj-source .rjs-node.st-open .rjs-dot { box-shadow: 0 0 0 5px #c9a84c55; }
+.rj-source .rjs-node.sel .rjs-dot { box-shadow: 0 0 0 5px #ffffff1f, 0 0 0 8px var(--site-cyan); }
+.rj-source .rjs-node.here .rjs-dot { box-shadow: 0 0 0 5px #c9a84c66, 0 6px 16px #00000040; }
+.rj-source .rjs-lbl { color: #fff; }
+.rj-source .rjs-st { color: #ffffffb3; }
+.rj-source .rjs-node.st-open .rjs-st { color: var(--site-accent); }
+.rj-source .rjs-node.here .rjs-lbl { color: var(--site-accent); }
+.rj-source .rjs-node.st-later .rjs-dot { color: var(--site-muted); }
+.rj-source .rjs-count { border-color: var(--site-brand); background: var(--site-accent); }
