@@ -712,22 +712,3 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
   .pub-header .logo-text-sub { display: none; }
 }
 @media (max-width: 1120px) and (min-width: 901px) { .pub-header .pub-hide-sm { display: none !important; } }
-
-/* home cover · moving lake water */
-.lake { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.lake-glint { position: absolute; inset: -20%; opacity: .07;
-  background-image: repeating-radial-gradient(ellipse 120% 40% at 50% 120%, transparent 0 26px, #fff 26px 27px);
-  animation: lake-glint 14s ease-in-out infinite alternate; }
-.lake-wave { position: absolute; left: 0; right: 0; bottom: 0; background-repeat: repeat-x; background-position: 0 100%;
-  animation: lake-drift linear infinite, lake-bob ease-in-out infinite alternate; }
-.lake-wave.lw1 { height: 120px; opacity: .10; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C240,10 480,10 720,40 C960,70 1200,70 1440,40 L1440,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E"); background-size: 1440px 120px; animation-duration: 22s, 6s; }
-.lake-wave.lw2 { height: 160px; opacity: .08; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C240,10 480,10 720,40 C960,70 1200,70 1440,40 L1440,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E"); background-size: 1100px 160px; animation-duration: 16s, 7.5s; animation-direction: reverse, alternate; }
-.lake-wave.lw3 { height: 220px; opacity: .12; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C240,10 480,10 720,40 C960,70 1200,70 1440,40 L1440,120 L0,120 Z' fill='%237dd4e8'/%3E%3C/svg%3E"); background-size: 1800px 220px; animation-duration: 34s, 9s; }
-.lake-wave.lw2 { --tile: 1100px; } .lake-wave.lw1 { --tile: 1440px; } .lake-wave.lw3 { --tile: 1800px; }
-@keyframes lake-drift { to { background-position-x: var(--tile, 1440px); } }
-@keyframes lake-bob { from { transform: translateY(0); } to { transform: translateY(10px); } }
-@keyframes lake-glint { from { transform: translateX(-3%) scaleY(1); } to { transform: translateX(3%) scaleY(1.06); } }
-.nat-cover-inner { z-index: 1; }
-.wave-divider.lake-edge { height: 60px; background-color: #0d3d4f; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 60' preserveAspectRatio='none'%3E%3Cpath d='M0,30 C240,0 480,0 720,30 C960,60 1200,60 1440,30 L1440,60 L0,60 Z' fill='%23f7fbf9'/%3E%3C/svg%3E"); background-repeat: repeat-x; background-size: 1440px 60px; background-position: 0 100%; animation: lake-edge 20s linear infinite; }
-@keyframes lake-edge { to { background-position-x: -1440px; } }
-@media (prefers-reduced-motion: reduce) { .lake-wave, .lake-glint, .wave-divider.lake-edge { animation: none; } }
