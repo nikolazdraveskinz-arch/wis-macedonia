@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019j">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019k">
 </head>
 <body data-base="../../" data-active="documents" data-portal="public" data-scope="basin">
 <header id="pub-header"></header>
@@ -26,26 +26,26 @@
 
 </main>
 <footer id="pub-footer"></footer>
-<script src="../../assets/shell.js?v=20261019j"></script>
-<script src="../../assets/participation.js?v=20261019j"></script>
+<script src="../../assets/shell.js?v=20261019k"></script>
+<script src="../../assets/participation.js?v=20261019k"></script>
 <script>
 (function(){
 const k = new URLSearchParams(location.search).get('d')||'RBMP', d = WIS.DOCS[k]||WIS.DOCS.RBMP;
 if (!d) { document.querySelector('main').innerHTML = '<div class="card"><div class="empty-state"><i class="fas fa-file-alt"></i><div><b>No documents published yet for '+WIS.RBD.label+' · '+WIS.cycle.label+'.</b><br><a href="../" style="color:#1a6b82;">Back to Have your say</a></div></div></div>'; return; }
 const st = WIS.STAGES.find(s=>s.n===d.stage);
-document.getElementById('crumb').innerHTML = `<a href="../stage/?s=${d.stage}">Station ${d.stage} · ${st.title}</a> › ${d.id}`;
+document.getElementById('crumb').innerHTML = `<a href="../stage/?s=${d.stage}">Phase ${d.stage} · ${st.title}</a> › ${d.id}`;
 document.getElementById('dhead').innerHTML = `<div>
-  <div class="rj-eyebrow">Station ${d.stage} · ${st.title} · document</div>
+  <div class="rj-eyebrow">Phase ${d.stage} · ${st.title} · document</div>
   <h1 class="rj-h1">${d.title}</h1>
   <div class="meta-row" style="margin-top:12px;"><span><b>Permanent ID:</b> <span class="id-pill">${d.id}</span></span><span><b>Version:</b> ${d.ver}</span><span><b>Published:</b> ${WIS.fmt(d.date)}</span><span><b>Language:</b> English (MK, SQ planned)</span><span><b>Permanent link:</b> <span class="id-pill">wis.moepp.gov.mk/doc/${d.id}/${d.ver.split(' ')[0]}</span></span></div>
   <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;"><button class="btn btn-secondary btn-sm" onclick="wisToast('PDF downloaded (mockup)')"><i class="fas fa-file-pdf"></i>Download PDF</button><button class="btn btn-secondary btn-sm" onclick="wisToast('Earlier versions: none (mockup)')"><i class="fas fa-history"></i>Versions</button></div>
  </div>
  <div class="card rj-here-card"><div class="card-body">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><div class="rj-eyebrow" style="color:#2a8fa8;">You are here</div><span class="badge ${st.state==='Open'?'qa-accepted':'badge-inactive'}">${st.state}</span></div>
-  <div class="rj-here-t">Station ${d.stage} · ${st.title}</div>
+  <div class="rj-here-t">Phase ${d.stage} · ${st.title}</div>
   <div style="font-size:12.5px;color:#4a6b75;">${st.state==='Open'?`Open for comments until ${WIS.fmt(st.closes)} · ${st.daysLeft} days left`:`Comments ${st.state.toLowerCase()}`}</div>
   <div style="font-size:12.5px;color:#4a6b75;margin-top:6px;">${d.pages} pages · ${d.sections.length} chapters, each can be commented on separately</div>
-  <a href="../stage/?s=${d.stage}" class="btn btn-secondary btn-sm" style="margin-top:12px;">Back to the station</a>
+  <a href="../stage/?s=${d.stage}" class="btn btn-secondary btn-sm" style="margin-top:12px;">Back to the phase</a>
  </div></div>`;
 WIS.riverStrip('rj-strip', { here: d.stage });
 document.getElementById('toc').innerHTML = d.sections.map(s=>`<a href="#s${s[0]}" style="display:block;color:#334155;padding:4px 0;text-decoration:none;">§${s[0]} ${s[1]}</a>`).join('');
