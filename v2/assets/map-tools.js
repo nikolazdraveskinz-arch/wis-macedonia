@@ -1,11 +1,11 @@
 /* NWIS mockup v2 – geoportal toolbar for the map viewer, modelled on the Sava GIS Geoportal tool set.
-   Navigation · view aids · identify/selection · measuring · data tools · pollution propagation.
+   Navigation · view aids · identify/selection · measuring · attribute table, print and settings.
    All values are placeholders; geometry is schematic. */
 window.initWisMapTools = function (map, opts) {
   const W = window.WIS, M = map.wis, stage = document.getElementById(opts.stage);
   const info = M.info, toast = m => (window.wisToast || alert)(m);
   const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const settings = { coord: 'dec', velocity: 0.8, hoverCoords: true };
+  const settings = { coord: 'dec', hoverCoords: true };
 
   /* ───────── toolbar ───────── */
   const GROUPS = [
@@ -14,9 +14,7 @@ window.initWisMapTools = function (map, opts) {
     ['View', [['ov', 'fa-map', 'Overview map', 2], ['grat', 'fa-border-all', 'Graticule (coordinate grid)', 2]]],
     ['Identify', [['idpoly', 'fa-draw-polygon', 'Identify features by polygon', 1], ['search', 'fa-search', 'Search data'], ['clearsel', 'fa-eraser', 'Clear identify and selection']]],
     ['Measure', [['dist', 'fa-ruler', 'Measure length', 1], ['area', 'fa-ruler-combined', 'Measure area', 1], ['clearmeas', 'fa-times-circle', 'Clear measurements']]],
-    ['Data', [['edit', 'fa-pen', 'Edit feature attributes (registered users)', 1], ['table', 'fa-table', 'Attribute table', 2], ['print', 'fa-print', 'Print / export map'],
-      ['share', 'fa-share-alt', 'Share this map view'], ['ows', 'fa-plus-square', 'Add external OWS layer (WMS)'], ['set', 'fa-cog', 'Settings']]],
-    ['Pollution', [['prop', 'fa-biohazard', 'Pollution propagation (accidental pollution)', 1], ['clearprop', 'fa-ban', 'Clear propagation']]]
+    ['Data', [['table', 'fa-table', 'Attribute table', 2], ['print', 'fa-print', 'Print / export map'], ['set', 'fa-cog', 'Settings']]]
   ];
   /* kind 1 = map mode (one at a time), 2 = on/off panel, none = one-off action */
   const KIND = {}; GROUPS.forEach(g => g[1].forEach(t => KIND[t[0]] = t[3] || 0));
@@ -52,15 +50,12 @@ window.initWisMapTools = function (map, opts) {
     if (mode !== 'identify' && mode !== k) stopDrawing();
     mode = (mode === k && k !== 'identify') ? 'identify' : k;
     map.wisTool = mode;
-    ['identify', 'zrect', 'idpoly', 'dist', 'area', 'edit', 'prop'].forEach(t => pressed(t, t === mode));
-    stage.classList.toggle('tool-draw', mode !== 'identify' && mode !== 'edit');
+    ['identify', 'zrect', 'idpoly', 'dist', 'area'].forEach(t => pressed(t, t === mode));
+    stage.classList.toggle('tool-draw', mode !== 'identify');
     if (mode === 'zrect') map.dragging.disable(); else map.dragging.enable();
     map.doubleClickZoom[['idpoly', 'dist', 'area'].includes(mode) ? 'disable' : 'enable']();
     hint({ identify: '', zrect: 'Drag a rectangle on the map to zoom to it', idpoly: 'Click to draw a polygon · double-click to finish · Esc to cancel',
-      dist: 'Click to add points · double-click to finish · Esc to cancel', area: 'Click to add corners · double-click to finish · Esc to cancel',
-      edit: 'Click a feature to edit its attributes', prop: 'Click on the Vardar river where the pollution enters' }[mode]);
-    if (mode === 'edit') editIntro();
-    if (mode === 'prop') propIntro();
+      dist: 'Click to add points · double-click to finish · Esc to cancel', area: 'Click to add corners · double-click to finish · Esc to cancel' }[mode]);
   }
 
   /* ───────── selection ───────── */
@@ -72,7 +67,7 @@ window.initWisMapTools = function (map, opts) {
     if (layer.getLatLng) L.circleMarker(layer.getLatLng(), { radius: 16, color: '#c9a84c', weight: 3, fill: false, interactive: false }).addTo(selLayer);
     else L.polyline(flat(layer.getLatLngs()), { color: '#c9a84c', weight: 9, opacity: .55, interactive: false }).addTo(selLayer).bringToBack();
   }
-  map.on('wis:select', e => { if (mode === 'identify' || mode === 'edit') highlight(e.layer); if (mode === 'edit') editForm(e.layer, e.group); });
+  map.on('wis:select', e => { if (mode === 'identify') highlight(e.layer); });
   const flat = a => Array.isArray(a) && a.length && Array.isArray(a[0]) ? a.flatMap(flat) : a;
   const boundsOf = l => l.getLatLng ? L.latLngBounds([l.getLatLng(), l.getLatLng()]) : l.getBounds();
 
@@ -108,7 +103,7 @@ window.initWisMapTools = function (map, opts) {
     }
   }
   map.on('click', e => {
-    if (!['idpoly', 'dist', 'area'].includes(mode)) { if (mode === 'prop') propagate(e.latlng); return; }
+    if (!['idpoly', 'dist', 'area'].includes(mode)) return;
     pts.push(e.latlng); redraw();
   });
   map.on('mousemove', e => { if (pts.length && ['idpoly', 'dist', 'area'].includes(mode)) redraw(e.latlng); });
@@ -266,101 +261,22 @@ window.initWisMapTools = function (map, opts) {
     render(); setTimeout(() => map.invalidateSize(), 50);
   }
 
-  /* ───────── share, print, external layer, settings, edit ───────── */
-  function share() {
-    const c = map.getCenter(), url = `${location.origin}${location.pathname}?rbd=${W.RBD.id}&view=${c.lat.toFixed(5)},${c.lng.toFixed(5)},${map.getZoom()}`;
-    M.showInfo(panel('Share this map view', 'fa-share-alt', `<div class="tool-sub">Anyone opening this link sees the same place and zoom level.</div>
-      <input class="form-input" id="share-url" readonly value="${url}" style="margin-top:10px;font-size:12px;"><button class="btn btn-primary btn-sm" id="share-copy" style="margin-top:8px;"><i class="fas fa-copy"></i>Copy link</button>`));
-    const inp = info.querySelector('#share-url'); inp.onclick = () => inp.select();
-    info.querySelector('#share-copy').onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast('Link copied'), () => { inp.select(); toast('Press Ctrl+C to copy the selected link'); });
-  }
+  /* ───────── print, settings ───────── */
   function print() {
     let t = document.querySelector('.map-print-title');
     if (!t) { t = document.createElement('div'); t.className = 'map-print-title'; stage.parentNode.insertBefore(t, stage); }
     t.innerHTML = `<b>NWIS · Map of the ${W.RBD.full}</b><span>${W.cycle.label} · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} · ${status.querySelector('#ms-scale').textContent} · placeholder data</span>`;
     setTimeout(() => window.print(), 50);
   }
-  const owsLayers = [];
-  function ows() {
-    M.showInfo(panel('Add external OWS layer', 'fa-plus-square', `<div class="tool-sub">Add a layer from any Web Map Service (WMS), for example from a national geoportal or the EEA.</div>
-      <label class="form-label" for="ows-url" style="margin-top:10px;">Service URL</label><input class="form-input" id="ows-url" placeholder="https://example.org/geoserver/wms">
-      <label class="form-label" for="ows-lyr" style="margin-top:8px;">Layer name</label><input class="form-input" id="ows-lyr" placeholder="workspace:layer">
-      <button class="btn btn-primary btn-sm" id="ows-add" style="margin-top:10px;"><i class="fas fa-plus"></i>Add layer</button>
-      <div id="ows-list" style="margin-top:12px;"></div>`));
-    const list = () => { info.querySelector('#ows-list').innerHTML = owsLayers.map((o, i) => `<div class="tool-row" style="display:flex;align-items:center;gap:8px;"><span style="flex:1;min-width:0;overflow-wrap:anywhere;"><b>${o.name}</b><span class="tool-sub" style="display:block;">${o.url}</span></span><button class="btn btn-secondary btn-sm" data-rm="${i}">Remove</button></div>`).join(''); info.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { map.removeLayer(owsLayers[+b.dataset.rm].l); owsLayers.splice(+b.dataset.rm, 1); list(); }); };
-    info.querySelector('#ows-add').onclick = () => {
-      const url = info.querySelector('#ows-url').value.trim(), name = info.querySelector('#ows-lyr').value.trim();
-      if (!/^https:\/\//.test(url) || !name) { toast('Enter an https:// WMS address and a layer name'); return; }
-      const l = L.tileLayer.wms(url, { layers: name, format: 'image/png', transparent: true, opacity: .8 }).addTo(map);
-      l.on('tileerror', () => { if (!l._warned) { l._warned = 1; toast('The service did not return map images for "' + name + '". Check the address and layer name.'); } });
-      owsLayers.push({ url, name, l }); list(); toast('Layer "' + name + '" added');
-    };
-    list();
-  }
   function settingsPanel() {
     M.showInfo(panel('Settings', 'fa-cog', `<div class="form-label">Coordinate format</div>
       <label class="layer-item"><input type="radio" name="st-c" value="dec" ${settings.coord === 'dec' ? 'checked' : ''}> Decimal degrees (41.71500°)</label>
       <label class="layer-item"><input type="radio" name="st-c" value="dms" ${settings.coord === 'dms' ? 'checked' : ''}> Degrees, minutes, seconds (41° 42′ 54″)</label>
       <div class="form-label" style="margin-top:10px;">Cursor</div>
-      <label class="layer-item"><input type="checkbox" id="st-h" ${settings.hoverCoords ? 'checked' : ''}> Show coordinates under the cursor</label>
-      <div class="form-label" style="margin-top:10px;">Pollution propagation</div>
-      <label class="layer-item" style="gap:8px;">Flow velocity <input type="number" id="st-v" min="0.1" max="5" step="0.1" value="${settings.velocity}" class="form-input" style="width:80px;padding:4px 8px;"> m/s</label>`));
+      <label class="layer-item"><input type="checkbox" id="st-h" ${settings.hoverCoords ? 'checked' : ''}> Show coordinates under the cursor</label>`));
     info.querySelectorAll('[name="st-c"]').forEach(r => r.onchange = () => { settings.coord = r.value; status.querySelector('#ms-xy').textContent = fmtLL(map.getCenter()); });
     info.querySelector('#st-h').onchange = e => { settings.hoverCoords = e.target.checked; if (!settings.hoverCoords) status.querySelector('#ms-xy').textContent = 'Cursor coordinates off'; };
-    info.querySelector('#st-v').onchange = e => { const v = +e.target.value; if (v > 0) settings.velocity = v; };
   }
-  function editIntro() {
-    if (M.mode === 'internal' || (W.isSignedIn && W.isSignedIn())) { M.showInfo(panel('Edit feature attributes', 'fa-pen', '<div class="tool-sub">Click a feature on the map to edit its attributes. Changes are saved as a new version and go through QA/QC before publication.</div>')); return; }
-    M.showInfo(panel('Edit feature attributes', 'fa-pen', `<div class="tool-sub">Editing is available to registered users of the competent institutions. Sign in to suggest or make changes; every change is versioned and checked (QA/QC) before it is published.</div>
-      <a class="btn btn-primary btn-sm" style="margin-top:10px;" href="${W.base}login/"><i class="fas fa-sign-in-alt"></i>Sign in</a>`));
-  }
-  function editForm(layer, group) {
-    if (!(M.mode === 'internal' || (W.isSignedIn && W.isSignedIn()))) return;
-    const [n, id] = label(layer, group);
-    setTimeout(() => M.showInfo(panel('Edit attributes', 'fa-pen', `<div class="tool-sub">${group}</div><b>${n}</b> ${id ? `<span class="id-pill">${id}</span>` : ''}
-      <label class="form-label" style="margin-top:10px;">Name</label><input class="form-input" value="${n}">
-      <label class="form-label" style="margin-top:8px;">Remark</label><textarea class="form-input" rows="3" placeholder="Reason for the change"></textarea>
-      <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="wisToast('Change saved as a draft version for QA/QC (mockup)')"><i class="fas fa-save"></i>Save as draft</button>`)), 0);
-  }
-
-  /* ───────── pollution propagation (Vardar main stem) ───────── */
-  const propLayer = L.featureGroup().addTo(map); let propTimer = null;
-  function densify(line) { const out = [L.latLng(line[0])]; for (let i = 1; i < line.length; i++) { const a = L.latLng(line[i - 1]), b = L.latLng(line[i]), n = Math.max(1, Math.round(map.distance(a, b) / 250)); for (let k = 1; k <= n; k++) out.push(L.latLng(a.lat + (b.lat - a.lat) * k / n, a.lng + (b.lng - a.lng) * k / n)); } return out; }
-  const riv = M.river ? densify(M.river) : null, cum = riv ? riv.reduce((acc, p, i) => (acc.push(i ? acc[i - 1] + map.distance(riv[i - 1], p) : 0), acc), []) : null;
-  const nearest = ll => { let bi = 0, bd = Infinity; riv.forEach((p, i) => { const d = map.distance(ll, p); if (d < bd) { bd = d; bi = i; } }); return [bi, bd]; };
-  const hrs = m => { const h = m / settings.velocity / 3600; return h < 1 ? Math.round(h * 60) + ' min' : h < 48 ? h.toFixed(1) + ' h' : (h / 24).toFixed(1) + ' days'; };
-  function propIntro() {
-    M.showInfo(panel('Pollution propagation', 'fa-biohazard', riv
-      ? `<div class="tool-sub">Simulates how an accidental spill travels down the Vardar. Click on the river where the pollution enters. Arrival times use a flow velocity of <b>${settings.velocity} m/s</b> (change it under Settings). Placeholder model for demonstration.</div>`
-      : `<div class="tool-sub">In this mockup the propagation model is set up for the Vardar main stem. Open the Vardar River Basin District to try it.</div>`));
-  }
-  function propagate(ll) {
-    if (!riv) { propIntro(); return; }
-    const [i0, d0] = nearest(ll);
-    if (d0 > 5000) { hint('Click closer to the Vardar river (within 5 km)'); return; }
-    clearProp();
-    const src = riv[i0], down = riv.slice(i0), total = cum[cum.length - 1] - cum[i0];
-    L.marker(src, { icon: L.divIcon({ className: '', html: '<div class="prop-src"><i class="fas fa-biohazard"></i></div>', iconSize: [28, 28], iconAnchor: [14, 14] }), interactive: false }).addTo(propLayer);
-    const line = L.polyline([src], { color: '#dc2626', weight: 7, opacity: .75, interactive: false }).addTo(propLayer);
-    /* receptors: monitoring sites and towns along the river, downstream of the source */
-    const rec = [].concat(W.SITES.map(s => ({ n: s.name, t: 'Monitoring site', ll: L.latLng(s.ll) })),
-      Object.entries(M.places).map(([k, v]) => ({ n: k[0].toUpperCase() + k.slice(1), t: 'Town', ll: L.latLng(v) })))
-      .map(r => { const [j, d] = nearest(r.ll); return Object.assign(r, { j, d, km: cum[j] - cum[i0] }); })
-      .filter(r => r.j >= i0 && r.d < 4000).sort((a, b) => a.km - b.km);
-    rec.push({ n: 'State border (Gevgelija · Axios in Greece)', t: 'Transboundary', ll: riv[riv.length - 1], km: total, border: true });
-    M.showInfo(panel('Pollution propagation', 'fa-biohazard', `<div class="tool-sub">Source at ${fmtLL(src)} · ${fmtLen(total)} of river to the border · flow velocity ${settings.velocity} m/s</div>
-      <table class="data-table" style="font-size:12px;margin-top:10px;"><thead><tr><th>Reached</th><th style="text-align:right;">Distance</th><th style="text-align:right;">Arrival</th></tr></thead><tbody>
-      ${rec.map(r => `<tr><td><b>${r.n}</b><div class="tool-sub">${r.t}</div></td><td style="text-align:right;white-space:nowrap;">${fmtLen(r.km)}</td><td style="text-align:right;white-space:nowrap;"><b>${hrs(r.km)}</b></td></tr>`).join('')}</tbody></table>
-      <div class="alert alert-warn" style="margin-top:10px;"><i class="fas fa-exclamation-triangle"></i><div>Warn the downstream monitoring sites and, under the transboundary agreement, the Greek authorities before the pollution reaches the border (about <b>${hrs(total)}</b>).</div></div>`));
-    rec.forEach(r => L.circleMarker(r.ll, { radius: r.border ? 8 : 6, color: '#dc2626', weight: 2, fillColor: '#fff', fillOpacity: 1, interactive: false }).addTo(propLayer)
-      .bindTooltip(`${r.n} · ${hrs(r.km)}`, { permanent: true, direction: 'right', offset: [8, 0], className: 'prop-tip' }));
-    map.fitBounds(L.latLngBounds(down), { padding: [80, 80], maxZoom: 11 });
-    if (reduceMotion) { line.setLatLngs(down); return; }
-    let k = 1; const step = Math.max(1, Math.ceil(down.length / 90));
-    propTimer = setInterval(() => { k = Math.min(down.length, k + step); line.setLatLngs(down.slice(0, k)); if (k >= down.length) { clearInterval(propTimer); propTimer = null; } }, 30);
-  }
-  function clearProp() { if (propTimer) { clearInterval(propTimer); propTimer = null; } propLayer.clearLayers(); }
-
   /* ───────── panel helper and click wiring ───────── */
   function panel(title, icon, body) { return `<div class="tool-head"><i class="fas ${icon}"></i>${title}</div>${body}`; }
   bar.addEventListener('click', e => {
@@ -377,8 +293,7 @@ window.initWisMapTools = function (map, opts) {
       clearsel: () => { highlight(null); selLayer.clearLayers(); found = []; map.closePopup(); M.showInfo('Click a water body, site, pressure, measure or comment on the map. Click anywhere else to comment on that point.'); },
       clearmeas: () => { measLayer.clearLayers(); stopDrawing(); },
       table: () => toggleTable(!drawer),
-      print, share, ows, set: settingsPanel,
-      clearprop: clearProp
+      print, set: settingsPanel
     }[k] || (() => {}))();
   });
   navState();

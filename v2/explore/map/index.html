@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019i">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019j">
 </head>
 <body data-base="../../" data-active="map" data-portal="public" data-scope="basin">
 <header id="pub-header"></header>
@@ -32,10 +32,10 @@
 </div>
 </main>
 <footer id="pub-footer"></footer>
-<script src="../../assets/shell.js?v=20261019i"></script>
-<script src="../../assets/participation.js?v=20261019i"></script>
-<script src="../../assets/map.js?v=20261019i"></script>
-<script src="../../assets/map-tools.js?v=20261019i"></script>
+<script src="../../assets/shell.js?v=20261019j"></script>
+<script src="../../assets/participation.js?v=20261019j"></script>
+<script src="../../assets/map.js?v=20261019j"></script>
+<script src="../../assets/map-tools.js?v=20261019j"></script>
 <script>document.getElementById('map-toggle').onclick = function () { var st = document.getElementById('map-stage'), off = st.classList.toggle('panels-off'); this.setAttribute('aria-pressed', off); this.querySelector('span').textContent = off ? 'Show panels' : 'Hide panels'; };
 WIS.mapObj = initWisMap({mode:'public', el:'wmap', info:'minfo', layers:'mlayers', search:'msearch'});
 WIS.mapTools = initWisMapTools(WIS.mapObj, { stage: 'map-stage' });</script>
