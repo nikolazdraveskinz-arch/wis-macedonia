@@ -203,12 +203,11 @@
         const strip = document.createElement('div');
         strip.className = 'basin-strip';
         strip.innerHTML = `<div class="basin-strip-inner">
-          <a href="${base}" class="basin-all"><i class="fas fa-th-large"></i><span>All river basins</span></a>
-          <div class="basin-tabs">${RBDS.map(r => `<button class="basin-tab ${r.id === RBD.id ? 'on' : ''}" data-rbd="${r.id}" title="${r.full}"><i class="fas fa-circle" style="color:${r.color};font-size:8px;"></i>${lang === 'mk' ? r.mk : r.name}</button>`).join('')}</div>
+          <a href="${base}#basins" class="basin-all"><i class="fas fa-th-large"></i><span>All river basins</span></a>
+          <div class="basin-tabs"><span class="basin-tab on" title="${RBD.full}"><i class="fas fa-circle" style="color:${RBD.color};font-size:8px;"></i>${lang === 'mk' ? RBD.mk : RBD.name} ${lang === 'mk' ? '' : 'River Basin District'}</span></div>
           <label class="basin-cycle"><span>RBMP cycle</span><select id="pub-cycle">${CYCLES.map(c => `<option value="${c.id}" ${c.id === cycle.id ? 'selected' : ''}>${c.label} · ${c.state}</option>`).join('')}</select></label>
         </div>`;
         h.after(strip);
-        strip.querySelectorAll('[data-rbd]').forEach(b => b.onclick = () => setBasin(b.dataset.rbd));
         strip.querySelector('#pub-cycle').onchange = e => setCycle(e.target.value);
       }
     }

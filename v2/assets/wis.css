@@ -496,3 +496,4 @@ a { color: inherit; }
 @media (max-width: 720px) { .rj-journey { grid-template-columns: 40px minmax(0, 1fr); gap: 0 14px; } .rj-node { left: -48px; width: 34px; height: 34px; font-size: 13px; top: 34px; box-shadow: 0 0 0 4px #F9FAFB; } .rj-km { display: none; } }
 @media (prefers-reduced-motion: reduce) { .rj-flow { animation: none; } .rj-details, .rj-node { transition: none; } }
 .rj-km { background: #F9FAFB; border-radius: 6px; padding: 1px 4px; z-index: 2; left: -92px; width: 68px; }
+.basin-tab.on { cursor: default; }
