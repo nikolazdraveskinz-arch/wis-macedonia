@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019h">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019i">
 </head>
 <body data-base="../../" data-active="datasets" data-portal="internal">
 <aside id="wis-sidebar"></aside>
@@ -105,7 +105,7 @@
 
   </main>
 </div>
-<script src="../../assets/shell.js?v=20261019h"></script>
+<script src="../../assets/shell.js?v=20261019i"></script>
 <script>
 const DS = {"DS-VAR-001": ["DS-VAR-001", "Surface water bodies (rivers, lakes)", "Spatial \u00b7 line/polygon", "MoEPP \u2013 Water Dept.", "NWIS (VRBSD)", "Manual / GIS upload", "v1.4", "2026-09-30", "accepted", "Public"], "DS-VAR-002": ["DS-VAR-002", "Groundwater bodies", "Spatial \u00b7 polygon", "MoEPP \u2013 Water Dept.", "NWIS (GWDMS)", "GIS upload", "v1.2", "2026-09-18", "accepted", "Public"], "DS-VAR-003": ["DS-VAR-003", "Surface water monitoring sites", "Spatial \u00b7 point", "Hydrometeorological Service", "Water Quality platform", "Bulk template", "v2.0", "2026-10-10", "accepted", "Public"], "DS-VAR-004": ["DS-VAR-004", "Surface water quality results 2025", "Tabular \u00b7 time series", "Hydrometeorological Service", "Water Quality platform", "Bulk template", "2025.2", "2026-10-17", "pending", "Restricted"], "DS-VAR-005": ["DS-VAR-005", "Groundwater monitoring sites", "Spatial \u00b7 point", "MoEPP \u2013 Water Dept.", "NWIS (GWDMS)", "Manual entry", "v1.3", "2026-10-17", "accepted", "Public"], "DS-VAR-006": ["DS-VAR-006", "Point-source pressures", "Spatial \u00b7 point", "Subproject 3 (study)", "External study", "Bulk template", "v0.9", "2026-10-05", "pending", "Internal"], "DS-VAR-007": ["DS-VAR-007", "Diffuse pressure zones", "Spatial \u00b7 polygon", "Subproject 3 (study)", "External study", "GIS upload", "v0.6", "2026-10-15", "rejected", "Internal"], "DS-VAR-008": ["DS-VAR-008", "Drinking-water protection zones", "Spatial \u00b7 polygon", "MoEPP / Public Health Institute", "NWIS", "GIS upload", "v1.0", "2026-08-22", "accepted", "Restricted"], "DS-VAR-009": ["DS-VAR-009", "Programme of Measures register", "Tabular", "Subproject 1 (RBM)", "NWIS", "Manual entry", "v0.3", "2026-10-14", "draft", "Internal"], "DS-VAR-010": ["DS-VAR-010", "Ecological status classification", "Tabular", "Subproject 2 (study)", "External study", "Bulk template", "v0.2", "2026-10-01", "draft", "Internal"], "DS-VAR-011": ["DS-VAR-011", "Water permits (Water Book)", "Tabular", "MoEPP \u2013 Water Dept.", "NWIS (Water Book)", "Workflow", "live", "2026-10-17", "accepted", "Public (non-confidential)"], "DS-VAR-012": ["DS-VAR-012", "Digital elevation model 10 m", "Raster \u00b7 file system", "AREC", "SIS (WMS)", "External service", "v2.0", "2026-06-01", "accepted", "Internal"]};
 document.getElementById('imp-period').innerHTML = WIS.CYCLES.map(c => `<option>${c.period} (${c.label})</option>`).join('');

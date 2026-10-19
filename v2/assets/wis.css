@@ -818,3 +818,71 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
 .ctx-basin:focus-within { outline: 2px solid var(--site-accent); outline-offset: 2px; }
 .ctx-national { border: 2px solid var(--site-brand); background: var(--site-brand); color: #fff; padding: 5px 12px; }
 .ctx-national i { color: var(--site-accent); }
+
+/* ═══ Map page · geoportal toolbar (Sava GIS tool set) ═══ */
+.mtb { position: absolute; top: 0; left: 0; right: 0; z-index: 650; height: 46px; display: flex; align-items: center; gap: 0 4px; padding: 0 12px;
+  background: var(--site-teal-mid); box-shadow: 0 2px 8px #0000001f; overflow-x: auto; scrollbar-width: thin; }
+.mtb-grp { display: flex; gap: 2px; padding-right: 6px; margin-right: 2px; border-right: 1px solid #ffffff40; flex: none; }
+.mtb-grp:last-of-type { border-right: 0; }
+.mtb-btn { width: 34px; height: 34px; border-radius: 4px; border: 0; background: transparent; color: #fff; display: grid; place-items: center; cursor: pointer; font-size: 14px; transition: background .2s, color .2s; }
+.mtb-btn:hover { background: #ffffff26; }
+.mtb-btn[aria-pressed="true"] { background: var(--site-accent); color: #fff; box-shadow: inset 0 -2px 0 #00000026; }
+.mtb-btn:disabled { opacity: .35; cursor: default; background: transparent; }
+.mtb-btn:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.mtb-hint { margin-left: auto; padding-left: 12px; color: #ffffffe0; font-size: 12.5px; white-space: nowrap; }
+.map-stage #wmap { top: 46px; }
+.map-panel { top: 62px; }
+.map-panel-right { max-height: calc(100% - 78px); }
+.map-stage .leaflet-top.leaflet-left { top: 0; }
+.tool-draw #wmap, .tool-draw #wmap .leaflet-interactive { cursor: crosshair !important; }
+.tool-draw #wmap .leaflet-interactive { pointer-events: none !important; }
+.map-status { position: absolute; z-index: 600; left: 312px; bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap; pointer-events: none; transition: left .3s; }
+.panels-off .map-status { left: 12px; }
+.map-chip { background: #ffffffeb; border: 1px solid var(--site-border); border-radius: 4px; padding: 3px 9px; font-size: 11.5px; color: var(--site-ink); font-variant-numeric: tabular-nums; box-shadow: 0 1px 4px #0000000f; }
+.map-stage .leaflet-control-scale { margin-bottom: 26px !important; }
+/* tool results in the information panel */
+.tool-head { display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 700; font-size: 15px; color: var(--site-brand); margin-bottom: 8px; }
+.tool-head i { color: var(--site-accent); }
+.tool-big { font-family: var(--font-heading); font-size: 28px; font-weight: 800; color: var(--site-brand); font-variant-numeric: tabular-nums; }
+.tool-sub { font-size: 12px; color: var(--site-muted); line-height: 1.5; }
+.tool-row { display: block; width: 100%; text-align: left; border: 1px solid var(--site-border); background: #fff; border-radius: 8px; padding: 8px 10px; margin-top: 6px; cursor: pointer; font: inherit; font-size: 12.5px; color: var(--site-ink); }
+.tool-row:hover { border-color: var(--site-teal); background: var(--site-bg); }
+.tool-row .id-pill { margin-top: 4px; display: inline-block; }
+.leaflet-tooltip.meas-tip { background: var(--site-brand); color: #fff; border: 0; border-radius: 4px; font-family: var(--font-heading); font-weight: 700; font-size: 12px; padding: 3px 8px; box-shadow: 0 2px 6px #00000033; }
+.leaflet-tooltip.meas-tip::before { display: none; }
+.leaflet-tooltip.grat-lbl { background: #ffffffcc; border: 0; box-shadow: none; color: var(--site-brand); font-size: 10px; padding: 0 3px; }
+.leaflet-tooltip.grat-lbl::before { display: none; }
+.leaflet-tooltip.prop-tip { background: #fff; border: 1px solid #dc2626; color: #991b1b; font-size: 11px; font-weight: 600; padding: 2px 6px; }
+.prop-src { width: 28px; height: 28px; border-radius: 50%; background: #dc2626; color: #fff; display: grid; place-items: center; border: 3px solid #fff; box-shadow: 0 0 0 2px #dc2626, 0 0 0 8px #dc262633; font-size: 13px; }
+/* overview map */
+.map-ov { position: absolute; z-index: 640; right: 16px; bottom: 40px; width: 220px; height: 160px; border: 3px solid #fff; border-radius: 8px; box-shadow: 0 6px 18px #00000033; overflow: hidden; }
+.ov-on .map-panel-right { max-height: calc(100% - 78px - 190px); }
+/* attribute table drawer */
+.map-drawer { position: absolute; z-index: 660; left: 0; right: 0; bottom: 0; height: 40%; min-height: 200px; background: #fff; box-shadow: 0 -8px 24px #0000001f; display: flex; flex-direction: column; }
+.map-drawer-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 14px; border-bottom: 1px solid var(--site-border); background: var(--site-bg); }
+.map-drawer-h b { font-family: var(--font-heading); color: var(--site-brand); font-size: 14px; }
+.map-drawer-h b i { color: var(--site-accent); margin-right: 4px; }
+.map-drawer-b { overflow: auto; flex: 1; }
+.map-drawer-b .data-table th { position: sticky; top: 0; z-index: 1; }
+.map-drawer-b tbody tr { cursor: pointer; }
+.table-on .map-panel-left { bottom: calc(40% + 16px); }
+.table-on .map-status, .table-on .map-ov { bottom: calc(40% + 10px); }
+.map-print-title { display: none; }
+@media (max-width: 900px) {
+  .mtb { position: relative; height: 46px; }
+  .mtb-hint { display: none; }
+  .map-stage #wmap { top: 0; }
+  .map-status { position: relative; left: 0; bottom: auto; order: 1; margin: 6px 16px 0; }
+  .map-ov { display: none; }
+  .map-drawer { position: relative; order: 1; height: 320px; }
+  .table-on .map-panel-left { bottom: auto; }
+}
+@media print {
+  @page { size: landscape; margin: 10mm; }
+  #pub-header, .basin-strip, .map-titlebar, .mtb, .map-panel, .map-status, .map-drawer, .map-ov, #pub-footer, .pub-footer, .leaflet-control-zoom { display: none !important; }
+  .map-print-title { display: flex !important; justify-content: space-between; gap: 12px; font-size: 12px; padding: 0 0 6px; border-bottom: 2px solid #0d4a5e; margin-bottom: 6px; }
+  .map-print-title b { font-size: 15px; color: #0d4a5e; }
+  .map-stage { height: 170mm !important; }
+  .map-stage #wmap { top: 0 !important; }
+}
+@media (prefers-reduced-motion: reduce) { .mtb-btn, .map-status { transition: none; } }

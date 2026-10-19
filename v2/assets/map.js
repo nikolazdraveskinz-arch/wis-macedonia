@@ -22,7 +22,7 @@ window.initWisMap = function (opts) {
   function photo(label) { return `<div style="height:90px;border-radius:8px;background:linear-gradient(135deg,#cffafe,#dbeafe);display:flex;align-items:center;justify-content:center;color:#64748b;font-size:11px;margin:8px 0;"><i class="fas fa-image" style="margin-right:6px;"></i>${label}</div>`; }
 
   const groups = {};
-  function grp(name) { return groups[name] || (groups[name] = L.layerGroup().addTo(map)); }
+  function grp(name) { if (!groups[name]) { groups[name] = L.featureGroup().addTo(map); groups[name].on('click', e => map.fire('wis:select', { layer: e.layer, group: name })); } return groups[name]; }
 
   /* Water bodies */
   const wbLayers = {};
@@ -42,7 +42,8 @@ window.initWisMap = function (opts) {
   });
   /* River network (hydrological features) */
   const isVar = !W.RBD || W.RBD.id === 'VAR';
-  if (isVar) L.polyline([[42.08, 21.30], [41.99, 21.42], [41.85, 21.62], [41.716, 21.776], [41.583, 21.950], [41.497, 22.090], [41.40, 22.25], [41.18, 22.52]], { color: '#60a5fa', weight: 2, dashArray: '4 4', interactive: false }).addTo(grp('River network (hydrology)'));
+  const RIVER = [[42.08, 21.30], [41.99, 21.42], [41.85, 21.62], [41.716, 21.776], [41.583, 21.950], [41.497, 22.090], [41.40, 22.25], [41.18, 22.52]]; /* Vardar main stem, upstream → downstream */
+  if (isVar) L.polyline(RIVER, { color: '#60a5fa', weight: 2, dashArray: '4 4', interactive: false }).addTo(grp('River network (hydrology)'));
   /* Monitoring sites */
   W.SITES.forEach(s => L.circleMarker(s.ll, { radius: 7, color: '#0f172a', weight: 1.5, fillColor: '#38bdf8', fillOpacity: .9, bubblingMouseEvents: false }).addTo(grp('Monitoring sites'))
     .on('click', () => showInfo(`<div class="form-label" style="color:#64748b;">Monitoring site</div><div style="font-weight:800;font-size:15px;">${s.name}</div><span class="id-pill">${s.id}</span>
@@ -84,9 +85,12 @@ window.initWisMap = function (opts) {
   const fw = focus && W.WBS.find(w => w.id === focus);
   /* start view: fit the basin's water bodies (or the focused one); re-fit once the page layout has settled,
      because a fit made while the map box still has no size jumps to the maximum zoom */
+  const qv = (new URLSearchParams(location.search).get('view') || '').split(',').map(Number);
+  const sharedView = qv.length === 3 && qv.every(n => isFinite(n)) ? qv : null;
   function startView() {
     map.invalidateSize();
-    if (fw) map.fitBounds(L.latLngBounds(fw.line || fw.poly), { padding: [60, 60], maxZoom: 12 });
+    if (sharedView && !fw) map.setView([sharedView[0], sharedView[1]], sharedView[2]);
+    else if (fw) map.fitBounds(L.latLngBounds(fw.line || fw.poly), { padding: [60, 60], maxZoom: 12 });
     else if (W.WBS.length) map.fitBounds(L.latLngBounds(W.WBS.flatMap(w => w.line || w.poly)), { padding: [30, 30], maxZoom: 11 });
   }
   startView();
@@ -124,11 +128,13 @@ window.initWisMap = function (opts) {
 
   /* Click on the map: comment on a point (public) or coordinates (internal) */
   map.on('click', e => {
+    if (map.wisTool && map.wisTool !== 'identify') return;
     const ll = [+e.latlng.lat.toFixed(4), +e.latlng.lng.toFixed(4)];
     const html = mode === 'public'
       ? `<div style="font-size:12px;"><b>${ll[0]}, ${ll[1]}</b><br><button class="btn btn-primary btn-sm" style="margin-top:6px;" onclick='WIS.openComment({"kind":"point","ll":[${ll}]},3)'><i class="fas fa-comment-dots"></i>Comment here</button></div>`
       : `<div style="font-size:12px;"><b>${ll[0]}, ${ll[1]}</b><br>EPSG:4326</div>`;
     L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
   });
+  map.wis = { mode, groups, wbLayers, base, info, showInfo, startView, river: isVar ? RIVER : null, places: PLACES, ECO, fullBounds: () => L.latLngBounds(W.WBS.flatMap(w => w.line || w.poly)) };
   return map;
 };
