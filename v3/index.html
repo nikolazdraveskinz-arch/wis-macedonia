@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Water Information System — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="assets/wis.css?v=20261019p3">
+</head>
+<body data-base="" data-active="home" data-portal="public" data-scope="national">
+<header id="pub-header"></header>
+<section class="nat-cover-band">
+  <div class="nat-cover-pattern" aria-hidden="true"></div>
+  <div class="nat-cover-inner">
+    <div class="nat-cover-badge">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    <h1>National Water Information System – NWIS</h1>
+    <div class="nat-cover-btns">
+      <a href="#about" class="pf-btn pf-btn-outline"><i class="fas fa-info-circle"></i>About NWIS</a>
+      <a href="login/" class="pf-btn pf-btn-filled"><i class="fas fa-lock"></i>Institutional sign-in</a>
+    </div>
+  </div>
+</section>
+<svg class="wave-divider" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f7fbf9"></path></svg>
+<main class="pub-wrap">
+
+<section id="about" class="nat-section">
+  <h2>What NWIS is</h2>
+  <p class="lead">The National Water Information System is the Ministry of Environment and Physical Planning's central system for water data. It is developed by upgrading the existing water data management system (GWDMS) and serves the whole country: the same data model, identifiers and tools are used in every river basin district.</p>
+</section>
+
+<section class="nat-section">
+  <h2>Purpose and aims</h2>
+  <p class="lead">NWIS supports the preparation, implementation and reporting of river basin management plans under the Law on Waters and the EU Water Framework Directive (2000/60/EC).</p>
+  <div class="nat-grid-3">
+    <div class="aim-card"><div class="ic" style="background:#dbeafe;color:#1a6b82;"><i class="fas fa-database"></i></div><b>One authoritative source</b><p>Water data from ministries, agencies and utilities kept once, with a clear owner, version and quality status – instead of scattered spreadsheets and reports.</p></div>
+    <div class="aim-card"><div class="ic" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-book-open"></i></div><b>River basin management planning</b><p>Characterisation, status, pressures, objectives and programmes of measures for each river basin district, organised by six-year RBMP cycle.</p></div>
+    <div class="aim-card"><div class="ic" style="background:#d1fae5;color:#059669;"><i class="fas fa-comments"></i></div><b>Transparency and participation</b><p>Open access to information and documents, and the three public consultation stages of Article 14 WFD, with a public record of every comment and response.</p></div>
+    <div class="aim-card"><div class="ic" style="background:#fef3c7;color:#d97706;"><i class="fas fa-file-contract"></i></div><b>Water permits</b><p>The Water Book: issued water permits and applications in one register, linked to water bodies, with a public, non-confidential view.</p></div>
+    <div class="aim-card"><div class="ic" style="background:#cffafe;color:#2a8fa8;"><i class="fas fa-project-diagram"></i></div><b>Interoperability</b><p>Permanent identifiers, shared code lists, metadata and INSPIRE-based services, so that data can be combined and reused by every institution.</p></div>
+    <div class="aim-card"><div class="ic" style="background:#fee2e2;color:#dc2626;"><i class="fas fa-flag"></i></div><b>EU alignment</b><p>A data structure compatible with European reporting (WISE), supporting the alignment with the EU water acquis under negotiating Chapter 27.</p></div>
+  </div>
+</section>
+
+
+
+<section id="basins" class="nat-section">
+  <h2>Enter a river basin district</h2>
+  <p class="lead">Choose a basin to open its water bodies, map, consultation, dashboards and permits.</p>
+  <div id="nat-basin-cards" class="nat-grid-4"></div>
+</section>
+
+<section class="nat-section">
+  <h2>The same structure in every river basin</h2>
+  <p class="lead">Whichever basin you enter, you find the same pages, in the same place.</p>
+  <div class="nat-grid-3">
+    <div class="aim-card same-card"><div class="ic" style="background:#dbeafe;color:#1a6b82;"><i class="fas fa-home"></i></div><b>Basin home</b><p>Key facts, the selected RBMP cycle, and where the public consultation stands.</p></div>
+    <div class="aim-card same-card"><div class="ic" style="background:#dbeafe;color:#1a6b82;"><i class="fas fa-water"></i></div><b>Water bodies</b><p>Rivers, lakes and groundwater with status, pressures and measures – a fact sheet for each.</p></div>
+    <div class="aim-card same-card"><div class="ic" style="background:#cffafe;color:#2a8fa8;"><i class="fas fa-map"></i></div><b>Map</b><p>All layers of the basin, search by place or identifier, and "Comment here".</p></div>
+    <div class="aim-card same-card"><div class="ic" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-comments"></i></div><b>Have your say</b><p>The three Article 14 consultation stages, plan documents, my comments and the public log.</p></div>
+    <div class="aim-card same-card"><div class="ic" style="background:#d1fae5;color:#059669;"><i class="fas fa-chart-pie"></i></div><b>Dashboards and open data</b><p>Status, monitoring, pressures, measures and consultation at a glance; downloads and services.</p></div>
+    <div class="aim-card same-card"><div class="ic" style="background:#fef3c7;color:#d97706;"><i class="fas fa-file-contract"></i></div><b>Permits</b><p>Issued water permits in the basin (non-confidential data) and your own permit requests.</p></div>
+  </div>
+</section>
+
+<section class="nat-section">
+  <div class="who-band">
+    <div><b>Who runs NWIS</b><p>The Ministry of Environment and Physical Planning owns and operates the system. Data are supplied by the institutions responsible for monitoring, permits and water use; the river basin councils give their opinion on the plans. Registered users can comment on the plans of every basin.</p></div>
+    <div class="who-btns"><a href="about/contacts/" class="pf-btn pf-btn-outline pf-btn-sm"><i class="fas fa-address-book"></i>Who is responsible · contacts</a><a href="register/" class="pf-btn pf-btn-filled pf-btn-sm"><i class="fas fa-user-plus"></i>Register to take part</a></div>
+  </div>
+</section>
+
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="assets/shell.js?v=20261019p3"></script>
+<script>
+const SHAPE = {
+  VAR: [[42.25,21.05],[42.33,21.55],[42.30,22.30],[42.05,22.75],[41.75,22.85],[41.55,22.60],[41.35,22.75],[41.13,22.70],[41.12,22.20],[41.10,21.60],[41.25,21.20],[41.55,20.95],[41.95,20.75],[42.15,20.85]],
+  BDR: [[41.75,20.60],[41.55,20.95],[41.25,21.20],[41.10,21.10],[40.86,21.05],[40.88,20.95],[40.92,20.75],[41.10,20.66],[41.35,20.48],[41.60,20.45]],
+  STR: [[41.55,22.60],[41.62,22.90],[41.48,23.02],[41.35,22.98],[41.30,22.75],[41.35,22.75]],
+  JMO: [[42.33,21.55],[42.32,21.75],[42.25,21.72],[42.25,21.56]]
+};
+/* small basin silhouette, drawn from the schematic outline (no map service needed) */
+function outline(id, color) {
+  const pts = SHAPE[id], lats = pts.map(p => p[0]), lons = pts.map(p => p[1]);
+  const x0 = Math.min(...lons), x1 = Math.max(...lons), y0 = Math.min(...lats), y1 = Math.max(...lats);
+  const k = Math.cos(41.6 * Math.PI / 180), w = (x1 - x0) * k, h = y1 - y0, S = 52 / Math.max(w, h);
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + (4 + (p[1] - x0) * k * S + (52 - w * S) / 2).toFixed(1) + ' ' + (4 + (y1 - p[0]) * S + (52 - h * S) / 2).toFixed(1)).join(' ') + 'Z';
+  return `<svg class="basin-outline" viewBox="0 0 60 60" aria-hidden="true"><path d="${d}" fill="${color}" fill-opacity=".18" stroke="${color}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+}
+/* consultation status: example dates exist for Vardar only (stage 3 · draft RBMP) */
+function consult(id) {
+  if (id !== 'VAR') return '<span class="basin-st basin-st-none"><i class="fas fa-clock"></i>Consultation not yet published</span>';
+  const t = new Date(new Date().toISOString().slice(0, 10)), o = new Date('2026-09-01'), c = new Date('2027-03-01');
+  if (t < o) return '<span class="basin-st basin-st-soon"><i class="fas fa-calendar"></i>Draft RBMP · opens 1 Sep 2026</span>';
+  if (t > c) return '<span class="basin-st basin-st-none"><i class="fas fa-check"></i>Draft RBMP consultation closed</span>';
+  return `<span class="basin-st basin-st-open"><i class="fas fa-comments"></i>Draft RBMP open · ${Math.ceil((c - t) / 864e5)} days left</span>`;
+}
+const CYC = WIS.CYCLES[0];
+document.getElementById('nat-basin-cards').innerHTML = WIS.RBDS.map(r => `
+  <a href="basin/?rbd=${r.id}" class="basin-card" style="--c:${r.color};text-decoration:none;">
+    <div class="basin-photo" id="ph-${r.id}" style="--c:${r.color};">${outline(r.id, r.color)}<span class="basin-credit" hidden></span></div>
+    <div class="basin-card-top"><div><h3>${r.name}</h3><div class="mk" lang="mk">${r.mk}</div></div></div>
+    <div class="basin-cycle-line"><i class="fas fa-book-open"></i>${CYC.label} · ${CYC.state}</div>
+    ${consult(r.id)}
+    <span class="pf-btn pf-btn-ghost pf-btn-sm" style="margin-top:auto;align-self:flex-start;">Enter ${r.name} <i class="fas fa-arrow-right"></i></span>
+  </a>`).join('');
+/* Basin photos: lead image of a representative Wikipedia article (Wikimedia Commons), with author and licence */
+const PHOTO = {
+  VAR: ['Vardar', 'Veles,_North_Macedonia', 'Matka_Canyon'],
+  BDR: ['Lake_Ohrid', 'Black_Drin', 'Struga'],
+  STR: ['Strumica_(river)', 'Kolešino_Falls', 'Strumica'],
+  JMO: ['Binačka_Morava', 'Lipkovo_Lake', 'Kumanovo']
+};
+const isPhoto = u => !!u && /\.(jpe?g|png|webp)$/i.test(u.split('?')[0]) && !/(map|karte|locator|location|relief|flag|coat_of|grb|\.svg)/i.test(u);
+const strip = h => (h || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+async function basinPhoto(id) {
+  for (const t of PHOTO[id]) {
+    try {
+      const sm = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(t)).then(r => r.ok ? r.json() : null);
+      const src = sm && (sm.originalimage || sm.thumbnail) && (sm.originalimage || sm.thumbnail).source;
+      if (!isPhoto(src)) continue;
+      const file = decodeURIComponent(src.split('?')[0].split('/').pop().replace(/^\d+px-/, ''));
+      const meta = await fetch('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=900&titles=File:' + encodeURIComponent(file)).then(r => r.json()).catch(() => null);
+      const page = meta && meta.query && Object.values(meta.query.pages)[0], ii = page && page.imageinfo && page.imageinfo[0];
+      const m = (ii && ii.extmetadata) || {};
+      const box = document.getElementById('ph-' + id);
+      const img = document.createElement('img');
+      img.alt = (sm.title || id) + ' – ' + strip(m.ImageDescription && m.ImageDescription.value).slice(0, 120);
+      img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
+      img.style.opacity = '0';
+      box.prepend(img);
+      const ok = await new Promise(res => { img.onload = () => res(true); img.onerror = () => res(false); img.src = (ii && ii.thumburl) || (sm.thumbnail && sm.thumbnail.source) || src; });
+      if (!ok) { img.remove(); continue; }
+      img.style.opacity = '1';
+      box.querySelector('.basin-outline') && box.querySelector('.basin-outline').remove();
+      box.classList.add('has-photo');
+      const cr = box.querySelector('.basin-credit');
+      const who = strip(m.Artist && m.Artist.value) || 'Wikimedia Commons', lic = strip(m.LicenseShortName && m.LicenseShortName.value);
+      cr.textContent = 'Photo: ' + who.slice(0, 40) + (lic ? ' · ' + lic : '');
+      cr.title = file + ' · Wikimedia Commons';
+      cr.hidden = false;
+      return;
+    } catch (e) { console.warn('NWIS basin photo', id, t, e); }
+  }
+}
+WIS.RBDS.forEach(r => basinPhoto(r.id));
+</script>
+</body>
+</html>

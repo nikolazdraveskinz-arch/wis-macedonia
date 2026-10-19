@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultation stage — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019p3">
+</head>
+<body data-base="../../" data-active="participate" data-portal="public" data-scope="basin">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<div class="rj-crumb"><a href="../">Have your say</a> › <span id="crumb"></span></div>
+<section class="rj-source rj-head"><div class="rj-head-grid" id="head"></div><div id="rj-strip"></div></section>
+<div class="pub-grid-1" style="display:grid;grid-template-columns:2fr 1fr;gap:18px;">
+  <div>
+    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-file-alt" style="color:#7c3aed;margin-right:6px;"></i>Documents in this stage</h3></div>
+      <div class="table-container"><table class="data-table"><tbody id="docs"></tbody></table></div></div>
+    <div class="card" id="swmi-card" style="margin-top:18px;display:none;"><div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-circle" style="color:#d97706;margin-right:6px;"></i>Significant water management issues</h3><span style="font-size:11px;color:#94a3b8;">Comment on each issue separately</span></div>
+      <div class="card-body" id="swmi" style="display:grid;gap:10px;"></div></div>
+  </div>
+  <div>
+    <div class="card"><div class="card-header"><h3 class="card-title">Comments in this stage</h3><div style="display:flex;gap:6px;"><button class="btn btn-secondary btn-sm" onclick="WIS.follow('stage')"><i class="fas fa-bell"></i>Follow</button><a href="../log/" class="btn btn-secondary btn-sm">Public log</a></div></div>
+      <div class="card-body" id="stats"></div></div>
+    <div class="card" style="margin-top:18px;"><div class="card-body" style="font-size:12.5px;color:#475569;">
+      <b>Other ways to comment</b><p style="margin:6px 0 0;">By e-mail to <span class="id-pill" id="rbd-mail">rbmp.vardar@example.mk</span>, by post to the Ministry of Environment and Physical Planning, or at the public hearings listed on the <a href="../#documents" style="color:#1a6b82;">consultation page</a>. All channels are registered in the same log.</p><p style="margin:8px 0 0;">Need the studies behind the plan? <a href="../request/" style="color:#1a6b82;">Request background documents</a>.</p></div></div>
+  </div>
+</div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../../assets/shell.js?v=20261019p3"></script>
+<script src="../../assets/participation.js?v=20261019p3"></script>
+<script>
+const n = +(new URLSearchParams(location.search).get('s')||3), s = WIS.STAGES.find(x=>x.n===n)||WIS.STAGES[2];
+const SC={Open:'qa-accepted',Closed:'badge-inactive',Upcoming:'badge-active','Not started':'badge-inactive','Not published':'badge-inactive'};
+document.getElementById('crumb').textContent = 'Phase '+s.n+' · '+s.title;
+document.getElementById('head').innerHTML = `<div>
+    <div class="rj-eyebrow">Phase ${s.n} · ${s.art} WFD · consultation stage ${s.n} of 3</div>
+    <h1 class="rj-h1">${s.title}</h1>
+    <p class="rj-lead">${s.lead}</p>
+  </div>
+  <div class="card rj-here-card"><div class="card-body">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><div class="rj-eyebrow" style="color:#2a8fa8;">You are here</div><span class="badge ${SC[s.state]}">${s.state}</span></div>
+    ${s.state==='Open'?`<div class="rj-here-big" style="margin-top:8px;">${s.daysLeft}</div><div class="rj-mini">days left to comment</div>`:''}
+    <div style="font-size:12.5px;color:#4a6b75;margin-top:8px;">${s.opens?`${WIS.fmt(s.opens)} – ${WIS.fmt(s.closes)} · ${s.months} months (minimum 6)`:`Legal deadline ${WIS.fmt(s.legal)} · at least 6 months`}</div>
+    ${!s.opens?'':s.state==='Open'?`<button class="btn btn-primary" style="margin-top:12px;padding:10px 16px;" onclick="WIS.openComment(null,${s.n})"><i class="fas fa-comment-dots"></i>Write a comment</button>`:`<a href="../log/?stage=${s.n}" class="btn btn-secondary" style="margin-top:12px;padding:9px 14px;">See how comments were used</a>`}
+  </div></div>`;
+WIS.riverStrip('rj-strip', { here: s.n });
+document.getElementById('docs').innerHTML = s.docs.map(k=>{const d=WIS.DOCS[k];return `<tr><td><b>${d.title}</b><div style="font-size:11px;color:#94a3b8;">${d.pages} pages · ${d.sections.length} chapters</div></td><td><span class="id-pill">${d.id}</span></td><td>${d.ver}</td><td><a class="btn btn-primary btn-sm" href="../document/?d=${k}">Read${s.state==='Open'?' and comment':''}</a> <button class="btn btn-secondary btn-sm" onclick="wisToast('PDF downloaded (mockup)')"><i class="fas fa-file-pdf"></i>PDF</button></td></tr>`;}).join('') || '<tr><td style="color:#94a3b8;text-align:center;padding:18px;">No documents published yet for this stage.</td></tr>';
+if (s.n===2 && WIS.SWMI.length){ document.getElementById('swmi-card').style.display='block';
+  document.getElementById('swmi').innerHTML = WIS.SWMI.map(i=>{const c=WIS.comments().filter(x=>x.target.kind==='swmi'&&x.target.issue===i[0]).length;return `<div style="border:1px solid #f1f5f9;border-radius:10px;padding:12px;display:flex;gap:12px;align-items:flex-start;">
+    <span class="badge badge-in-review">${i[0]}</span><div style="flex:1;"><b>${i[1]}</b><div style="font-size:12.5px;color:#475569;margin:2px 0;">${i[2]}</div><div style="font-size:12px;color:#7c3aed;"><i class="fas fa-question-circle"></i> ${i[3]}</div></div>
+    <div style="text-align:right;font-size:11px;color:#64748b;min-width:110px;">${c} comments<br><button class="btn btn-secondary btn-sm" style="margin-top:4px;" onclick='WIS.openComment({"kind":"swmi","issue":"${i[0]}"},2)'>Comment on ${i[0]}</button></div></div>`;}).join(''); }
+function stats(){const cs=WIS.comments().filter(c=>c.stage===s.n), by=k=>cs.filter(c=>c.outcome===k).length;
+ document.getElementById('stats').innerHTML = `<div class="stat-grid"><div class="stat-item"><div class="stat-val">${cs.length}</div><div class="stat-lbl">Received</div></div><div class="stat-item"><div class="stat-val">${cs.filter(c=>!c.outcome).length}</div><div class="stat-lbl">Being assessed</div></div><div class="stat-item"><div class="stat-val" style="color:#059669;">${by('Incorporated')+by('Partly incorporated')}</div><div class="stat-lbl">Fully or partly incorporated</div></div><div class="stat-item"><div class="stat-val" style="color:#dc2626;">${by('Not incorporated')}</div><div class="stat-lbl">Not incorporated</div></div></div>
+ ${s.state==='Closed'?'<button class="btn btn-secondary btn-sm" style="margin-top:12px;" onclick="wisToast(\'Consultation report for stage '+s.n+' downloaded (mockup)\')"><i class="fas fa-file-download"></i>Consultation report</button>':''}`;}
+stats(); window.onCommentAdded = stats;
+document.getElementById('rbd-mail').textContent = 'rbmp.' + WIS.RBD.name.toLowerCase().replace(/[^a-z]/g,'') + '@example.mk';
+</script>
+</body>
+</html>

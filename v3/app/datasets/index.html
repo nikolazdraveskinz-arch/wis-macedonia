@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datasets & Imports — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019p3">
+</head>
+<body data-base="../../" data-active="datasets" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-layer-group" style="color:#1a6b82; font-size:16px; margin-right:8px;"></i>Datasets & Imports</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-layer-group"></i><div><b>ToR Tasks 1, 4 and 5.</b> One register for every RBMP dataset. Each dataset carries its reporting period, timestamp, version, responsible institution, source system, import route and QA/QC status, and every action is logged. External systems are reached through three routes (API, bulk template, manual entry); in Phase 1 the API route is shown but not active.</div></div>
+
+<div class="card">
+  <div style="padding:0 20px;"><div class="tab-nav">
+    <button class="tab-btn active" data-tab-group="ds" data-tab="reg" onclick="switchTab('ds','reg')"><i class="fas fa-table" style="margin-right:5px;"></i>Dataset register</button>
+    <button class="tab-btn" data-tab-group="ds" data-tab="imp" onclick="switchTab('ds','imp')"><i class="fas fa-file-import" style="margin-right:5px;"></i>Import data</button>
+    <button class="tab-btn" data-tab-group="ds" data-tab="qa" onclick="switchTab('ds','qa')"><i class="fas fa-clipboard-check" style="margin-right:5px;"></i>QA/QC queue <span class="nav-badge" style="margin-left:4px;">3</span></button>
+    <button class="tab-btn" data-tab-group="ds" data-tab="log" onclick="switchTab('ds','log')"><i class="fas fa-history" style="margin-right:5px;"></i>Audit trail</button>
+  </div></div>
+
+  <div class="tab-panel active" data-panel-group="ds" data-panel="reg">
+    <div class="filter-bar">
+      <div class="search-wrap"><i class="fas fa-search"></i><input id="ds-q" class="search-input" placeholder="Search datasets, institutions, sources…" oninput="filterTable('ds-q','ds-table')"></div>
+      <select class="filter-select"><option>All components</option><option>Water bodies</option><option>Monitoring</option><option>Pressures</option><option>Protected areas</option><option>PoM</option></select>
+      <select class="filter-select"><option>All QA/QC states</option><option>Accepted</option><option>Pending</option><option>Returned</option><option>Draft</option></select>
+      <select class="filter-select"><option>All access levels</option><option>Public</option><option>Restricted</option><option>Internal</option></select>
+      <button class="btn btn-primary" onclick="switchTab('ds','imp')"><i class="fas fa-plus"></i>Register dataset</button>
+    </div>
+    <div class="table-container"><table class="data-table" id="ds-table">
+      <thead><tr><th>Dataset ID</th><th>Dataset</th><th>Responsible institution</th><th>Source system</th><th>Import route</th><th>Version</th><th>Last update</th><th>QA/QC</th><th>Access</th></tr></thead>
+      <tbody><tr onclick="showDs('DS-VAR-001')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-001</span></td><td><b>Surface water bodies (rivers, lakes)</b><div style="font-size:11px;color:#94a3b8;">Spatial · line/polygon</div></td><td>MoEPP – Water Dept.</td><td>NWIS (VRBSD)</td><td>Manual / GIS upload</td><td>v1.4</td><td>2026-09-30</td><td><span class="badge qa-accepted">Accepted</span></td><td>Public</td></tr><tr onclick="showDs('DS-VAR-002')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-002</span></td><td><b>Groundwater bodies</b><div style="font-size:11px;color:#94a3b8;">Spatial · polygon</div></td><td>MoEPP – Water Dept.</td><td>NWIS (GWDMS)</td><td>GIS upload</td><td>v1.2</td><td>2026-09-18</td><td><span class="badge qa-accepted">Accepted</span></td><td>Public</td></tr><tr onclick="showDs('DS-VAR-003')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-003</span></td><td><b>Surface water monitoring sites</b><div style="font-size:11px;color:#94a3b8;">Spatial · point</div></td><td>Hydrometeorological Service</td><td>Water Quality platform</td><td>Bulk template</td><td>v2.0</td><td>2026-10-10</td><td><span class="badge qa-accepted">Accepted</span></td><td>Public</td></tr><tr onclick="showDs('DS-VAR-004')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-004</span></td><td><b>Surface water quality results 2025</b><div style="font-size:11px;color:#94a3b8;">Tabular · time series</div></td><td>Hydrometeorological Service</td><td>Water Quality platform</td><td>Bulk template</td><td>2025.2</td><td>2026-10-17</td><td><span class="badge qa-pending">Pending</span></td><td>Restricted</td></tr><tr onclick="showDs('DS-VAR-005')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-005</span></td><td><b>Groundwater monitoring sites</b><div style="font-size:11px;color:#94a3b8;">Spatial · point</div></td><td>MoEPP – Water Dept.</td><td>NWIS (GWDMS)</td><td>Manual entry</td><td>v1.3</td><td>2026-10-17</td><td><span class="badge qa-accepted">Accepted</span></td><td>Public</td></tr><tr onclick="showDs('DS-VAR-006')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-006</span></td><td><b>Point-source pressures</b><div style="font-size:11px;color:#94a3b8;">Spatial · point</div></td><td>Subproject 3 (study)</td><td>External study</td><td>Bulk template</td><td>v0.9</td><td>2026-10-05</td><td><span class="badge qa-pending">Pending</span></td><td>Internal</td></tr><tr onclick="showDs('DS-VAR-007')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-007</span></td><td><b>Diffuse pressure zones</b><div style="font-size:11px;color:#94a3b8;">Spatial · polygon</div></td><td>Subproject 3 (study)</td><td>External study</td><td>GIS upload</td><td>v0.6</td><td>2026-10-15</td><td><span class="badge qa-rejected">Returned</span></td><td>Internal</td></tr><tr onclick="showDs('DS-VAR-008')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-008</span></td><td><b>Drinking-water protection zones</b><div style="font-size:11px;color:#94a3b8;">Spatial · polygon</div></td><td>MoEPP / Public Health Institute</td><td>NWIS</td><td>GIS upload</td><td>v1.0</td><td>2026-08-22</td><td><span class="badge qa-accepted">Accepted</span></td><td>Restricted</td></tr><tr onclick="showDs('DS-VAR-009')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-009</span></td><td><b>Programme of Measures register</b><div style="font-size:11px;color:#94a3b8;">Tabular</div></td><td>Subproject 1 (RBM)</td><td>NWIS</td><td>Manual entry</td><td>v0.3</td><td>2026-10-14</td><td><span class="badge qa-draft">Draft</span></td><td>Internal</td></tr><tr onclick="showDs('DS-VAR-010')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-010</span></td><td><b>Ecological status classification</b><div style="font-size:11px;color:#94a3b8;">Tabular</div></td><td>Subproject 2 (study)</td><td>External study</td><td>Bulk template</td><td>v0.2</td><td>2026-10-01</td><td><span class="badge qa-draft">Draft</span></td><td>Internal</td></tr><tr onclick="showDs('DS-VAR-011')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-011</span></td><td><b>Water permits (Water Book)</b><div style="font-size:11px;color:#94a3b8;">Tabular</div></td><td>MoEPP – Water Dept.</td><td>NWIS (Water Book)</td><td>Workflow</td><td>live</td><td>2026-10-17</td><td><span class="badge qa-accepted">Accepted</span></td><td>Public (non-confidential)</td></tr><tr onclick="showDs('DS-VAR-012')" style="cursor:pointer;"><td><span class="id-pill">DS-VAR-012</span></td><td><b>Digital elevation model 10 m</b><div style="font-size:11px;color:#94a3b8;">Raster · file system</div></td><td>AREC</td><td>SIS (WMS)</td><td>External service</td><td>v2.0</td><td>2026-06-01</td><td><span class="badge qa-accepted">Accepted</span></td><td>Internal</td></tr></tbody></table></div>
+    <div id="ds-detail" style="display:none;margin:0 20px 20px;" class="card"></div>
+  </div>
+
+  <div class="tab-panel" data-panel-group="ds" data-panel="imp">
+    <div class="card-body">
+      <p style="font-size:13px;color:#475569;margin-top:0;">Choose how the data reach the WIS. The same dataset can be fed by more than one route, so work continues when an external system is unavailable (NWIS Report, Data Processing module).</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+        <div class="card" style="opacity:.6;"><div class="card-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><b><i class="fas fa-plug" style="color:#64748b;margin-right:6px;"></i>API integration</b><span class="phase-chip">Later phase</span></div>
+          <p style="font-size:12px;color:#64748b;">Automatic collection from the Water Quality platform, NEIS or SIS. Foreseen in Phase 2; not part of the current development.</p>
+          <button class="btn btn-secondary btn-sm" disabled>Configure connection</button></div></div>
+        <div class="card" style="border:2px solid #1a6b82;"><div class="card-body">
+          <b><i class="fas fa-file-excel" style="color:#059669;margin-right:6px;"></i>Bulk import (template)</b>
+          <p style="font-size:12px;color:#64748b;">Upload an Excel/CSV file built on the NWIS template. Rows are checked against code lists and permanent identifiers before QA/QC.</p>
+          <label class="form-label">Dataset</label><select class="form-input" style="margin-bottom:8px;"><option>DS-VAR-004 · Surface water quality results 2025</option><option>DS-VAR-006 · Point-source pressures</option><option>New dataset…</option></select>
+          <label class="form-label">Reporting period</label><select class="form-input" style="margin-bottom:8px;" id="imp-period"></select>
+          <div style="border:2px dashed #cbd5e1;border-radius:8px;padding:16px;text-align:center;font-size:12px;color:#94a3b8;margin-bottom:8px;"><i class="fas fa-cloud-upload-alt" style="font-size:20px;"></i><br>Drop the filled template here</div>
+          <div style="display:flex;gap:6px;"><button class="btn btn-secondary btn-sm" onclick="wisToast('Template downloaded (mockup)')"><i class="fas fa-download"></i>Template</button><button class="btn btn-primary btn-sm" onclick="wisToast('Validation: 1,248 rows read · 3 unknown station IDs · sent to QA/QC as pending (mockup)')"><i class="fas fa-check"></i>Validate & submit</button></div>
+        </div></div>
+        <div class="card"><div class="card-body">
+          <b><i class="fas fa-keyboard" style="color:#d97706;margin-right:6px;"></i>Manual entry</b>
+          <p style="font-size:12px;color:#64748b;">For small datasets, corrections and gap filling (e.g. one-off laboratory results). Entries go through the same QA/QC step.</p>
+          <label class="form-label">Dataset</label><select class="form-input" style="margin-bottom:8px;"><option>DS-VAR-005 · Groundwater monitoring sites</option><option>DS-VAR-009 · Programme of Measures register</option></select>
+          <button class="btn btn-primary btn-sm" onclick="wisToast('Entry form opened (mockup)')"><i class="fas fa-pen"></i>Open entry form</button>
+        </div></div>
+      </div>
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:0;">Direct database import is limited to technical administrators (ToR Task 4) and is logged like any other upload.</p>
+    </div>
+  </div>
+
+  <div class="tab-panel" data-panel-group="ds" data-panel="qa">
+    <div class="table-container"><table class="data-table">
+      <thead><tr><th>Submission</th><th>Dataset</th><th>Submitted by</th><th>Automatic checks</th><th>Acceptance by</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><span class="id-pill">SUB-2026-118</span></td><td>DS-VAR-004 · SW quality results 2025</td><td>Contributor · HMS</td><td><span class="badge qa-pending">3 warnings</span> unknown station IDs</td><td>Approver · MoEPP</td><td><button class="btn btn-primary btn-sm" onclick="wisToast('Accepted – dataset version 2025.2 published to the register (mockup)')">Accept</button> <button class="btn btn-danger btn-sm" onclick="wisToast('Returned to submitter with comments (mockup)')">Return</button></td></tr>
+        <tr><td><span class="id-pill">SUB-2026-117</span></td><td>DS-VAR-006 · Point-source pressures</td><td>Editor · MoEPP</td><td><span class="badge qa-accepted">Passed</span></td><td>Approver · MoEPP</td><td><button class="btn btn-primary btn-sm" onclick="wisToast('Accepted (mockup)')">Accept</button> <button class="btn btn-danger btn-sm" onclick="wisToast('Returned (mockup)')">Return</button></td></tr>
+        <tr><td><span class="id-pill">SUB-2026-115</span></td><td>DS-VAR-007 · Diffuse pressure zones</td><td>GIS Expert · MoEPP</td><td><span class="badge qa-rejected">Geometry errors (12)</span></td><td>GIS Expert · MoEPP</td><td><span class="badge qa-rejected">Returned</span></td></tr>
+      </tbody></table></div>
+    <p style="font-size:11.5px;color:#94a3b8;padding:0 20px 16px;margin:0;">Each data owner remains responsible for quality; MoEPP accepts the data into the WIS. Spatial datasets may also be checked by SIS before acceptance.</p>
+  </div>
+
+  <div class="tab-panel" data-panel-group="ds" data-panel="log">
+    <div class="table-container"><table class="data-table">
+      <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Dataset / version</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>2026-10-17 09:42:18</td><td>Contributor · HMS</td><td>UPLOAD</td><td>DS-VAR-004 / 2025.2</td><td>Bulk template, 1,248 rows</td></tr>
+        <tr><td>2026-10-17 09:15:04</td><td>Approver · MoEPP</td><td>ACCEPT</td><td>DS-VAR-005 / v1.3</td><td>QA/QC passed</td></tr>
+        <tr><td>2026-10-16 16:02:44</td><td>Editor · MoEPP</td><td>CREATE ID</td><td>MK_PRS_PT_0412</td><td>Point pressure added</td></tr>
+        <tr><td>2026-10-15 11:30:10</td><td>GIS Expert · MoEPP</td><td>RETURN</td><td>DS-VAR-007 / v0.6</td><td>12 invalid geometries</td></tr>
+        <tr><td>2026-10-14 14:12:51</td><td>Technical user · Consultant</td><td>DOWNLOAD</td><td>DS-VAR-001 / v1.4</td><td>GeoPackage via API</td></tr>
+      </tbody></table></div>
+  </div>
+</div>
+
+  </main>
+</div>
+<script src="../../assets/shell.js?v=20261019p3"></script>
+<script>
+const DS = {"DS-VAR-001": ["DS-VAR-001", "Surface water bodies (rivers, lakes)", "Spatial \u00b7 line/polygon", "MoEPP \u2013 Water Dept.", "NWIS (VRBSD)", "Manual / GIS upload", "v1.4", "2026-09-30", "accepted", "Public"], "DS-VAR-002": ["DS-VAR-002", "Groundwater bodies", "Spatial \u00b7 polygon", "MoEPP \u2013 Water Dept.", "NWIS (GWDMS)", "GIS upload", "v1.2", "2026-09-18", "accepted", "Public"], "DS-VAR-003": ["DS-VAR-003", "Surface water monitoring sites", "Spatial \u00b7 point", "Hydrometeorological Service", "Water Quality platform", "Bulk template", "v2.0", "2026-10-10", "accepted", "Public"], "DS-VAR-004": ["DS-VAR-004", "Surface water quality results 2025", "Tabular \u00b7 time series", "Hydrometeorological Service", "Water Quality platform", "Bulk template", "2025.2", "2026-10-17", "pending", "Restricted"], "DS-VAR-005": ["DS-VAR-005", "Groundwater monitoring sites", "Spatial \u00b7 point", "MoEPP \u2013 Water Dept.", "NWIS (GWDMS)", "Manual entry", "v1.3", "2026-10-17", "accepted", "Public"], "DS-VAR-006": ["DS-VAR-006", "Point-source pressures", "Spatial \u00b7 point", "Subproject 3 (study)", "External study", "Bulk template", "v0.9", "2026-10-05", "pending", "Internal"], "DS-VAR-007": ["DS-VAR-007", "Diffuse pressure zones", "Spatial \u00b7 polygon", "Subproject 3 (study)", "External study", "GIS upload", "v0.6", "2026-10-15", "rejected", "Internal"], "DS-VAR-008": ["DS-VAR-008", "Drinking-water protection zones", "Spatial \u00b7 polygon", "MoEPP / Public Health Institute", "NWIS", "GIS upload", "v1.0", "2026-08-22", "accepted", "Restricted"], "DS-VAR-009": ["DS-VAR-009", "Programme of Measures register", "Tabular", "Subproject 1 (RBM)", "NWIS", "Manual entry", "v0.3", "2026-10-14", "draft", "Internal"], "DS-VAR-010": ["DS-VAR-010", "Ecological status classification", "Tabular", "Subproject 2 (study)", "External study", "Bulk template", "v0.2", "2026-10-01", "draft", "Internal"], "DS-VAR-011": ["DS-VAR-011", "Water permits (Water Book)", "Tabular", "MoEPP \u2013 Water Dept.", "NWIS (Water Book)", "Workflow", "live", "2026-10-17", "accepted", "Public (non-confidential)"], "DS-VAR-012": ["DS-VAR-012", "Digital elevation model 10 m", "Raster \u00b7 file system", "AREC", "SIS (WMS)", "External service", "v2.0", "2026-06-01", "accepted", "Internal"]};
+document.getElementById('imp-period').innerHTML = WIS.CYCLES.map(c => `<option>${c.period} (${c.label})</option>`).join('');
+function showDs(id){
+  const r = DS[id], d = document.getElementById('ds-detail');
+  d.style.display='block';
+  d.innerHTML = `<div class="card-header"><h3 class="card-title"><span class="id-pill">${r[0]}</span> ${r[1]}</h3><button class="btn btn-secondary btn-sm" onclick="this.closest('#ds-detail').style.display='none'">Close</button></div>
+  <div class="card-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:12.5px;">
+    <div><div class="form-label">Reporting period</div>${WIS.cycle.period}</div>
+    <div><div class="form-label">Type</div>${r[2]}</div>
+    <div><div class="form-label">Responsible institution</div>${r[3]}</div>
+    <div><div class="form-label">Source system</div>${r[4]}</div>
+    <div><div class="form-label">Import route</div>${r[5]}</div>
+    <div><div class="form-label">Version / timestamp</div>${r[6]} · ${r[7]}</div>
+    <div><div class="form-label">QA/QC status</div>${r[8]}</div>
+    <div><div class="form-label">Access level</div>${r[9]}</div>
+    <div style="grid-column:span 4;display:flex;gap:8px;"><a class="btn btn-secondary btn-sm" href="../metadata/"><i class="fas fa-database"></i>Metadata record</a><a class="btn btn-secondary btn-sm" href="../identifiers/"><i class="fas fa-fingerprint"></i>Identifiers used</a><button class="btn btn-secondary btn-sm" onclick="switchTab('ds','log')"><i class="fas fa-history"></i>Version history</button></div>
+  </div>`;
+}
+</script>
+</body>
+</html>

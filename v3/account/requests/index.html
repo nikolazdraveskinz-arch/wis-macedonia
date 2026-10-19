@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My requests — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019p3">
+</head>
+<body data-base="../../" data-active="account" data-portal="public" data-scope="national">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<h1 style="font-size:22px;font-weight:800;color:#0d4a5e;margin:0 0 4px;">My requests</h1>
+<p style="font-size:13px;color:#64748b;margin:0 0 18px;">Permit requests you submitted, and where they are in the procedure. Signed in as <b>Nikola Z.</b> (mockup).</p>
+<div class="card"><div class="card-header"><h3 class="card-title">REQ-2026-0308 · Well for household use</h3><span class="badge badge-active">In progress</span></div>
+  <div class="card-body">
+    <div id="steps" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <div class="meta-row" style="margin-top:12px;"><span><b>Submitted:</b> 2026-10-09</span><span><b>Water body:</b> MK-VAR-GW-004 · Polog alluvial aquifer</span><span><b>Handled by:</b> MoEPP – Water Department</span></div>
+    <div class="alert alert-info" style="margin-top:12px;"><i class="fas fa-envelope"></i><div><b>Message from MoEPP (2026-10-14):</b> Please add the cadastral plot number of the well location.</div></div>
+    <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary btn-sm" onclick="wisToast('Document uploaded and sent to the case officer (mockup)')"><i class="fas fa-upload"></i>Add document</button><button class="btn btn-secondary btn-sm" onclick="wisToast('Message sent (mockup)')"><i class="fas fa-reply"></i>Reply</button></div>
+  </div></div>
+<div class="card" style="margin-top:18px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-plus-circle" style="color:#059669;margin-right:6px;"></i>New request</h3></div>
+  <div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" id="newreq">
+    <div><label class="form-label">Request type *</label><select class="form-input"><option>Water use permit</option><option>Discharge permit</option><option>Extraction of sand, gravel and stone</option><option>Information request</option><option>Change of an existing permit</option></select></div>
+    <div><label class="form-label">Location / water body *</label><select class="form-input"><option>Pick on the map…</option><option>MK-VAR-GW-004 · Polog alluvial aquifer</option><option>MK-VAR-RW-0014 · Vardar – Gradsko to Negotino</option></select></div>
+    <div><label class="form-label">Requested volume</label><input class="form-input" placeholder="m³/yr"></div>
+    <div style="grid-column:span 2;"><label class="form-label">Description *</label><textarea class="form-input" rows="2"></textarea></div>
+    <div><label class="form-label">Documents</label><input type="file" class="form-input"></div>
+    <div><button class="btn btn-primary" onclick="wisToast('Request REQ-2026-0315 submitted; you will be notified at each step (mockup)')"><i class="fas fa-paper-plane"></i>Submit request</button></div>
+  </div></div>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../../assets/shell.js?v=20261019p3"></script>
+<script>
+if(!WIS.isSignedIn()){document.querySelector('.pub-wrap').insertAdjacentHTML('afterbegin','<div class="alert alert-warn" style="margin-bottom:14px;"><i class="fas fa-user-lock"></i><div>Sign in to see your requests. <a href="../../login/?next=/account/requests/" style="font-weight:600;">Sign in</a> · Mockup: the example below is shown anyway.</div></div>');}
+const S=['Submitted','Completeness check','Technical review','Opinions','Decision','Permit issued'];
+document.getElementById('steps').innerHTML=S.map((s,i)=>`<div style="flex:1;min-width:110px;text-align:center;font-size:11.5px;padding:7px;border-radius:7px;${i<=1?'background:#dbeafe;color:#1e40af;font-weight:600;':'background:#f1f5f9;color:#94a3b8;'}">${i<1?'<i class="fas fa-check"></i> ':''}${s}</div>`).join('');
+</script>
+</body>
+</html>

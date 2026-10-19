@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Data — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019p3">
+</head>
+<body data-base="../../" data-active="monitoring" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-satellite-dish" style="color:#1a6b82; font-size:16px; margin-right:8px;"></i>Monitoring Data</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-satellite-dish"></i><div><b>Phase 1 scope: monitoring data imported into the WIS.</b> Stations and results arrive by bulk template or manual entry, each with its source and import date, and must reference a registered station (as in GWDMS today). Surface water quality comes from the UHMR Water Quality platform; the automatic API link, station status and alerts are foreseen in Phase 2.</div></div>
+
+<div class="card" id="wq-link" style="margin-bottom:20px;">
+  <div class="card-body" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 24px;align-items:start;">
+    <div style="min-width:0;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+        <h3 class="card-title" style="margin:0;"><i class="fas fa-link" style="color:#c9a84c;margin-right:6px;"></i>Linked system: Water Quality platform (UHMR)</h3>
+        <span class="badge qa-accepted">Phase 1 · bulk exchange active</span>
+        <span class="badge qa-draft">Phase 2 · API link planned</span>
+      </div>
+      <p style="font-size:13px;color:#4b5563;line-height:1.55;margin:0 0 10px;max-width:880px;">UHMR (Hydrometeorological Service, Water Quality Sector) runs the national surface and groundwater quality monitoring and publishes status classes on its own portal. In Phase 1, UHMR exports results and NWIS imports them with the bulk template and QA/QC. Each NWIS station is paired with its UHMR station number, so imports match automatically. In Phase 2, NWIS pulls stations and monthly results from the platform's API every night, subject to a data-sharing agreement and an API account from UHMR and its developer.</p>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:#64748b;">
+        <span><b style="color:#0d4a5e;">2</b> stations linked</span>
+        <span><b style="color:#0d4a5e;">1</b> match proposed, to confirm</span>
+        <span><b style="color:#0d4a5e;">2</b> not on the platform (GWDMS)</span>
+        <span>Station matching by UHMR number, name and coordinates · last checked 2026-10-19</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:stretch;">
+      <a class="btn btn-primary" href="https://waterquality-uhmr.netlify.app/" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>Open the Water Quality portal</a>
+      <button class="btn btn-secondary" onclick="switchTab('m','imp')"><i class="fas fa-file-import"></i>See imports from UHMR</button>
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px;">
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px;font-weight:800;color:#1a6b82;">214</div><div style="font-size:12px;color:#64748b;">Registered monitoring sites</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px;font-weight:800;color:#2a8fa8;">61,920</div><div style="font-size:12px;color:#64748b;">Imported values (all years)</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px;font-weight:800;color:#059669;">2025</div><div style="font-size:12px;color:#64748b;">Latest year imported</div></div>
+  <div class="kpi-card" style="padding:16px;"><div style="font-size:24px;font-weight:800;color:#d97706;">1</div><div style="font-size:12px;color:#64748b;">Import awaiting QA/QC</div></div>
+</div>
+<div class="card">
+  <div style="padding:0 20px;"><div class="tab-nav">
+    <button class="tab-btn active" data-tab-group="m" data-tab="sites" onclick="switchTab('m','sites')"><i class="fas fa-map-marker-alt" style="margin-right:5px;"></i>Monitoring sites</button>
+    <button class="tab-btn" data-tab-group="m" data-tab="res" onclick="switchTab('m','res')"><i class="fas fa-chart-line" style="margin-right:5px;"></i>Results</button>
+    <button class="tab-btn" data-tab-group="m" data-tab="imp" onclick="switchTab('m','imp')"><i class="fas fa-file-import" style="margin-right:5px;"></i>Imports</button>
+  </div></div>
+  <div class="tab-panel active" data-panel-group="m" data-panel="sites">
+    <div class="filter-bar">
+      <div class="search-wrap"><i class="fas fa-search"></i><input id="st-q" class="search-input" placeholder="Search sites…" oninput="filterTable('st-q','st-table')"></div>
+      <select class="filter-select"><option>All categories</option><option>Surface water</option><option>Groundwater</option><option>Hydrological</option></select>
+      <select class="filter-select"><option>All programmes</option><option>Surveillance</option><option>Operational</option><option>Investigative</option></select>
+    </div>
+    <div class="table-container"><table class="data-table" id="st-table">
+      <thead><tr><th>Permanent ID</th><th>Site</th><th>Category</th><th>Programme</th><th>Water body</th><th>Responsible</th><th>Source system</th><th>Water Quality platform</th><th>Last import</th></tr></thead>
+      <tbody>
+        <tr><td><span class="id-pill">MK_MON_SW_00431</span></td><td><b>Vardar – Gradsko</b></td><td>Surface water</td><td>Surveillance</td><td><span class="id-pill">MK-VAR-RW-0014</span></td><td>HMS</td><td>Water Quality platform</td><td><span class="badge qa-accepted"><i class="fas fa-link" style="margin-right:4px;"></i>Linked</span><div style="font-size:11px;color:#64748b;margin-top:3px;">UHMR station <b>#41</b> · Gradsko · Vardar</div></td><td>2026-10-17 · bulk</td></tr>
+        <tr><td><span class="id-pill">MK_MON_SW_00447</span></td><td><b>Vardar – Demir Kapija</b></td><td>Surface water</td><td>Operational</td><td><span class="id-pill">MK-VAR-RW-0015</span></td><td>HMS</td><td>Water Quality platform</td><td><span class="badge qa-accepted"><i class="fas fa-link" style="margin-right:4px;"></i>Linked</span><div style="font-size:11px;color:#64748b;margin-top:3px;">UHMR station <b>#42</b> · DemirKapija · Vardar; not #77 on the Boshava</div></td><td>2026-10-17 · bulk</td></tr>
+        <tr><td><span class="id-pill">MK_MON_GW_00112</span></td><td><b>Polog – piezometer P-12</b></td><td>Groundwater</td><td>Operational</td><td><span class="id-pill">MK-VAR-GW-004</span></td><td>MoEPP</td><td>NWIS (GWDMS)</td><td><span class="badge badge-inactive">Not linked</span><div style="font-size:11px;color:#64748b;margin-top:3px;">GWDMS station, not on the platform</div></td><td>2026-09-30 · manual</td></tr>
+        <tr><td><span class="id-pill">MK_MON_GW_00087</span></td><td><b>Skopje – well SK-7</b></td><td>Groundwater</td><td>Surveillance</td><td><span class="id-pill">MK-VAR-GW-002</span></td><td>MoEPP</td><td>NWIS (GWDMS)</td><td><span class="badge badge-inactive">Not linked</span><div style="font-size:11px;color:#64748b;margin-top:3px;">GWDMS station, not on the platform</div></td><td>2026-09-30 · bulk</td></tr>
+        <tr><td><span class="id-pill">MK_MON_HY_00019</span></td><td><b>Bregalnica – Shtip (flow)</b></td><td>Hydrological</td><td>—</td><td><span class="id-pill">MK-VAR-RW-0201</span></td><td>HMS</td><td>Water Quality platform</td><td><span class="badge qa-pending"><i class="fas fa-question" style="margin-right:4px;"></i>Match proposed</span><div style="font-size:11px;color:#64748b;margin-top:3px;">UHMR station <b>#50</b> · Shtip · Bregalnica, same location; confirm with UHMR</div></td><td>2026-08-12 · bulk</td></tr>
+      </tbody></table></div>
+  </div>
+  <div class="tab-panel" data-panel-group="m" data-panel="res">
+    <div class="card-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <select class="filter-select"><option>MK_MON_SW_00431 · Vardar – Gradsko</option><option>MK_MON_GW_00112 · Polog P-12</option></select>
+        <select class="filter-select"><option>Nitrate (mg/l NO3)</option><option>Total phosphorus (mg/l)</option><option>Dissolved oxygen (mg/l)</option></select>
+        <select class="filter-select"><option>2020–2025</option><option>2015–2025</option></select>
+        <button class="btn btn-secondary btn-sm" onclick="wisToast('CSV downloaded (mockup)')"><i class="fas fa-download"></i>CSV</button>
+      </div>
+      <canvas id="resChart" height="90"></canvas>
+      <div class="meta-row" style="margin-top:10px;"><span><b>Values shown:</b> imported, QA/QC accepted</span><span><b>Source:</b> Water Quality platform (bulk import 2026-10-17)</span><span><b>Validation flag:</b> final</span></div>
+    </div>
+  </div>
+  <div class="tab-panel" data-panel-group="m" data-panel="imp">
+    <div class="table-container"><table class="data-table">
+      <thead><tr><th>Import</th><th>Dataset</th><th>Route</th><th>Rows</th><th>Unmatched station IDs</th><th>QA/QC</th></tr></thead>
+      <tbody>
+        <tr><td>2026-10-17</td><td>SW quality results 2025 <span style="font-size:11px;color:#64748b;">· UHMR export</span></td><td>Bulk template</td><td>1,248</td><td>3</td><td><span class="badge qa-pending">Pending</span></td></tr>
+        <tr><td>2026-09-30</td><td>GW levels 2025 Q1–Q3</td><td>Bulk template</td><td>2,310</td><td>0</td><td><span class="badge qa-accepted">Accepted</span></td></tr>
+        <tr><td>2026-09-30</td><td>GW chemistry – Polog campaign</td><td>Manual entry</td><td>86</td><td>0</td><td><span class="badge qa-accepted">Accepted</span></td></tr>
+      </tbody></table></div>
+    <div style="padding:0 20px 18px;"><a class="btn btn-primary btn-sm" href="../datasets/"><i class="fas fa-file-import"></i>New import in Datasets & Imports</a> <span class="phase-chip" style="margin-left:8px;">API link with the Water Quality platform: later phase</span></div>
+  </div>
+</div>
+
+  </main>
+</div>
+<script src="../../assets/shell.js?v=20261019p3"></script>
+<script>
+new Chart(document.getElementById('resChart'),{type:'line',data:{labels:['2020','2021','2022','2023','2024','2025'],
+datasets:[{label:'Annual mean NO3 (mg/l)',data:[8.1,7.6,9.2,8.4,7.9,8.8],borderColor:'#1a6b82',backgroundColor:'rgba(26,86,219,.08)',fill:true,tension:.3},
+{label:'Threshold (placeholder)',data:[25,25,25,25,25,25],borderColor:'#dc2626',borderDash:[5,5],pointRadius:0}]},
+options:{plugins:{legend:{labels:{font:{size:11}}}},scales:{y:{beginAtZero:true}}}});
+</script>
+</body>
+</html>

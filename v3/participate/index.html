@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Have your say — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../assets/wis.css?v=20261019p3">
+</head>
+<body data-base="../" data-active="participate" data-portal="public" data-scope="basin">
+<header id="pub-header"></header>
+<main class="pub-wrap">
+
+<!-- Art 14 WFD · consultation hub arranged as a river journey: source (timetable) → mouth (monitoring) -->
+<section class="rj-source">
+  <div class="rj-source-grid">
+    <div>
+      <div class="rj-eyebrow">Article 14 · public information and consultation</div>
+      <h1 class="rj-h1">Have your say on the Vardar River Basin Management Plan</h1>
+      <p class="rj-lead">The plan for <span class="cyc-period">2028–2033</span> is prepared in three consultation stages. Each stage is open for written comments for at least six months (Water Framework Directive, Article 14). Every comment gets a reference number, an outcome and a reason, published in the public log. Follow the plan downstream, from the first timetable to implementation and monitoring.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+        <a href="#journey" class="btn btn-primary" style="padding:9px 16px;font-size:13px;"><i class="fas fa-water"></i>Start at the source</a>
+        <button class="btn btn-secondary" style="padding:9px 14px;font-size:13px;" onclick="WIS.follow('rbd')"><i class="fas fa-bell"></i>Follow the consultation</button>
+        <a class="btn btn-secondary" style="padding:9px 14px;font-size:13px;" href="request/"><i class="fas fa-folder-open"></i>Request background documents</a>
+        <a class="btn btn-secondary" style="padding:9px 14px;font-size:13px;" href="../about/contacts/"><i class="fas fa-address-book"></i>Who is responsible</a>
+      </div>
+    </div>
+    <div class="card rj-here"><div class="card-body" id="rj-here"></div></div>
+  </div>
+  <div class="rj-stages" id="rj-stages"></div>
+</section>
+
+<section id="journey" class="rj-journey" aria-label="Phases of the river basin management plan">
+  <div class="rj-river" aria-hidden="true"><svg id="rj-svg" preserveAspectRatio="none"></svg></div>
+  <div id="rj-stations"></div>
+</section>
+
+<section id="documents" class="rj-delta">
+  <div class="rj-eyebrow">Delta · all documents of the cycle</div>
+  <h2 class="rj-h2">RBMP documents</h2>
+  <p class="rj-lead" style="margin-top:4px;">Each version keeps a permanent link, and every chapter can be commented on separately.</p>
+  <div id="rj-docfilter" style="display:flex;gap:6px;flex-wrap:wrap;margin:12px 0;"></div>
+  <div id="rj-docs" class="rj-docgrid"></div>
+</section>
+
+<section class="card" style="margin-top:22px;">
+  <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt" style="color:#2a8fa8;margin-right:6px;"></i>Meetings and events</h3><span style="font-size:11px;color:#94a3b8;">Organised by the competent authority for the basin</span></div>
+  <div class="table-container" data-demo="meetings or events"><table class="data-table"><thead><tr><th>Date</th><th>Event</th><th>Place</th><th>Material</th></tr></thead><tbody>
+    <tr><td>2026-11-12</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Shtip</td><td><a href="#" style="color:#1a6b82;">Agenda</a></td></tr>
+    <tr><td>2026-10-22</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Veles</td><td><a href="#" style="color:#1a6b82;">Agenda</a></td></tr>
+    <tr><td>2026-09-24</td><td><b>River Basin Council session</b></td><td>Skopje</td><td><a href="#" style="color:#1a6b82;">Minutes</a> · <a href="#" style="color:#1a6b82;">Presentation</a></td></tr>
+    <tr><td>2026-03-05</td><td><b>Stakeholder workshop – significant issues</b> (stage 2)</td><td>Kumanovo</td><td><a href="#" style="color:#1a6b82;">Minutes</a></td></tr>
+  </tbody></table></div>
+</section>
+
+<section class="rj-mouth">
+  <div class="rj-eyebrow" style="color:#5EEAD4;">River mouth · where your voice arrives</div>
+  <h2 class="rj-h2" style="color:#fff;">Take part and follow what happens</h2>
+  <div class="rj-mouth-grid">
+    <a href="../explore/map/" class="rj-mcard"><i class="fas fa-map-marker-alt"></i><b>Comment on the map</b><span>Click a river, lake, aquifer or any point and choose "Comment here"</span></a>
+    <a href="my-comments/" class="rj-mcard"><i class="fas fa-inbox"></i><b>My comments</b><span>Status and outcome of what you submitted</span></a>
+    <a href="log/" class="rj-mcard"><i class="fas fa-list-alt"></i><b>Public log</b><span>All comments, how they were taken into account, and the consultation reports</span></a>
+  </div>
+</section>
+
+</main>
+<footer id="pub-footer"></footer>
+<script src="../assets/shell.js?v=20261019p3"></script>
+<script src="../assets/participation.js?v=20261019p3"></script>
+<script>
+(function () {
+  const SC = { Open: 'qa-accepted', Closed: 'badge-inactive', Upcoming: 'badge-active', 'Not started': 'badge-inactive', 'Not published': 'badge-inactive', Ongoing: 'badge-active', Planned: 'badge-inactive' };
+  const ICON = { TWP: 'fa-calendar-check', SWMI: 'fa-exclamation-circle', RBMP: 'fa-book', POM: 'fa-tasks', SEA: 'fa-leaf' };
+  const R = WIS.RBD, all = WIS.comments();
+  document.querySelectorAll('.cyc-period').forEach(e => e.textContent = WIS.cycle.period);
+  const dates = s => s.opens ? `${WIS.fmt(s.opens)} – ${WIS.fmt(s.closes)} · ${s.months} months` : `Legal deadline ${WIS.fmt(s.legal)} · dates to be set`;
+  const cnt = n => all.filter(c => c.stage === n).length;
+
+  /* "You are here" */
+  const cur = WIS.STAGES.find(s => s.state === 'Open') || WIS.STAGES.find(s => s.state === 'Upcoming');
+  document.getElementById('rj-here').innerHTML = `<div class="rj-eyebrow" style="color:#2a8fa8;">You are here</div>
+    <div class="rj-here-t">${cur ? 'Phase ' + cur.n + ' · ' + cur.title : 'No consultation open'}</div>
+    <div style="font-size:12.5px;color:#64748b;">${cur ? (cur.state === 'Open' ? 'Open for comments · closes ' + WIS.fmt(cur.closes) : 'Opens ' + WIS.fmt(cur.opens)) : R.label + ' · ' + WIS.cycle.label}</div>
+    <div class="rj-here-k"><div><b>${cur && cur.state === 'Open' ? cur.daysLeft : '—'}</b><span>days left</span></div><div><b>${all.length}</b><span>comments</span></div><div><b>${Object.keys(WIS.DOCS).length}</b><span>documents</span></div></div>`;
+
+  /* Art 14 three-stage strip */
+  document.getElementById('rj-stages').innerHTML = WIS.STAGES.map(s => `<a href="#st${s.n}" class="rj-stage ${s.state === 'Open' ? 'on' : ''}">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><span class="rj-mini">Stage ${s.n} · ${s.art}</span><span class="badge ${SC[s.state]}">${s.state}</span></div>
+    <b>${s.title}</b><span class="rj-mini">${dates(s)}</span>
+    <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:${s.state === 'Closed' ? 100 : s.state === 'Open' ? Math.round(100 * (1 - s.daysLeft / (s.months * 30.44))) : 0}%;"></div></div></a>`).join('');
+
+  /* Phases: the three Art 14 stages, then implementation (Art 11) and monitoring (Art 8) */
+  const docRow = k => { const d = WIS.DOCS[k]; return `<a class="rj-doc" href="document/?d=${k}"><span class="rj-doc-ic"><i class="fas ${ICON[k] || 'fa-file-alt'}"></i></span><span style="min-width:0;"><b>${d.title}</b><span class="rj-mini">${d.id} · ${d.ver} · ${d.pages} pages</span></span></a>`; };
+  const ST = WIS.STAGES.map(s => ({ n: s.n, id: 'st' + s.n, title: s.title, art: s.art + ' WFD', date: dates(s), state: s.state, lead: s.lead, km: ['source', 'upper reach', 'middle reach'][s.n - 1],
+    docs: s.docs.length ? s.docs.map(docRow).join('') : '<div class="empty-state" style="margin:0;"><i class="fas fa-inbox"></i><div>No documents published yet for this stage.</div></div>',
+    count: cnt(s.n), open: s.state === 'Open',
+    actions: `<a href="stage/?s=${s.n}" class="btn ${s.state === 'Open' ? 'btn-secondary' : 'btn-primary'} btn-sm">${s.state === 'Open' ? 'Read the stage' : 'View documents and outcomes'}</a>${s.state === 'Open' ? `<button class="btn btn-primary btn-sm" onclick="WIS.openComment(null,${s.n})"><i class="fas fa-comment-dots"></i>Comment here</button>` : ''}`,
+    log: true }));
+  ST.push({ n: 4, id: 'st4', title: 'Implementation · Programme of Measures', art: 'Art. 11 · Art. 15(3) WFD', date: 'After adoption of the plan · interim report after 3 years', state: 'Planned', km: 'lower reach',
+    lead: 'Measures by key type, who carries them out, and how far they have come. Implementation tracking is foreseen in a later phase.',
+    docs: `<a class="rj-doc" href="../explore/dashboards/"><span class="rj-doc-ic"><i class="fas fa-tasks"></i></span><span><b>Draft Programme of Measures register</b><span class="rj-mini">${WIS.MEASURES.length} measures on the map · dashboard "Measures"</span></span></a>`,
+    count: null, actions: `<a href="../explore/dashboards/" class="btn btn-secondary btn-sm">Measures dashboard</a><a href="../explore/map/" class="btn btn-secondary btn-sm">Measures on the map</a>` });
+  ST.push({ n: 5, id: 'st5', title: 'Monitoring and status', art: 'Art. 8 · Annex V WFD', date: 'Continuous · results imported yearly', state: 'Ongoing', km: 'mouth',
+    lead: 'Monitoring of rivers, lakes and groundwater, the status of each water body, and whether the measures work.',
+    docs: `<a class="rj-doc" href="../explore/"><span class="rj-doc-ic"><i class="fas fa-water"></i></span><span><b>Water bodies and status</b><span class="rj-mini">${WIS.WBS.length} water bodies · fact sheets</span></span></a><a class="rj-doc" href="../explore/dashboards/"><span class="rj-doc-ic"><i class="fas fa-satellite-dish"></i></span><span><b>Monitoring results</b><span class="rj-mini">${WIS.SITES.length} monitoring sites · dashboard "Monitoring"</span></span></a>`,
+    count: null, actions: `<a href="../explore/" class="btn btn-secondary btn-sm">Water bodies</a><a href="../explore/dashboards/" class="btn btn-secondary btn-sm">Monitoring dashboard</a>` });
+
+  const host = document.getElementById('rj-stations');
+  host.innerHTML = ST.map(s => {
+    const cs = s.log ? all.filter(c => c.stage === s.n) : [], by = k => cs.filter(c => c.outcome === k).length, tot = Math.max(1, cs.filter(c => c.outcome).length);
+    return `<article class="rj-station" id="${s.id}" data-n="${s.n}">
+      <div class="rj-node" aria-hidden="true">${s.n}</div><div class="rj-km">${s.km}</div>
+      <div class="card"><div class="card-body" style="padding:20px 22px;">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;"><span class="rj-mini" style="font-weight:700;color:#2a8fa8;text-transform:uppercase;letter-spacing:.08em;">Phase ${s.n} · ${s.art}</span><span class="badge ${SC[s.state]}">${s.state}</span><span class="rj-mini" style="margin-left:auto;">${s.date}</span></div>
+        <h3 class="rj-h3">${s.title}</h3>
+        <p style="font-size:13.5px;color:#4B5563;margin:4px 0 0;">${s.lead}</p>
+        <div class="rj-docs2">${s.docs}</div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px;">
+          ${s.count !== null ? `<span style="font-size:13px;font-weight:700;color:#0d4a5e;"><i class="fas fa-comment" style="color:#2a8fa8;"></i> ${s.count} comments</span>` : ''}
+          <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">${s.log ? `<button class="btn btn-secondary btn-sm" data-toggle="${s.id}" aria-expanded="false">Open phase</button>` : ''}${s.actions}</span>
+        </div>
+        ${s.log ? `<div class="rj-details" id="${s.id}-d"><div>
+          <div class="rj-dgrid">
+            <div><div class="rj-mini" style="font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Recent comments</div>
+              ${cs.slice(-3).reverse().map(c => `<div class="rj-com"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><a href="log/#${c.id}" class="id-pill">${c.id}</a>${WIS.statusBadge(c)}</div><div class="rj-mini" style="margin-top:4px;"><i class="fas ${WIS.targetIcon(c.target)}"></i> ${WIS.targetLabel(c.target)}</div><div style="font-size:12.5px;margin-top:4px;">${c.text}</div></div>`).join('') || '<div class="rj-mini" style="margin-top:6px;">No comments yet.</div>'}</div>
+            <div><div class="rj-mini" style="font-weight:700;text-transform:uppercase;letter-spacing:.06em;">How comments were used</div>
+              ${[['Incorporated', '#16A34A'], ['Partly incorporated', '#D97706'], ['Not incorporated', '#DC2626'], ['Out of scope', '#94A3B8']].map(([k, col]) => `<div class="rj-bar"><span>${k}</span><span class="rj-bar-t"><i style="width:${100 * by(k) / tot}%;background:${col};"></i></span><b>${by(k)}</b></div>`).join('')}
+              <div class="rj-mini" style="margin-top:6px;">${cs.filter(c => !c.outcome).length} still being assessed</div>
+              <a href="log/?stage=${s.n}" class="btn btn-secondary btn-sm" style="margin-top:10px;">Public log of stage ${s.n}</a></div>
+          </div></div></div>` : ''}
+      </div></div></article>`; }).join('');
+  host.addEventListener('click', e => { const t = e.target.closest('[data-toggle]'); if (!t) return; const d = document.getElementById(t.dataset.toggle + '-d'), o = d.classList.toggle('open'); t.setAttribute('aria-expanded', o); t.textContent = o ? 'Close phase' : 'Open phase'; });
+
+  /* the river: widens and deepens downstream */
+  const svg = document.getElementById('rj-svg');
+  function draw() {
+    const col = svg.parentElement, W = col.clientWidth, H = col.clientHeight; if (!H || !W) return;
+    const cx = W / 2, L = [], Rr = [], C = [];
+    for (let y = 0; y <= H; y += 12) { const t = y / H, x = cx + Math.sin(y / 140) * (W * 0.18) * (0.6 + t * 0.4), w = 6 + t * (W * 0.42); L.push([x - w / 2, y]); Rr.push([x + w / 2, y]); C.push([x, y]); }
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.innerHTML = `<defs><linearGradient id="rjg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BAE6FD"/><stop offset=".45" stop-color="#1a6b82"/><stop offset="1" stop-color="#0d4a5e"/></linearGradient></defs>
+      <polygon points="${L.concat(Rr.reverse()).map(p => p.join(',')).join(' ')}" fill="url(#rjg)" stroke="#2a8fa8" stroke-opacity=".35" stroke-width="2"/>
+      <path class="rj-flow" d="M${C.map(p => p.join(',')).join(' L')}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 24"/>`;
+  }
+  draw(); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw); new ResizeObserver(draw).observe(host);
+
+  /* follow the reader */
+  const here = n => document.querySelectorAll('.rj-station').forEach(x => x.classList.toggle('here', +x.dataset.n === n));
+  here(cur ? cur.n : 1);
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) here(+e.target.dataset.n); }), { rootMargin: '-45% 0px -45% 0px' });
+  document.querySelectorAll('.rj-station').forEach(x => io.observe(x));
+
+  /* documents with stage filter */
+  const keys = Object.keys(WIS.DOCS), df = document.getElementById('rj-docfilter'), dg = document.getElementById('rj-docs');
+  df.innerHTML = ['All', 'Stage 1', 'Stage 2', 'Stage 3'].map((l, i) => `<button class="basin-tab ${i ? '' : 'on'}" data-f="${i}">${l}</button>`).join('');
+  function docs(f) { const ks = keys.filter(k => !f || WIS.DOCS[k].stage === f);
+    dg.innerHTML = ks.length ? ks.map(k => { const d = WIS.DOCS[k]; return `<div class="card rj-dcard"><span class="rj-doc-ic" style="width:42px;height:52px;"><i class="fas ${ICON[k] || 'fa-file-alt'}"></i></span><div style="min-width:0;flex:1;"><b style="color:#0d4a5e;">${d.title}</b><div class="rj-mini" style="margin-top:2px;">${d.id} · ${d.ver} · stage ${d.stage} · ${WIS.fmt(d.date)}</div><div style="display:flex;gap:6px;margin-top:10px;"><a class="btn btn-secondary btn-sm" href="document/?d=${k}">Read</a><button class="btn btn-secondary btn-sm" onclick="wisToast('PDF downloaded (mockup)')"><i class="fas fa-file-pdf"></i>PDF</button></div></div></div>`; }).join('')
+      : '<div class="empty-state" style="grid-column:1/-1;margin:0;"><i class="fas fa-inbox"></i><div>No documents published yet for this basin and cycle.</div></div>'; }
+  df.addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; df.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); docs(+b.dataset.f); });
+  docs(0);
+  window.onCommentAdded = () => location.reload();
+})();
+</script>
+</body>
+</html>

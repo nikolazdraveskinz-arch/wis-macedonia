@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Participation — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019p3">
+</head>
+<body data-base="../../" data-active="participation" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-users" style="color:#1a6b82; font-size:16px; margin-right:8px;"></i>Public Participation</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+<div class="phase-banner" style=""><i class="fas fa-users"></i><div><b>ToR Task 7 + Article 14.</b> Manage the three consultation stages per RBMP cycle, process every comment to an outcome with a reason, and generate the consultation report (Annex VII A.9). Comments submitted on the public portal in this browser appear here; outcomes you record appear in the public log and in the commenter's "My comments".</div></div>
+
+<div class="card">
+  <div style="padding:0 20px;"><div class="tab-nav">
+    <button class="tab-btn active" data-tab-group="p" data-tab="st" onclick="switchTab('p','st')"><i class="fas fa-flag" style="margin-right:5px;"></i>Consultation stages</button>
+    <button class="tab-btn" data-tab-group="p" data-tab="tr" onclick="switchTab('p','tr')"><i class="fas fa-inbox" style="margin-right:5px;"></i>Comment triage <span class="nav-badge" id="tr-n" style="margin-left:4px;"></span></button>
+    <button class="tab-btn" data-tab-group="p" data-tab="rp" onclick="switchTab('p','rp')"><i class="fas fa-file-alt" style="margin-right:5px;"></i>Consultation report</button>
+    <button class="tab-btn" data-tab-group="p" data-tab="nt" onclick="switchTab('p','nt')"><i class="fas fa-bell" style="margin-right:5px;"></i>Notifications</button>
+  </div></div>
+
+  <div class="tab-panel active" data-panel-group="p" data-panel="st"><div class="card-body">
+    <div class="table-container"><table class="data-table"><thead><tr><th>Stage</th><th>Document(s)</th><th>Legal deadline</th><th>Published</th><th>Comments close</th><th>Duration</th><th>Checks</th><th>Status</th><th></th></tr></thead><tbody id="st-rows"></tbody></table></div>
+    <div class="card" id="st-edit" style="margin-top:16px;display:none;"></div>
+    <p style="font-size:11.5px;color:#94a3b8;">Legal deadlines are computed from the start of the plan period (1 Jan 2028): 3, 2 and 1 years before for stages 1, 2 and 3 (Art. 14(1)). Closing dates earlier than 6 months after opening are refused (Art. 14(2)).</p>
+  </div></div>
+
+  <div class="tab-panel" data-panel-group="p" data-panel="tr">
+    <div class="filter-bar">
+      <select class="filter-select" id="tf-s"><option value="">All stages</option><option value="1">Stage 1</option><option value="2">Stage 2</option><option value="3">Stage 3</option></select>
+      <select class="filter-select" id="tf-o"><option value="open">To process</option><option value="">All</option><option value="done">With outcome</option></select>
+      <span style="font-size:11.5px;color:#64748b;">Response target: 30 working days</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:0;">
+      <div class="table-container" style="border-right:1px solid #f1f5f9;"><table class="data-table"><thead><tr><th>Ref.</th><th>About</th><th>From</th><th>Status</th></tr></thead><tbody id="tr-rows"></tbody></table></div>
+      <div id="tr-form" class="card-body" style="font-size:12.5px;color:#64748b;">Select a comment to assess it.</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" data-panel-group="p" data-panel="rp"><div class="card-body" id="rp"></div></div>
+
+  <div class="tab-panel" data-panel-group="p" data-panel="nt"><div class="card-body">
+    <p style="font-size:12.5px;color:#475569;margin-top:0;">Uses the existing GWDMS notifications module (action alerts, e-mail to users and groups, user-defined notifications).</p>
+    <div class="table-container"><table class="data-table"><thead><tr><th>Event</th><th>Recipients</th><th>Channel</th><th>Active</th></tr></thead><tbody>
+      <tr><td>Stage opens for comments</td><td>All registered users, subscribers of the RBD</td><td>E-mail + portal</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>30 days before a stage closes</td><td>All registered users</td><td>E-mail</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>New comment received</td><td>Assigned officer, participation coordinator</td><td>Portal</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>Comment not assessed after 20 working days</td><td>Assigned officer + supervisor</td><td>E-mail + portal</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>Outcome published</td><td>The commenter</td><td>E-mail</td><td><input type="checkbox" checked></td></tr>
+      <tr><td>Consultation report published</td><td>All commenters of the stage</td><td>E-mail</td><td><input type="checkbox" checked></td></tr>
+    </tbody></table></div>
+  </div></div>
+</div>
+
+  </main>
+</div>
+<script src="../../assets/shell.js?v=20261019p3"></script>
+<script src="../../assets/participation.js?v=20261019p3"></script>
+<script>
+const SC={Open:'qa-accepted',Closed:'badge-inactive',Upcoming:'badge-active','Not started':'badge-inactive','Not published':'badge-inactive'};
+function stRows(){document.getElementById('st-rows').innerHTML=WIS.STAGES.map(s=>`<tr><td><b>${s.n}. ${s.title}</b><div style="font-size:11px;color:#94a3b8;">${s.art}</div></td><td style="font-size:12px;">${s.docs.map(k=>'<span class="id-pill">'+WIS.DOCS[k].id+'</span>').join('<br>')}</td><td>${WIS.fmt(s.legal)}</td><td>${WIS.fmt(s.opens)}</td><td>${WIS.fmt(s.closes)}</td><td>${s.months} months</td>
+ <td style="font-size:11.5px;">${s.sixOk?'<i class="fas fa-check" style="color:#059669;"></i> ≥ 6 months':'<i class="fas fa-times" style="color:#dc2626;"></i> < 6 months'}<br>${s.onTime?'<i class="fas fa-check" style="color:#059669;"></i> on time':'<i class="fas fa-exclamation-triangle" style="color:#d97706;"></i> after legal deadline'}</td><td><span class="badge ${SC[s.state]}">${s.state}</span></td><td><button class="btn btn-secondary btn-sm" onclick="edit(${s.n})">Edit</button></td></tr>`).join('');}
+function edit(n){const s=WIS.STAGES.find(x=>x.n===n),e=document.getElementById('st-edit');e.style.display='block';
+ e.innerHTML=`<div class="card-header"><h3 class="card-title">Edit stage ${n} · ${s.title}</h3></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+ <div><label class="form-label">Comments open</label><input type="date" class="form-input" id="e-o" value="${s.opens}"></div>
+ <div><label class="form-label">Comments close</label><input type="date" class="form-input" id="e-c" value="${s.closes}"><div class="form-hint" id="e-h"></div></div>
+ <div><label class="form-label">Legal deadline for publication</label><input class="form-input" value="${WIS.fmt(s.legal)}" disabled></div>
+ <div style="grid-column:span 3;display:flex;gap:8px;"><button class="btn btn-primary" id="e-save">Save</button><button class="btn btn-secondary" onclick="this.closest('#st-edit').style.display='none'">Cancel</button></div></div>`;
+ const chk=()=>{const o=new Date(document.getElementById('e-o').value),c=new Date(document.getElementById('e-c').value),min=WIS.addMonths(o,6),h=document.getElementById('e-h'),b=document.getElementById('e-save');
+  if(c<min){h.innerHTML=`<span style="color:#dc2626;font-weight:600;">Closing date must be at least 6 months after opening (WFD Art. 14(2)). Earliest allowed: ${WIS.fmt(min)}.</span>`;b.disabled=true;b.style.opacity=.5;}
+  else{h.innerHTML=`<span style="color:#059669;">${Math.round((c-o)/(864e5*30.44))} months – meets the 6-month minimum.</span>`;b.disabled=false;b.style.opacity=1;}};
+ ['e-o','e-c'].forEach(i=>document.getElementById(i).oninput=chk); chk();
+ document.getElementById('e-save').onclick=()=>wisToast('Stage dates saved; subscribers notified (mockup)');}
+function trRows(){const s=document.getElementById('tf-s').value,o=document.getElementById('tf-o').value;
+ const cs=WIS.comments().filter(c=>(!s||c.stage==s)&&(o===''||(o==='open'?!c.outcome:!!c.outcome))).sort((a,b)=>b.date.localeCompare(a.date));
+ document.getElementById('tr-n').textContent=WIS.comments().filter(c=>!c.outcome).length;
+ document.getElementById('tr-rows').innerHTML=cs.map(c=>`<tr style="cursor:pointer;" onclick="assess('${c.id}')"><td><span class="id-pill">${c.id}</span>${c.mine?' <span class="nav-new">NEW</span>':''}<div style="font-size:11px;color:#94a3b8;">${WIS.fmt(c.date)} · stage ${c.stage}</div></td><td style="font-size:12px;"><i class="fas ${WIS.targetIcon(c.target)}"></i> ${WIS.targetLabel(c.target)}</td><td style="font-size:12px;">${c.org||c.who}</td><td>${WIS.statusBadge(c)}</td></tr>`).join('')||'<tr><td colspan="4" style="color:#94a3b8;">Nothing to process.</td></tr>';}
+function assess(id){const c=WIS.comments().find(x=>x.id===id),f=document.getElementById('tr-form');
+ const links=Object.keys(WIS.DOCS).map(k=>WIS.DOCS[k].sections.map(s=>`<option>${WIS.DOCS[k].id} §${s[0]} ${s[1]}</option>`).join('')).join('')+WIS.MEASURES.map(m=>`<option>${m.id} · ${m.name}</option>`).join('');
+ f.innerHTML=`<div style="color:#0f172a;"><span class="id-pill">${c.id}</span> ${WIS.statusBadge(c)}</div>
+ <p style="font-size:13px;color:#334155;margin:8px 0;">"${c.text}"</p>
+ <div class="meta-row" style="margin-bottom:10px;"><span><b>From:</b> ${c.org||'—'} (${c.who})</span><span><b>About:</b> ${WIS.targetLabel(c.target)}</span></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+  <div><label class="form-label">Assigned to</label><select class="form-input"><option>Water Dept. – planning officer</option><option>Subproject 1 expert</option><option>Subproject 2 expert</option><option>Subproject 3 expert</option></select></div>
+  <div><label class="form-label">Status</label><select class="form-input" id="a-s">${['Received','Under review','Reviewed'].map(x=>`<option ${x===c.status?'selected':''}>${x}</option>`).join('')}</select></div>
+  <div><label class="form-label">Outcome</label><select class="form-input" id="a-o"><option value="">— not decided —</option>${['Incorporated','Partly incorporated','Not incorporated','Out of scope'].map(x=>`<option ${x===c.outcome?'selected':''}>${x}</option>`).join('')}</select></div>
+  <div><label class="form-label">Changed section or measure</label><select class="form-input" id="a-l"><option value="">—</option>${links}</select></div>
+ </div>
+ <label class="form-label" style="margin-top:10px;">Reason (published) *</label><textarea class="form-input" id="a-r" rows="3">${c.reason||''}</textarea>
+ <div class="form-hint" id="a-h">A reason is required for every outcome; a changed section or measure is required for "Incorporated" and "Partly incorporated".</div>
+ <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" onclick="saveA('${c.id}')"><i class="fas fa-check"></i>Save and publish</button><a class="btn btn-secondary" href="../../participate/log/#${c.id}" target="_blank">View in public log</a></div>`;}
+function saveA(id){const o=document.getElementById('a-o').value,r=document.getElementById('a-r').value.trim(),l=document.getElementById('a-l').value,s=document.getElementById('a-s').value,h=document.getElementById('a-h');
+ if(o&&!r){h.innerHTML='<span style="color:#dc2626;font-weight:600;">Add the reason before publishing an outcome.</span>';return;}
+ if((o==='Incorporated'||o==='Partly incorporated')&&!l){h.innerHTML='<span style="color:#dc2626;font-weight:600;">Select the section or measure that changed.</span>';return;}
+ WIS.editComment(id,{status:o?'Reviewed':s,outcome:o,reason:r,change:l});wisToast(id+': '+(o?'outcome published; commenter notified by e-mail':'status updated')+' (mockup)');trRows();assess(id);rpt();}
+function rpt(){const all=WIS.comments();const st=WIS.STAGES;
+ const row=n=>{const cs=all.filter(c=>c.stage===n),k=x=>cs.filter(c=>c.outcome===x).length;return `<tr><td><b>Stage ${n}</b></td><td>${cs.length}</td><td>${new Set(cs.map(c=>c.who)).size}</td><td>${k('Incorporated')}</td><td>${k('Partly incorporated')}</td><td>${k('Not incorporated')}</td><td>${k('Out of scope')}</td><td>${cs.filter(c=>!c.outcome).length}</td></tr>`;};
+ const groups=[...new Set(all.map(c=>c.who))].map(g=>`<tr><td>${g}</td><td>${all.filter(c=>c.who===g).length}</td></tr>`).join('');
+ const changed=all.filter(c=>c.change).map(c=>`<li><span class="id-pill">${c.id}</span> → ${c.change}</li>`).join('');
+ document.getElementById('rp').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;"><div><b style="font-size:15px;color:#0f172a;">Summary of public information and consultation – Vardar RBD, RBMP 2028–2033</b><div style="font-size:11.5px;color:#64748b;">Generated from the consultation records · becomes RBMP chapter 9 (WFD Annex VII A.9)</div></div>
+ <div style="display:flex;gap:6px;"><button class="btn btn-secondary btn-sm" onclick="wisToast('DOCX exported (mockup)')"><i class="fas fa-file-word"></i>DOCX</button><button class="btn btn-secondary btn-sm" onclick="wisToast('CSV exported (mockup)')"><i class="fas fa-file-csv"></i>CSV</button></div></div>
+ <div class="form-label" style="margin-top:14px;">1. Consultation measures</div>
+ <ul style="font-size:12.5px;color:#475569;margin:4px 0 0 18px;line-height:1.7;">${st.map(s=>`<li>Stage ${s.n} (${s.title}): published ${WIS.fmt(s.opens)}, written comments until ${WIS.fmt(s.closes)} (${s.months} months); portal, e-mail, post and public hearings.</li>`).join('')}</ul>
+ <div class="form-label" style="margin-top:14px;">2. Comments received and their results</div>
+ <div class="table-container"><table class="data-table"><thead><tr><th>Stage</th><th>Comments</th><th>Groups</th><th>Incorporated</th><th>Partly</th><th>Not incorporated</th><th>Out of scope</th><th>Pending</th></tr></thead><tbody>${[1,2,3].map(row).join('')}</tbody></table></div>
+ <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-top:14px;"><div><div class="form-label">3. Who took part</div><table class="data-table"><tbody>${groups}</tbody></table></div>
+ <div><div class="form-label">4. Changes made to the plan as a result</div><ul style="font-size:12.5px;color:#475569;margin:4px 0 0 18px;line-height:1.8;">${changed||'<li>None yet</li>'}</ul></div></div>`;}
+['tf-s','tf-o'].forEach(i=>document.getElementById(i).onchange=trRows);
+stRows();trRows();rpt();
+</script>
+</body>
+</html>

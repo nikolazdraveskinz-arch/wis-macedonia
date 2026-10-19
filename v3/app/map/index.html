@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map Viewer — NWIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019p3">
+</head>
+<body data-base="../../" data-active="map" data-portal="internal">
+<aside id="wis-sidebar"></aside>
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="page-title-wrap">
+      <h1><i class="fas fa-map" style="color:#1a6b82; font-size:16px; margin-right:8px;"></i>Map Viewer</h1>
+      <div class="breadcrumb">Republic of North Macedonia · Ministry of Environment and Physical Planning</div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="header-btn notification-dot" title="Notifications"><i class="fas fa-bell"></i></button>
+      <button class="header-btn" title="Help"><i class="fas fa-question-circle"></i><span>Help</span></button>
+    </div>
+  </header>
+  <main class="content-area">
+
+<div class="map-stage map-stage-internal" id="map-stage">
+  <div id="wmap"></div>
+  <aside class="card map-panel map-panel-left" aria-label="Search and layers"><div class="card-body" style="padding:12px 14px;">
+    <div class="search-wrap" style="margin-bottom:6px;"><i class="fas fa-search"></i><input id="msearch" class="search-input" style="width:100%;" placeholder="Place, water-body ID or lat, lon"></div>
+    <div class="form-hint">Press Enter. Try a town, a water-body ID (e.g. <b>MK-VAR-RW-0014</b>) or <b>41.7, 21.8</b></div>
+    <div id="mlayers"></div>
+    <div class="form-label" style="margin:12px 0 4px;color:#64748b;text-transform:uppercase;font-size:10px;letter-spacing:.8px;">Ecological status</div>
+    <div style="font-size:11.5px;line-height:1.9;"><span style="color:#059669;">━</span> Good · <span style="color:#d97706;">━</span> Moderate · <span style="color:#dc2626;">━</span> Poor · <span style="color:#7c3aed;">▭</span> Groundwater</div>
+  </div></aside>
+  <aside class="card map-panel map-panel-right" aria-label="Feature information"><div class="card-header"><h3 class="card-title">Feature information</h3></div>
+    <div class="card-body" id="minfo" style="font-size:12.5px;color:#64748b;">Click a water body, site, pressure, measure or comment on the map.
+    <div class="alert alert-info" style="margin-top:12px;"><i class="fas fa-user-shield"></i><div>Layers and attributes follow your role. Internal and restricted layers are hidden on the public map; the attribute table shows each feature's source dataset and access level, and CSV exports include full attributes for technical users.</div></div>
+    </div></aside>
+</div>
+
+  </main>
+</div>
+<script src="../../assets/shell.js?v=20261019p3"></script>
+<script src="../../assets/participation.js?v=20261019p3"></script>
+<script src="../../assets/map.js?v=20261019p3"></script>
+<script src="../../assets/map-tools.js?v=20261019p3"></script>
+<script>WIS.mapObj = initWisMap({mode:'internal', el:'wmap', info:'minfo', layers:'mlayers', search:'msearch'});
+/* staff set: the public tools minus the presentation aids (overview map, graticule) */
+WIS.mapTools = initWisMapTools(WIS.mapObj, { stage: 'map-stage', idle: 'Click a water body, site, pressure, measure or comment on the map.',
+  tools: ['identify','zrect','home','zsel','prev','next','idpoly','search','clearsel','dist','area','clearmeas','table','print','set'] });
+(function () { /* "Hide panels" sits at the right end of the toolbar */
+  var st = document.getElementById('map-stage'), b = document.createElement('button');
+  b.type = 'button'; b.className = 'map-toggle mtb-toggle'; b.setAttribute('aria-pressed', 'false'); b.title = 'Show or hide the side panels';
+  b.innerHTML = '<i class="fas fa-columns"></i><span>Hide panels</span>';
+  b.onclick = function () { var off = st.classList.toggle('panels-off'); b.setAttribute('aria-pressed', off); b.querySelector('span').textContent = off ? 'Show panels' : 'Hide panels'; };
+  st.querySelector('.mtb').appendChild(b);
+})();</script>
+</body>
+</html>
