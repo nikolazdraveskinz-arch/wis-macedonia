@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019b">
 </head>
 <body data-base="../../" data-active="participation" data-portal="internal">
 <aside id="wis-sidebar"></aside>
@@ -73,8 +73,8 @@
 
   </main>
 </div>
-<script src="../../assets/shell.js"></script>
-<script src="../../assets/participation.js"></script>
+<script src="../../assets/shell.js?v=20261019b"></script>
+<script src="../../assets/participation.js?v=20261019b"></script>
 <script>
 const SC={Open:'qa-accepted',Closed:'badge-inactive',Upcoming:'badge-active','Not started':'badge-inactive','Not published':'badge-inactive'};
 function stRows(){document.getElementById('st-rows').innerHTML=WIS.STAGES.map(s=>`<tr><td><b>${s.n}. ${s.title}</b><div style="font-size:11px;color:#94a3b8;">${s.art}</div></td><td style="font-size:12px;">${s.docs.map(k=>'<span class="id-pill">'+WIS.DOCS[k].id+'</span>').join('<br>')}</td><td>${WIS.fmt(s.legal)}</td><td>${WIS.fmt(s.opens)}</td><td>${WIS.fmt(s.closes)}</td><td>${s.months} months</td>
