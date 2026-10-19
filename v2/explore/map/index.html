@@ -11,13 +11,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019c">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261019d">
 </head>
 <body data-base="../../" data-active="map" data-portal="public" data-scope="basin">
 <header id="pub-header"></header>
 <main class="pub-wrap">
-<h1 style="font-size:20px;font-weight:800;color:#0d4a5e;margin:0 0 10px;">Map of the Vardar River Basin</h1>
-<div class="map-layout" style="display:grid;grid-template-columns:250px 1fr 300px;gap:14px;height:calc(100vh - 180px);min-height:560px;">
+<section class="dark-band">
+<h1 class="dark-band-h1" style="margin-bottom:16px;">Map of the Vardar River Basin</h1>
+<div class="map-layout" style="display:grid;grid-template-columns:250px 1fr 300px;gap:14px;height:calc(100vh - 240px);min-height:560px;">
   <div class="card" style="overflow:auto;"><div class="card-body" style="padding:12px 14px;">
     <div class="search-wrap" style="margin-bottom:6px;"><i class="fas fa-search"></i><input id="msearch" class="search-input" style="width:100%;" placeholder="Place, water-body ID or lat, lon"></div>
     <div class="form-hint">Press Enter. Try a town, a water-body ID (e.g. <b>MK-VAR-RW-0014</b>) or <b>41.7, 21.8</b></div>
@@ -31,12 +32,13 @@
     
     </div></div>
 </div>
+</section>
 
 </main>
 <footer id="pub-footer"></footer>
-<script src="../../assets/shell.js?v=20261019c"></script>
-<script src="../../assets/participation.js?v=20261019c"></script>
-<script src="../../assets/map.js?v=20261019c"></script>
+<script src="../../assets/shell.js?v=20261019d"></script>
+<script src="../../assets/participation.js?v=20261019d"></script>
+<script src="../../assets/map.js?v=20261019d"></script>
 <script>WIS.mapObj = initWisMap({mode:'public', el:'wmap', info:'minfo', layers:'mlayers', search:'msearch'});</script>
 </body>
 </html>
