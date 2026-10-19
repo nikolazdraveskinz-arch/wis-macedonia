@@ -166,7 +166,7 @@
         <p style="margin:0;">Reading is open to everyone. To comment, follow a consultation and track your comments, sign in or create a free account. You can also send comments by e-mail or post; they are registered in the same log.</p>
         <a class="btn btn-primary" style="justify-content:center;padding:9px;" href="${W.base}login/?next=${encodeURIComponent(location.pathname + location.search)}"><i class="fas fa-sign-in-alt"></i>Sign in</a>
         <a class="btn btn-secondary" style="justify-content:center;padding:9px;" href="${W.base}register/"><i class="fas fa-user-plus"></i>Create an account</a>
-        <button class="btn btn-secondary" style="justify-content:center;padding:9px;" id="gate-demo"><i class="fas fa-flask"></i>Mockup: continue as demo user (Ana P.)</button>
+        <button class="btn btn-secondary" style="justify-content:center;padding:9px;" id="gate-demo"><i class="fas fa-flask"></i>Mockup: continue as demo user (Nikola Z.)</button>
       </div></div>`);
     m.querySelector('#gate-demo').onclick = () => { try { localStorage.setItem('wis.signedIn', '1'); } catch (e) {} m.remove(); after(); };
   }
@@ -207,7 +207,7 @@
         <div><label class="form-label">Comment *</label><textarea class="form-input" id="cm-text" rows="5" placeholder="What should change, and why?"></textarea></div>
         <div><label class="form-label">Attachment (optional)</label><input class="form-input" type="file"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div><label class="form-label">Signed in as</label><div class="form-input" style="background:#f8fafc;">Ana P. · Citizen</div></div>
+          <div><label class="form-label">Signed in as</label><div class="form-input" style="background:#f8fafc;">Nikola Z. · Citizen</div></div>
           <div><label class="form-label">Show my name in the public log</label><select class="form-input" id="cm-pub"><option value="0">No – show category only</option><option value="1">Yes</option></select></div>
         </div>
         <div style="font-size:11.5px;color:#64748b;">Every comment receives a reference number, is assessed by MoEPP, and gets a published outcome and reason. You will be notified by e-mail when the status changes.</div>
@@ -226,7 +226,7 @@
       const v = m.querySelector('#cm-target').value.split('|');
       const t = v[0] === 'point' ? target : v[0] === 'chapter' ? { kind: 'chapter', doc: v[1], sec: v[2] } : v[0] === 'swmi' ? { kind: 'swmi', issue: v[1] } : { kind: 'wb', wb: v[1] };
       const id = 'PC-' + today.getFullYear() + '-' + String(200 + myIds().length).padStart(4, '0');
-      addComment({ id, rbd: RBD, cyc: CYC, stage: st.n, who: 'Citizen', org: m.querySelector('#cm-pub').value === '1' ? 'Ana P.' : '', date: iso(today), target: t, text: txt, status: 'Received', outcome: '', reason: '', change: '', mine: true });
+      addComment({ id, rbd: RBD, cyc: CYC, stage: st.n, who: 'Citizen', org: m.querySelector('#cm-pub').value === '1' ? 'Nikola Z.' : '', date: iso(today), target: t, text: txt, status: 'Received', outcome: '', reason: '', change: '', mine: true });
       m.remove();
       (window.wisToast || alert)(`Comment ${id} received. Confirmation sent by e-mail (mockup). Follow it under "My comments".`);
       if (window.onCommentAdded) window.onCommentAdded();

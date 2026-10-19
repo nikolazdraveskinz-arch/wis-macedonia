@@ -198,7 +198,7 @@
         <div class="lang-switch" title="Language (Macedonian and Albanian planned)">
           <span class="planned" title="Macedonian – planned">МК</span><span class="planned" title="Albanian – planned">SQ</span><span class="on">EN</span>
         </div>
-        ${signedIn ? `<a href="${base}participate/my-comments/" class="header-btn" style="background:#fff;color:#374151;border-color:#E5E7EB;"><i class="fas fa-user-circle"></i><span>Ana P.</span></a>
+        ${signedIn ? `<a href="${base}participate/my-comments/" class="header-btn" style="background:#fff;color:#374151;border-color:#E5E7EB;"><i class="fas fa-user-circle"></i><span>Nikola Z.</span></a>
         <button class="header-btn" style="background:#fff;color:#6B7280;border-color:#E5E7EB;" onclick="WIS.signOut()" title="Sign out"><i class="fas fa-sign-out-alt"></i></button>` :
         `<a href="${base}register/" class="header-btn pub-hide-sm" style="background:#fff;color:#374151;border-color:#E5E7EB;"><i class="fas fa-user-plus"></i><span>Register</span></a>
         <a href="${base}login/" class="header-btn header-btn-primary"><i class="fas fa-sign-in-alt"></i><span>Sign in</span></a>`}
