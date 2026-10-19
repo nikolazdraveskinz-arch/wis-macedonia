@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Water body — NWIS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -13,21 +13,21 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="../../assets/wis.css">
 </head>
-<body data-base="../../" data-active="explore" data-portal="public" data-scope="basin" style="background:#f1f5f9;">
+<body data-base="../../" data-active="explore" data-portal="public" data-scope="basin">
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
-<div style="font-size:12px;margin-bottom:8px;"><a href="../" style="color:#1D4ED8;">Water bodies</a> › <span id="crumb"></span></div>
+<div style="font-size:12px;margin-bottom:8px;"><a href="../" style="color:#1a6b82;">Water bodies</a> › <span id="crumb"></span></div>
 <div id="fs-head"></div>
 <div class="pub-grid-1" style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:18px;">
   <div style="display:grid;gap:18px;align-content:start;">
     <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-heartbeat" style="color:#059669;margin-right:6px;"></i>Status and objective</h3></div><div class="card-body" id="fs-status"></div></div>
     <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-industry" style="color:#dc2626;margin-right:6px;"></i>Significant pressures</h3></div><div class="table-container"><table class="data-table"><tbody id="fs-prs"></tbody></table></div></div>
-    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-tasks" style="color:#1D4ED8;margin-right:6px;"></i>Planned measures</h3></div><div class="table-container"><table class="data-table"><tbody id="fs-ms"></tbody></table></div></div>
+    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-tasks" style="color:#1a6b82;margin-right:6px;"></i>Planned measures</h3></div><div class="table-container"><table class="data-table"><tbody id="fs-ms"></tbody></table></div></div>
   </div>
   <div style="display:grid;gap:18px;align-content:start;">
     <div class="card" style="overflow:hidden;"><div id="fs-map" style="height:240px;"></div></div>
-    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-satellite-dish" style="color:#0891b2;margin-right:6px;"></i>Monitoring sites</h3></div><div class="table-container"><table class="data-table"><tbody id="fs-sites"></tbody></table></div></div>
+    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-satellite-dish" style="color:#2a8fa8;margin-right:6px;"></i>Monitoring sites</h3></div><div class="table-container"><table class="data-table"><tbody id="fs-sites"></tbody></table></div></div>
     <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-comments" style="color:#7c3aed;margin-right:6px;"></i>Public comments</h3><button class="btn btn-primary btn-sm" id="fs-cm"><i class="fas fa-comment-dots"></i>Comment</button></div><div class="card-body" id="fs-com" style="display:grid;gap:8px;"></div></div>
     <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-file-alt" style="color:#64748b;margin-right:6px;"></i>Documents and data</h3></div><div class="card-body" id="fs-docs" style="font-size:12.5px;"></div></div>
   </div>
@@ -42,13 +42,13 @@
 const id = new URLSearchParams(location.search).get('id') || (WIS.WBS[0] && WIS.WBS[0].id);
 const w = WIS.WBS.find(x=>x.id===id) || WIS.WBS[0];
 if (!w) { document.querySelector('main').innerHTML='<div class="card"><div class="empty-state"><i class="fas fa-water"></i><div><b>No water bodies published yet.</b></div></div></div>'; return; }
-const ECO={High:'#1D4ED8',Good:'#059669',Moderate:'#d97706',Poor:'#dc2626',Bad:'#7f1d1d',Unknown:'#94a3b8','n/a':'#94a3b8'};
+const ECO={High:'#1a6b82',Good:'#059669',Moderate:'#d97706',Poor:'#dc2626',Bad:'#7f1d1d',Unknown:'#94a3b8','n/a':'#94a3b8'};
 const PRS={'MK-VAR-RW-0015':['MK_PRS_PT_0412'],'MK-VAR-RW-0014':['MK_PRS_PT_0412','MK_PRS_PT_0398'],'MK-VAR-RW-0102':['MK_PRS_HM_0077']};
 const MSR={'MK-VAR-RW-0015':['MK_MSR_VAR_001'],'MK-VAR-RW-0014':['MK_MSR_VAR_001'],'MK-VAR-RW-0102':['MK_MSR_VAR_019']};
 const goal = (w.eco==='Good'||w.eco==='High')&&w.chem!=='Poor' ? 'Maintain good status (no deterioration)' : 'Good status by ' + (WIS.cycle.period.split('–')[1]) + ' – exemption under Art. 4(4) proposed in draft RBMP §6';
 document.getElementById('crumb').textContent = w.name;
 document.getElementById('fs-head').innerHTML = `<div class="card"><div class="card-body" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
- <div style="flex:1;min-width:260px;"><div style="font-size:11px;color:#64748b;font-weight:600;">${w.cat.toUpperCase()} WATER BODY · ${WIS.RBD.label.toUpperCase()}</div><h1 style="font-size:22px;font-weight:800;color:#1E3A8A;margin:4px 0;">${w.name}</h1><span class="id-pill">${w.id}</span></div>
+ <div style="flex:1;min-width:260px;"><div style="font-size:11px;color:#64748b;font-weight:600;">${w.cat.toUpperCase()} WATER BODY · ${WIS.RBD.label.toUpperCase()}</div><h1 style="font-size:22px;font-weight:800;color:#0d4a5e;margin:4px 0;">${w.name}</h1><span class="id-pill">${w.id}</span></div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;"><a class="btn btn-secondary" href="../map/?wb=${w.id}"><i class="fas fa-map"></i>On the map</a><button class="btn btn-secondary" onclick="wisToast('Fact sheet PDF downloaded (mockup)')"><i class="fas fa-file-pdf"></i>PDF</button><button class="btn btn-secondary" onclick="WIS.follow('wb')"><i class="fas fa-bell"></i>Follow</button></div></div></div>`;
 document.getElementById('fs-status').innerHTML = `<div class="stat-grid"><div class="stat-item"><div class="stat-val" style="color:${ECO[w.eco]};font-size:18px;">${w.eco}</div><div class="stat-lbl">Ecological status</div></div><div class="stat-item"><div class="stat-val" style="color:${ECO[w.chem]};font-size:18px;">${w.chem}</div><div class="stat-lbl">Chemical status</div></div></div>
  <div class="meta-row" style="margin-top:12px;flex-direction:column;gap:5px;"><span><b>Environmental objective:</b> ${goal}</span><span><b>Classification:</b> national classification system (placeholder) · confidence medium</span><span><b>Reporting period:</b> ${WIS.cycle.period}</span></div>`;
@@ -62,7 +62,7 @@ function com(){const cs=WIS.comments().filter(c=>c.target.kind==='wb'&&c.target.
  document.getElementById('fs-com').innerHTML = cs.length ? cs.map(c=>`<div style="border:1px solid #f1f5f9;border-radius:8px;padding:10px;"><div style="display:flex;justify-content:space-between;"><a href="../../participate/log/#${c.id}" class="id-pill" style="text-decoration:none;">${c.id}</a>${WIS.statusBadge(c)}</div><div style="font-size:12.5px;color:#334155;margin-top:6px;">${c.text}</div>${c.reason?`<div style="font-size:12px;color:#059669;margin-top:4px;"><i class="fas fa-reply"></i> ${c.reason}</div>`:''}</div>`).join('') : '<div style="font-size:12.5px;color:#94a3b8;">No comments yet.</div>';}
 com(); window.onCommentAdded = com;
 document.getElementById('fs-cm').onclick = ()=>WIS.openComment({kind:'wb',wb:w.id},3);
-document.getElementById('fs-docs').innerHTML = [['Draft RBMP §2 – characterisation','../../participate/document/?d=RBMP#s2'],['Draft RBMP §5 – monitoring and status','../../participate/document/?d=RBMP#s5'],['Draft RBMP §6 – objectives and exemptions','../../participate/document/?d=RBMP#s6'],['Download water-body data (GeoJSON, CSV)','#open'],['Metadata record DS-VAR-001','#meta']].map(([t,h])=>`<a href="${h}" style="display:block;color:#1D4ED8;margin:3px 0;"><i class="fas fa-angle-right" style="margin-right:6px;"></i>${t}</a>`).join('');
+document.getElementById('fs-docs').innerHTML = [['Draft RBMP §2 – characterisation','../../participate/document/?d=RBMP#s2'],['Draft RBMP §5 – monitoring and status','../../participate/document/?d=RBMP#s5'],['Draft RBMP §6 – objectives and exemptions','../../participate/document/?d=RBMP#s6'],['Download water-body data (GeoJSON, CSV)','#open'],['Metadata record DS-VAR-001','#meta']].map(([t,h])=>`<a href="${h}" style="display:block;color:#1a6b82;margin:3px 0;"><i class="fas fa-angle-right" style="margin-right:6px;"></i>${t}</a>`).join('');
 try{const m=L.map('fs-map',{zoomControl:false,attributionControl:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
  const g=w.line?L.polyline(w.line,{color:ECO[w.eco],weight:6}):L.polygon(w.poly,{color:w.cat==='Groundwater'?'#7c3aed':ECO[w.eco]});g.addTo(m);m.fitBounds(g.getBounds(),{padding:[30,30]});
  st.forEach(s=>L.circleMarker(s.ll,{radius:6,color:'#0f172a',fillColor:'#38bdf8',fillOpacity:1}).addTo(m));}catch(e){}

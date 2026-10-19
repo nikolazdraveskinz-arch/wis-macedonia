@@ -161,7 +161,7 @@
     return m;
   }
   function signInGate(after) {
-    const m = modal(`<div class="card" style="width:min(460px,100%);"><div class="card-header"><h3 class="card-title"><i class="fas fa-user-lock" style="color:#1a56db;margin-right:6px;"></i>Sign in to comment</h3><button class="btn btn-secondary btn-sm" data-close>Close</button></div>
+    const m = modal(`<div class="card" style="width:min(460px,100%);"><div class="card-header"><h3 class="card-title"><i class="fas fa-user-lock" style="color:#1a6b82;margin-right:6px;"></i>Sign in to comment</h3><button class="btn btn-secondary btn-sm" data-close>Close</button></div>
       <div class="card-body" style="display:grid;gap:10px;font-size:13px;color:#475569;">
         <p style="margin:0;">Reading is open to everyone. To comment, follow a consultation and track your comments, sign in or create a free account. You can also send comments by e-mail or post; they are registered in the same log.</p>
         <a class="btn btn-primary" style="justify-content:center;padding:9px;" href="${W.base}login/?next=${encodeURIComponent(location.pathname + location.search)}"><i class="fas fa-sign-in-alt"></i>Sign in</a>

@@ -7,11 +7,11 @@ window.initWisMap = function (opts) {
     'Topographic': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '© OpenTopoMap' })
   };
   base['OpenStreetMap'].addTo(map);
-  const ECO = { High: '#1a56db', Good: '#059669', Moderate: '#d97706', Poor: '#dc2626', Bad: '#7f1d1d', Unknown: '#94a3b8', 'n/a': '#94a3b8' };
+  const ECO = { High: '#1a6b82', Good: '#059669', Moderate: '#d97706', Poor: '#dc2626', Bad: '#7f1d1d', Unknown: '#94a3b8', 'n/a': '#94a3b8' };
   const info = document.getElementById(opts.info);
 
   function showInfo(html) { info.innerHTML = html; info.scrollTop = 0; }
-  function docLinks(list) { return list.map(([t, h]) => `<a href="${h}" style="display:block;color:#1a56db;font-size:12px;margin:2px 0;"><i class="fas fa-file-alt" style="margin-right:5px;"></i>${t}</a>`).join(''); }
+  function docLinks(list) { return list.map(([t, h]) => `<a href="${h}" style="display:block;color:#1a6b82;font-size:12px;margin:2px 0;"><i class="fas fa-file-alt" style="margin-right:5px;"></i>${t}</a>`).join(''); }
   function actions(target, extra) {
     const dl = mode === 'internal'
       ? `<button class="btn btn-secondary btn-sm" onclick="wisToast('Download as GeoPackage / Shapefile / GeoJSON – full attributes (role: ' + (function(){try{return localStorage.getItem('wis.role')||'superadmin'}catch(e){return 'superadmin'}})() + ') (mockup)')"><i class="fas fa-download"></i>Download</button>`

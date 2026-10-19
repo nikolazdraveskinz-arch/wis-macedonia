@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Have your say — NWIS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="../assets/wis.css">
 </head>
-<body data-base="../" data-active="participate" data-portal="public" data-scope="basin" style="background:#f1f5f9;">
+<body data-base="../" data-active="participate" data-portal="public" data-scope="basin">
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
@@ -50,12 +50,12 @@
 </section>
 
 <section class="card" style="margin-top:22px;">
-  <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt" style="color:#0891b2;margin-right:6px;"></i>Meetings and events</h3><span style="font-size:11px;color:#94a3b8;">Organised by the competent authority for the basin</span></div>
+  <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt" style="color:#2a8fa8;margin-right:6px;"></i>Meetings and events</h3><span style="font-size:11px;color:#94a3b8;">Organised by the competent authority for the basin</span></div>
   <div class="table-container" data-demo="meetings or events"><table class="data-table"><thead><tr><th>Date</th><th>Event</th><th>Place</th><th>Material</th></tr></thead><tbody>
-    <tr><td>2026-11-12</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Shtip</td><td><a href="#" style="color:#1D4ED8;">Agenda</a></td></tr>
-    <tr><td>2026-10-22</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Veles</td><td><a href="#" style="color:#1D4ED8;">Agenda</a></td></tr>
-    <tr><td>2026-09-24</td><td><b>River Basin Council session</b></td><td>Skopje</td><td><a href="#" style="color:#1D4ED8;">Minutes</a> · <a href="#" style="color:#1D4ED8;">Presentation</a></td></tr>
-    <tr><td>2026-03-05</td><td><b>Stakeholder workshop – significant issues</b> (stage 2)</td><td>Kumanovo</td><td><a href="#" style="color:#1D4ED8;">Minutes</a></td></tr>
+    <tr><td>2026-11-12</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Shtip</td><td><a href="#" style="color:#1a6b82;">Agenda</a></td></tr>
+    <tr><td>2026-10-22</td><td><b>Public hearing – draft RBMP</b> (stage 3)</td><td>Veles</td><td><a href="#" style="color:#1a6b82;">Agenda</a></td></tr>
+    <tr><td>2026-09-24</td><td><b>River Basin Council session</b></td><td>Skopje</td><td><a href="#" style="color:#1a6b82;">Minutes</a> · <a href="#" style="color:#1a6b82;">Presentation</a></td></tr>
+    <tr><td>2026-03-05</td><td><b>Stakeholder workshop – significant issues</b> (stage 2)</td><td>Kumanovo</td><td><a href="#" style="color:#1a6b82;">Minutes</a></td></tr>
   </tbody></table></div>
 </section>
 
@@ -84,7 +84,7 @@
 
   /* "You are here" */
   const cur = WIS.STAGES.find(s => s.state === 'Open') || WIS.STAGES.find(s => s.state === 'Upcoming');
-  document.getElementById('rj-here').innerHTML = `<div class="rj-eyebrow" style="color:#0D9488;">You are here</div>
+  document.getElementById('rj-here').innerHTML = `<div class="rj-eyebrow" style="color:#2a8fa8;">You are here</div>
     <div class="rj-here-t">${cur ? 'Station ' + cur.n + ' · ' + cur.title : 'No consultation open'}</div>
     <div style="font-size:12.5px;color:#64748b;">${cur ? (cur.state === 'Open' ? 'Open for comments · closes ' + WIS.fmt(cur.closes) : 'Opens ' + WIS.fmt(cur.opens)) : R.label + ' · ' + WIS.cycle.label}</div>
     <div class="rj-here-k"><div><b>${cur && cur.state === 'Open' ? cur.daysLeft : '—'}</b><span>days left</span></div><div><b>${all.length}</b><span>comments</span></div><div><b>${Object.keys(WIS.DOCS).length}</b><span>documents</span></div></div>`;
@@ -117,12 +117,12 @@
     return `<article class="rj-station" id="${s.id}" data-n="${s.n}">
       <div class="rj-node" aria-hidden="true">${s.n}</div><div class="rj-km">${s.km}</div>
       <div class="card"><div class="card-body" style="padding:20px 22px;">
-        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;"><span class="rj-mini" style="font-weight:700;color:#0D9488;text-transform:uppercase;letter-spacing:.08em;">Station ${s.n} · ${s.art}</span><span class="badge ${SC[s.state]}">${s.state}</span><span class="rj-mini" style="margin-left:auto;">${s.date}</span></div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;"><span class="rj-mini" style="font-weight:700;color:#2a8fa8;text-transform:uppercase;letter-spacing:.08em;">Station ${s.n} · ${s.art}</span><span class="badge ${SC[s.state]}">${s.state}</span><span class="rj-mini" style="margin-left:auto;">${s.date}</span></div>
         <h3 class="rj-h3">${s.title}</h3>
         <p style="font-size:13.5px;color:#4B5563;margin:4px 0 0;">${s.lead}</p>
         <div class="rj-docs2">${s.docs}</div>
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px;">
-          ${s.count !== null ? `<span style="font-size:13px;font-weight:700;color:#1E3A8A;"><i class="fas fa-comment" style="color:#14B8A6;"></i> ${s.count} comments</span>` : ''}
+          ${s.count !== null ? `<span style="font-size:13px;font-weight:700;color:#0d4a5e;"><i class="fas fa-comment" style="color:#2a8fa8;"></i> ${s.count} comments</span>` : ''}
           <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">${s.log ? `<button class="btn btn-secondary btn-sm" data-toggle="${s.id}" aria-expanded="false">Open station</button>` : ''}${s.actions}</span>
         </div>
         ${s.log ? `<div class="rj-details" id="${s.id}-d"><div>
@@ -144,8 +144,8 @@
     const cx = W / 2, L = [], Rr = [], C = [];
     for (let y = 0; y <= H; y += 12) { const t = y / H, x = cx + Math.sin(y / 140) * (W * 0.18) * (0.6 + t * 0.4), w = 6 + t * (W * 0.42); L.push([x - w / 2, y]); Rr.push([x + w / 2, y]); C.push([x, y]); }
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    svg.innerHTML = `<defs><linearGradient id="rjg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BAE6FD"/><stop offset=".45" stop-color="#2563EB"/><stop offset="1" stop-color="#1E3A8A"/></linearGradient></defs>
-      <polygon points="${L.concat(Rr.reverse()).map(p => p.join(',')).join(' ')}" fill="url(#rjg)" stroke="#14B8A6" stroke-opacity=".35" stroke-width="2"/>
+    svg.innerHTML = `<defs><linearGradient id="rjg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BAE6FD"/><stop offset=".45" stop-color="#1a6b82"/><stop offset="1" stop-color="#0d4a5e"/></linearGradient></defs>
+      <polygon points="${L.concat(Rr.reverse()).map(p => p.join(',')).join(' ')}" fill="url(#rjg)" stroke="#2a8fa8" stroke-opacity=".35" stroke-width="2"/>
       <path class="rj-flow" d="M${C.map(p => p.join(',')).join(' L')}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 24"/>`;
   }
   draw(); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw); new ResizeObserver(draw).observe(host);
@@ -160,7 +160,7 @@
   const keys = Object.keys(WIS.DOCS), df = document.getElementById('rj-docfilter'), dg = document.getElementById('rj-docs');
   df.innerHTML = ['All', 'Stage 1', 'Stage 2', 'Stage 3'].map((l, i) => `<button class="basin-tab ${i ? '' : 'on'}" data-f="${i}">${l}</button>`).join('');
   function docs(f) { const ks = keys.filter(k => !f || WIS.DOCS[k].stage === f);
-    dg.innerHTML = ks.length ? ks.map(k => { const d = WIS.DOCS[k]; return `<div class="card rj-dcard"><span class="rj-doc-ic" style="width:42px;height:52px;"><i class="fas ${ICON[k] || 'fa-file-alt'}"></i></span><div style="min-width:0;flex:1;"><b style="color:#1E3A8A;">${d.title}</b><div class="rj-mini" style="margin-top:2px;">${d.id} · ${d.ver} · stage ${d.stage} · ${WIS.fmt(d.date)}</div><div style="display:flex;gap:6px;margin-top:10px;"><a class="btn btn-secondary btn-sm" href="document/?d=${k}">Read</a><button class="btn btn-secondary btn-sm" onclick="wisToast('PDF downloaded (mockup)')"><i class="fas fa-file-pdf"></i>PDF</button></div></div></div>`; }).join('')
+    dg.innerHTML = ks.length ? ks.map(k => { const d = WIS.DOCS[k]; return `<div class="card rj-dcard"><span class="rj-doc-ic" style="width:42px;height:52px;"><i class="fas ${ICON[k] || 'fa-file-alt'}"></i></span><div style="min-width:0;flex:1;"><b style="color:#0d4a5e;">${d.title}</b><div class="rj-mini" style="margin-top:2px;">${d.id} · ${d.ver} · stage ${d.stage} · ${WIS.fmt(d.date)}</div><div style="display:flex;gap:6px;margin-top:10px;"><a class="btn btn-secondary btn-sm" href="document/?d=${k}">Read</a><button class="btn btn-secondary btn-sm" onclick="wisToast('PDF downloaded (mockup)')"><i class="fas fa-file-pdf"></i>PDF</button></div></div></div>`; }).join('')
       : '<div class="empty-state" style="grid-column:1/-1;margin:0;"><i class="fas fa-inbox"></i><div>No documents published yet for this basin and cycle.</div></div>'; }
   df.addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; df.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); docs(+b.dataset.f); });
   docs(0);

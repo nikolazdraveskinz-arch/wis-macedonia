@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register — NWIS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -13,12 +13,12 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="../assets/wis.css">
 </head>
-<body data-base="../" data-active="register" data-portal="public" data-scope="national" style="background:#f1f5f9;">
+<body data-base="../" data-active="register" data-portal="public" data-scope="national">
 <header id="pub-header"></header>
 <main class="pub-wrap">
 
 <div style="max-width:620px;margin:0 auto;">
-<h1 style="font-size:22px;font-weight:800;color:#1E3A8A;margin:0 0 4px;">Register</h1>
+<h1 style="font-size:22px;font-weight:800;color:#0d4a5e;margin:0 0 4px;">Register</h1>
 <p style="font-size:13px;color:#64748b;margin:0 0 18px;">An account lets you comment in consultations, follow them and track your comments and requests. Viewing maps, data and documents needs no account.</p>
 <div class="card"><div class="card-body" style="display:grid;gap:14px;">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -34,7 +34,7 @@
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
     <label style="font-size:12.5px;display:flex;gap:8px;align-items:flex-start;"><input type="checkbox"> <span>I also need <b>technical access</b> (institution or consultant): operational layers, extended attributes, WFS and API. This request is reviewed by MoEPP.</span></label>
   </div>
-  <div style="font-size:11.5px;color:#64748b;">Your data are processed by the Ministry of Environment and Physical Planning to manage your account and your participation. <a href="../about/privacy/" style="color:#1D4ED8;">Privacy notice</a></div>
+  <div style="font-size:11.5px;color:#64748b;">Your data are processed by the Ministry of Environment and Physical Planning to manage your account and your participation. <a href="../about/privacy/" style="color:#1a6b82;">Privacy notice</a></div>
   <label style="font-size:12.5px;display:flex;gap:8px;"><input type="checkbox"> I have read the privacy notice *</label>
   <div style="display:flex;gap:10px;"><button class="btn btn-primary" style="padding:9px 16px;" onclick="wisToast('Confirmation e-mail sent (mockup). After you confirm, the account is active.');setTimeout(()=>WIS.signIn('../participate/'),1600)"><i class="fas fa-user-plus"></i>Create account</button>
   <button class="btn btn-secondary" style="padding:9px 16px;" onclick="wisToast('Redirect to the national eID service (optional, mockup)')"><i class="fas fa-id-card"></i>Register with national eID</button></div>

@@ -12,10 +12,10 @@
   const scope = body.dataset.scope || (portal === 'internal' ? 'internal' : 'national');
   /* The four river basin districts. Areas are approximate shares of the national territory (placeholders). */
   const RBDS = [
-    { id: 'VAR', code: 'MK_RBD_VAR', name: 'Vardar', mk: 'Вардар', area: '≈ 20,500 km²', share: '≈ 80%', shared: 'Greece (Axios)', rivers: 'Vardar, Treska, Pchinja, Bregalnica, Crna Reka; Dojran Lake', centre: [41.70, 21.75], zoom: 8, color: '#2563EB', demo: true },
-    { id: 'BDR', code: 'MK_RBD_BDR', name: 'Black Drim', mk: 'Црн Дрим', area: '≈ 3,350 km²', share: '≈ 13%', shared: 'Albania; Greece (Prespa)', rivers: 'Black Drim, Sateska, Radika; Ohrid and Prespa lakes', centre: [41.22, 20.75], zoom: 9, color: '#0891B2' },
-    { id: 'STR', code: 'MK_RBD_STR', name: 'Strumica', mk: 'Струмица', area: '≈ 1,650 km²', share: '≈ 6.5%', shared: 'Bulgaria (Struma)', rivers: 'Strumica, Turija, Vodochnica', centre: [41.43, 22.65], zoom: 10, color: '#0D9488' },
-    { id: 'JMO', code: 'MK_RBD_JMO', name: 'Južna Morava', mk: 'Јужна Морава', area: '≈ 45 km²', share: '< 1%', shared: 'Serbia, Kosovo', rivers: 'Binachka Morava (upper catchment)', centre: [42.28, 21.64], zoom: 11, color: '#16A34A' }
+    { id: 'VAR', code: 'MK_RBD_VAR', name: 'Vardar', mk: 'Вардар', area: '≈ 20,500 km²', share: '≈ 80%', shared: 'Greece (Axios)', rivers: 'Vardar, Treska, Pchinja, Bregalnica, Crna Reka; Dojran Lake', centre: [41.70, 21.75], zoom: 8, color: '#0d4a5e', demo: true },
+    { id: 'BDR', code: 'MK_RBD_BDR', name: 'Black Drim', mk: 'Црн Дрим', area: '≈ 3,350 km²', share: '≈ 13%', shared: 'Albania; Greece (Prespa)', rivers: 'Black Drim, Sateska, Radika; Ohrid and Prespa lakes', centre: [41.22, 20.75], zoom: 9, color: '#2a8fa8' },
+    { id: 'STR', code: 'MK_RBD_STR', name: 'Strumica', mk: 'Струмица', area: '≈ 1,650 km²', share: '≈ 6.5%', shared: 'Bulgaria (Struma)', rivers: 'Strumica, Turija, Vodochnica', centre: [41.43, 22.65], zoom: 10, color: '#1a6b82' },
+    { id: 'JMO', code: 'MK_RBD_JMO', name: 'Južna Morava', mk: 'Јужна Морава', area: '≈ 45 km²', share: '< 1%', shared: 'Serbia, Kosovo', rivers: 'Binachka Morava (upper catchment)', centre: [42.28, 21.64], zoom: 11, color: '#c9a84c' }
   ];
   RBDS.forEach(r => { r.label = r.name + ' RBD'; r.full = r.name + ' River Basin District'; });
   const CYCLES = [
@@ -215,8 +215,8 @@
     const f = document.getElementById('pub-footer');
     if (f) {
       f.className = 'pub-footer';
-      f.innerHTML = `Ministry of Environment and Physical Planning · ${BRAND[1]} (${BRAND[0]})
-        <div style="margin-top:8px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;"><a href="${base}about/contacts/" style="color:#1a56db;">Who is responsible · contacts</a><a href="${base}participate/request/" style="color:#1a56db;">Request background documents</a><a href="${base}about/privacy/" style="color:#1a56db;">Privacy notice</a><a href="${base}about/accessibility/" style="color:#1a56db;">Accessibility</a></div>`;
+      f.innerHTML = `<div class="pub-footer-inner"><span class="pub-footer-copy">Ministry of Environment and Physical Planning · ${BRAND[1]} (${BRAND[0]})</span>
+        <nav class="pub-footer-links" aria-label="Footer"><a href="${base}about/contacts/">Who is responsible · contacts</a><a href="${base}participate/request/">Request background documents</a><a href="${base}about/privacy/">Privacy notice</a><a href="${base}about/accessibility/">Accessibility</a></nav></div>`;
     }
   }
 
