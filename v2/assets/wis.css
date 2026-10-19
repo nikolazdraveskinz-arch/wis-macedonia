@@ -768,3 +768,9 @@ h1, h2, h3, h4, .card-title, .kpi-value, .stat-val, .btn, .pf-btn, .header-btn, 
 .rj-source .rjs-node.here .rjs-lbl { color: var(--site-accent); }
 .rj-source .rjs-node.st-later .rjs-dot { color: var(--site-muted); }
 .rj-source .rjs-count { border-color: var(--site-brand); background: var(--site-accent); }
+
+/* dark teal band (same as the basin home and Have your say banners) around a content block */
+.dark-band { background: var(--grad-hero); border-radius: 16px; box-shadow: 0 10px 30px #0d4a5e33; padding: 28px 30px 30px; color: #fff; }
+.dark-band-h1 { font-size: clamp(22px, 3vw, 30px); font-weight: 800; color: #fff; margin: 0 0 4px; line-height: 1.2; }
+.dark-band-lead { font-size: 14px; color: #ffffffd9; margin: 0 0 20px; }
+@media (max-width: 900px) { .dark-band { padding: 20px; } }
