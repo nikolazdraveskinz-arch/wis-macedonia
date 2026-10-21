@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../assets/wis.css?v=20261019o">
+  <link rel="stylesheet" href="../assets/wis.css?v=20261021p">
 </head>
 <body data-base="../" data-active="dashboard" data-portal="internal">
 <aside id="wis-sidebar"></aside>
@@ -81,13 +81,14 @@
 <div class="card" style="margin-top:18px;">
   <div class="card-header"><h3 class="card-title"><i class="fas fa-hourglass-half" style="color:#64748b;margin-right:6px;"></i>Foreseen in later phases (not in Phase 1)</h3></div>
   <div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;">
-    <span class="phase-chip">Automated WISE reporting</span><span class="phase-chip">Live data link with the Water Quality platform</span><span class="phase-chip">Integration with NEIS and SIS</span><span class="phase-chip">PoM implementation tracking</span><span class="phase-chip">RBMP update mechanisms</span>
+    <span class="phase-chip">Automated WISE reporting</span><span class="phase-chip">Live data link with the Water Quality platform</span><span class="phase-chip">Integration with NEIS and SIS</span><span class="phase-chip">PoM reporting by other institutions (accounts, reporting rounds)</span><span class="phase-chip">Automated new-cycle workspace and cycle comparison</span>
+    <div style="flex-basis:100%;font-size:11.5px;color:#64748b;margin-top:4px;"><b>Already in Phase 1, maintained by MoEPP:</b> <a href="measures/" style="color:#1a6b82;font-weight:600;">PoM progress record</a> · <a href="datasets/" style="color:#1a6b82;font-weight:600;">cycle freeze and copy to the next cycle</a> · <a href="identifiers/" style="color:#1a6b82;font-weight:600;">identifier lineage</a> · Art. 14 timetable (above).</div>
   </div>
 </div>
 
   </main>
 </div>
-<script src="../assets/shell.js?v=20261019o"></script>
+<script src="../assets/shell.js?v=20261021p"></script>
 <script>
 const c = WIS.cycle;
 document.getElementById('cycle-card').innerHTML = `
@@ -99,8 +100,14 @@ document.getElementById('cycle-card').innerHTML = `
     <span><b>Datasets tagged to this cycle:</b> 38</span>
     <span><b>Previous cycles:</b> none archived in NWIS</span>
   </div>
-  <p style="font-size:11.5px;color:#94a3b8;margin:12px 0 0;">Every dataset, identifier and document is stored with its reporting period (ToR Task 1), so a new cycle or another basin can be added without redesign.</p>`;
-</script><script src="../assets/participation.js?v=20261019o"></script><script>
+  <div style="font-size:12px;font-weight:700;color:#0f172a;margin:14px 0 4px;">Timetable (WFD Art. 14) <span class="p1-chip">NEW</span></div>
+  <ul class="tt-list" id="tt"></ul>
+  <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><a href="participation/" class="btn btn-secondary btn-sm"><i class="fas fa-users"></i>Consultation stages</a><a href="datasets/" class="btn btn-secondary btn-sm"><i class="fas fa-lock"></i>Cycle freeze</a></div>
+  <p style="font-size:11.5px;color:#94a3b8;margin:10px 0 0;">Dates are placeholders kept by the administrator. Every dataset, identifier and document is stored with its reporting period (ToR Task 1), so a new cycle or another basin can be added without redesign.</p>`;
+const TT=[['2024-12','Timetable and work programme','participation/'],['2025-12','Significant water management issues','participation/'],['2026-12','Draft RBMP 2028–2033 for consultation','participation/'],['2027-12','RBMP adopted','documents'],['2028-03','Reported to WISE; cycle frozen','datasets/'],['2030-12','Interim report on PoM (Art. 15(3))','measures/'],['2030-12','Timetable for RBMP 2034–2039','participation/']];
+const today=new Date().toISOString().slice(0,7); let nx=TT.findIndex(t=>t[0]>=today);
+document.getElementById('tt').innerHTML=TT.map((t,i)=>`<li><span class="tt-d">${t[0]}</span><span class="${i===nx?'tt-next':''}" style="${i<nx?'color:#94a3b8;':''}">${i<nx?'<i class="fas fa-check" style="color:#059669;margin-right:4px;"></i>':i===nx?'<i class="fas fa-bell" style="margin-right:4px;"></i>':''}${t[1]}${i===nx?' – next due':''}</span></li>`).join('');
+</script><script src="../assets/participation.js?v=20261021p"></script><script>
 const op = WIS.STAGES.find(s=>s.state==='Open'), todo = WIS.comments().filter(c=>!c.outcome).length;
 document.getElementById('pp-card').innerHTML = `<div style="font-size:12px;color:#64748b;">Current stage</div><div style="font-weight:800;font-size:16px;color:#0f172a;">${op?('Stage '+op.n+' · '+op.title):'No stage open'}</div>
  <div class="stat-grid" style="margin-top:10px;"><div class="stat-item"><div class="stat-val" style="color:#059669;">${op?op.daysLeft:'–'}</div><div class="stat-lbl">Days left</div></div><div class="stat-item"><div class="stat-val">${WIS.comments().filter(c=>op&&c.stage===op.n).length}</div><div class="stat-lbl">Comments this stage</div></div><div class="stat-item"><div class="stat-val" style="color:#d97706;">${todo}</div><div class="stat-lbl">To process</div></div></div>`;

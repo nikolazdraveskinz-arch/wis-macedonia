@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019o">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261021p">
 </head>
 <body data-base="../../" data-active="identifiers" data-portal="internal">
 <aside id="wis-sidebar"></aside>
@@ -28,7 +28,7 @@
     </div>
   </header>
   <main class="content-area">
-<div class="phase-banner" style=""><i class="fas fa-fingerprint"></i><div><b>ToR Task 3.</b> Permanent, stable identifiers for every key RBMP entity, used as the link between spatial layers and attribute data (ToR Task 4) and across RBMP cycles. Identifiers can be created and edited only by authorised roles; they are never deleted, only retired, and every change is logged. The coding patterns shown are examples for agreement with MoEPP.</div></div>
+<div class="phase-banner" style=""><i class="fas fa-fingerprint"></i><div><b>ToR Task 3.</b> Permanent, stable identifiers for every key RBMP entity, used as the link between spatial layers and attribute data (ToR Task 4) and across RBMP cycles. Identifiers can be created and edited only by authorised roles; they are never deleted, only retired, and every change is logged. When a water body, site, pressure or measure changes between RBMP cycles, the change is recorded as <b>lineage</b> (replaces / replaced by), as WISE reporting requires. The coding patterns shown are examples for agreement with MoEPP.</div></div>
 
 <div class="card">
   <div class="card-header"><h3 class="card-title">Identifier types</h3><span style="font-size:11px;color:#94a3b8;">Pattern and owner per entity type</span></div>
@@ -51,11 +51,39 @@
   <div class="alert alert-warn" style="margin:0 20px 20px;"><i class="fas fa-lock"></i><div>Deleting an identifier is not possible. Retiring one requires a reason, keeps it in the history, and blocks its re-use. Restoring a retired identifier is logged.</div></div>
 </div>
 
+
+<div class="card" style="margin-top:18px;">
+  <div class="card-header"><h3 class="card-title"><i class="fas fa-code-branch" style="color:#1a6b82;margin-right:6px;"></i>Identifier lineage between cycles <span class="p1-chip">NEW</span></h3><span style="font-size:11px;color:#94a3b8;">Change types: code list CL-014</span></div>
+  <div class="table-container"><table class="data-table" id="lin">
+    <thead><tr><th>Previous identifier(s)</th><th>Change</th><th>New identifier(s)</th><th>Cycle</th><th>Reason</th><th>Recorded</th></tr></thead><tbody></tbody></table></div>
+  <div class="card-body" style="border-top:1px solid #f1f5f9;">
+    <div style="display:grid;grid-template-columns:1.2fr .9fr 1.2fr 1.6fr auto;gap:8px;align-items:end;">
+      <div><label class="form-label">Previous identifier(s)</label><input class="form-input" id="l-a" placeholder="MK-VAR-RW-0021"></div>
+      <div><label class="form-label">Change</label><select class="form-input" id="l-t"><option>Split</option><option>Merged</option><option>Boundary revised</option><option>Renamed</option><option>Retired</option><option>Carried over</option><option>Completed – archived</option></select></div>
+      <div><label class="form-label">New identifier(s)</label><input class="form-input" id="l-b" placeholder="MK-VAR-RW-0021A, MK-VAR-RW-0021B"></div>
+      <div><label class="form-label">Reason</label><input class="form-input" id="l-r" placeholder="e.g. new typology"></div>
+      <button class="btn btn-primary" id="l-go"><i class="fas fa-plus"></i>Record</button>
+    </div>
+    <div class="form-hint" style="margin-top:6px;">Old identifiers stay in the register (retired, not deleted). Records are examples; changes you add are kept in this browser only.</div>
+  </div>
+</div>
   </main>
 </div>
-<script src="../../assets/shell.js?v=20261019o"></script>
+<script src="../../assets/shell.js?v=20261021p"></script>
 <script>const IDT={"SWB": "Surface water bodies", "GWB": "Groundwater bodies", "MON": "Monitoring sites / stations", "PRS": "Pressures (point, diffuse, hydromorphological)", "RSK": "Impacts / risk assessment units", "PRA": "Protected areas", "MSR": "Measures (PoM items)", "RPU": "Reporting units (RBD, sub-units)"};
 function pickType(t){document.getElementById('id-title').textContent='Identifiers · '+IDT[t]+' ('+t+')';document.getElementById('id-title').scrollIntoView({behavior:'smooth',block:'center'});}
+</script>
+<script>
+(function(){
+  const SEED=[['MK-VAR-RW-0014','Split','MK-VAR-RW-0014A, MK-VAR-RW-0014B','2034–2039 (draft)','Pressure differs above and below the Veles discharge','2026-10-21 · Editor'],['MK-VAR-RW-0031, MK-VAR-RW-0032','Merged','MK-VAR-RW-0031','2034–2039 (draft)','Same type, pressures and status','2026-10-21 · Editor'],['MK-VAR-GW-004','Boundary revised','MK-VAR-GW-004 (version 2)','2034–2039 (draft)','New hydrogeological survey','2026-10-21 · GIS Expert'],['MK_PRS_PT_0101','Retired','—','2028–2033','Mine water outlet closed','2026-07-11 · Super admin'],['MK_MSR_VAR_019','Completed – archived','—','2034–2039 (draft)','Fish pass in operation','2026-10-21 · Editor']];
+  let L; try{L=JSON.parse(localStorage.getItem('wis.v2.lineage')||'null');}catch(e){L=null;} if(!L)L=SEED;
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const pills=s=>s==='—'?'—':s.split(',').map(x=>`<span class="id-pill">${esc(x.trim())}</span>`).join('<br>');
+  function draw(){document.querySelector('#lin tbody').innerHTML=L.map(r=>`<tr><td>${pills(r[0])}</td><td><span class="badge ${r[1]==='Retired'||r[1].startsWith('Completed')?'badge-inactive':'qa-pending'}">${esc(r[1])}</span></td><td>${pills(r[2])}</td><td>${esc(r[3])}</td><td style="font-size:12px;">${esc(r[4])}</td><td style="font-size:11.5px;color:#64748b;">${esc(r[5])}</td></tr>`).join('');}
+  document.getElementById('l-go').onclick=()=>{const a=document.getElementById('l-a').value.trim(),b=document.getElementById('l-b').value.trim()||'—',r=document.getElementById('l-r').value.trim();if(!a||!r)return wisToast('Enter the previous identifier and a reason.');
+    L.unshift([a,document.getElementById('l-t').value,b,'2034–2039 (draft)',r,new Date().toISOString().slice(0,10)+' · you']);try{localStorage.setItem('wis.v2.lineage',JSON.stringify(L));}catch(e){}draw();wisToast('Lineage recorded and logged in the audit trail (mockup).');};
+  draw();
+})();
 </script>
 </body>
 </html>

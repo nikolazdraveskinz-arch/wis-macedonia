@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019o">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261021p">
 </head>
 <body data-base="../../" data-active="measures" data-portal="internal">
 <aside id="wis-sidebar"></aside>
@@ -28,28 +28,76 @@
     </div>
   </header>
   <main class="content-area">
-<div class="phase-banner" style=""><i class="fas fa-tasks"></i><div><b>Phase 1 scope: PoM as an RBMP dataset.</b> Each measure has a permanent identifier and is linked to the pressures it addresses, the water bodies it targets and a WISE Key Type of Measure. Progress, financing and implementation tracking are foreseen in a later phase and are not part of the current development.</div></div>
+<div class="phase-banner" style=""><i class="fas fa-tasks"></i><div><b>Phase 1 scope: PoM as an RBMP dataset, maintained by MoEPP.</b> Each measure has a permanent identifier, one or more WISE Key Types of Measure, the minimum information the EU expects per measure (type, coverage, status, responsible authority, cost, financing) and an indicator from the KTM indicator list. MoEPP keeps a <b>progress record</b> for each measure: information received from other institutions is entered by MoEPP staff with its source, and checked by the MoEPP Approver. Accounts for other institutions and reporting rounds are foreseen in a later phase.</div></div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:18px;">
+  <div class="kpi-card"><div class="kpi-value" id="k-n">–</div><div class="kpi-label">Measures</div></div>
+  <div class="kpi-card"><div class="kpi-value" id="k-b">–</div><div class="kpi-label">Basic</div></div>
+  <div class="kpi-card"><div class="kpi-value" id="k-s">–</div><div class="kpi-label">Supplementary</div></div>
+  <div class="kpi-card"><div class="kpi-value" id="k-new">–</div><div class="kpi-label">New in this RBMP</div></div>
+  <div class="kpi-card"><div class="kpi-value" id="k-pend" style="color:#d97706;">–</div><div class="kpi-label">Progress records awaiting approval</div></div>
+</div>
 
 <div class="card">
-  <div class="filter-bar">
-    <div class="search-wrap"><i class="fas fa-search"></i><input id="ms-q" class="search-input" placeholder="Search measures, KTM, water bodies…" oninput="filterTable('ms-q','ms-table')"></div>
-    <select class="filter-select"><option>All types</option><option>Basic</option><option>Supplementary</option></select>
-    <select class="filter-select"><option>All KTM</option><option>KTM1 Wastewater</option><option>KTM2 Agriculture nutrients</option><option>KTM5 Continuity</option><option>KTM8 Water efficiency</option><option>KTM13 Drinking water protection</option><option>KTM14 Knowledge</option></select>
-    <button class="btn btn-primary" onclick="wisToast('New measure: identifier MK_MSR_VAR_045 reserved (mockup)')"><i class="fas fa-plus"></i>Add measure</button>
-  </div>
-  <div class="table-container"><table class="data-table" id="ms-table">
-    <thead><tr><th>Permanent ID</th><th>Measure</th><th>Type</th><th>KTM</th><th>Pressure addressed</th><th>Target water bodies</th><th>Cost estimate</th><th>Planned by</th></tr></thead>
-    <tbody><tr><td><span class="id-pill">MK_MSR_VAR_001</span></td><td><b>Construction of UWWTP Veles</b></td><td>Basic – Art. 11(3)(a) UWWT</td><td><span class="badge badge-active">KTM1</span></td><td><span class="id-pill">MK_PRS_PT_0412</span></td><td style="font-size:12px;">MK-VAR-RW-0014, MK-VAR-RW-0015</td><td>€ 18.2 m</td><td>2030</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_012</span></td><td><b>Nitrate action programme – Polog</b></td><td>Supplementary</td><td><span class="badge badge-active">KTM2</span></td><td><span class="id-pill">MK_PRS_DF_0031</span></td><td style="font-size:12px;">MK-VAR-GW-004</td><td>€ 3.2 m</td><td>2031</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_019</span></td><td><b>Fish passage at Treska weir</b></td><td>Supplementary</td><td><span class="badge badge-active">KTM5</span></td><td><span class="id-pill">MK_PRS_HM_0077</span></td><td style="font-size:12px;">MK-VAR-RW-0102</td><td>€ 0.9 m</td><td>2029</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_027</span></td><td><b>Drinking-water protection zones – delineation</b></td><td>Basic – Art. 7</td><td><span class="badge badge-active">KTM13</span></td><td><span class="id-pill">—</span></td><td style="font-size:12px;">MK-VAR-GW-001 … _012</td><td>€ 1.1 m</td><td>2028</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_033</span></td><td><b>Abstraction permit review – Bregalnica</b></td><td>Basic – Art. 11(3)(e)</td><td><span class="badge badge-active">KTM8</span></td><td><span class="id-pill">MK_PRS_HM_0120</span></td><td style="font-size:12px;">MK-VAR-RW-0201</td><td>Administrative</td><td>2029</td></tr><tr><td><span class="id-pill">MK_MSR_VAR_044</span></td><td><b>Upgrade of the National Water Information System</b></td><td>Supplementary – knowledge</td><td><span class="badge badge-active">KTM14</span></td><td><span class="id-pill">—</span></td><td style="font-size:12px;">Basin-wide</td><td>€ 0.6 m</td><td>2027</td></tr></tbody></table></div>
-  <div class="meta-row" style="padding:12px 20px;border-top:1px solid #f1f5f9;"><span><b>Dataset:</b> DS-VAR-009 · v0.3</span><span><b>Source:</b> Subproject 1 (River basin management)</span><span><b>QA/QC:</b> Draft</span><span><b>Reporting period:</b> 2028–2033</span></div>
-</div>
-<div class="card" style="margin-top:18px;opacity:.75;">
-  <div class="card-header"><h3 class="card-title"><i class="fas fa-hourglass-half" style="color:#64748b;margin-right:6px;"></i>Implementation progress and financing</h3><span class="phase-chip">Later phase</span></div>
-  <div class="card-body" style="font-size:12.5px;color:#64748b;">Systematic monitoring of RBMP implementation (progress per measure, spending, interim reporting) belongs to Phase 3 of the NWIS roadmap. The register above already holds the identifiers and links that this function will need.</div>
-</div>
+  <div style="padding:0 20px;"><div class="tab-nav">
+    <button class="tab-btn active" data-tab-group="pm" data-tab="reg" onclick="switchTab('pm','reg')"><i class="fas fa-list" style="margin-right:5px;"></i>Measures register</button>
+    <button class="tab-btn" data-tab-group="pm" data-tab="prog" onclick="switchTab('pm','prog')"><i class="fas fa-clipboard-check" style="margin-right:5px;"></i>Progress record <span class="p1-chip" style="margin-left:4px;">MoEPP</span></button>
+  </div></div>
 
+  <div class="tab-panel active" data-panel-group="pm" data-panel="reg">
+    <div class="filter-bar">
+      <div class="search-wrap"><i class="fas fa-search"></i><input id="ms-q" class="search-input" placeholder="Search measures, KTM, water bodies, institutions…"></div>
+      <select class="filter-select" id="ms-type"><option value="">All types</option><option value="Basic">Basic</option><option value="Supplementary">Supplementary</option></select>
+      <select class="filter-select" id="ms-ktm"><option value="">All KTM</option><option>KTM1</option><option>KTM2</option><option>KTM5</option><option>KTM7</option><option>KTM8</option><option>KTM12</option><option>KTM13</option><option>KTM14</option></select>
+      <button class="btn btn-primary" onclick="wisToast('New measure: identifier MK_MSR_VAR_045 reserved (mockup)')"><i class="fas fa-plus"></i>Add measure</button>
+    </div>
+    <div class="table-container"><table class="data-table" id="ms-table">
+      <thead><tr><th>Permanent ID</th><th>Measure</th><th>Type</th><th>KTM</th><th>Status</th><th>Responsible</th><th>Cost</th><th>Deadline</th></tr></thead><tbody></tbody></table></div>
+    <div class="card" style="margin:16px 20px 20px;"><div class="card-header"><h3 class="card-title" id="sh-title">Measure sheet</h3><span style="font-size:11px;color:#94a3b8;">Click a row to open its sheet</span></div><div class="card-body" id="sh-body"></div></div>
+    <div class="meta-row" style="padding:12px 20px;border-top:1px solid #f1f5f9;"><span><b>Dataset:</b> DS-VAR-009 · v0.4</span><span><b>Source:</b> Subproject 1 (River basin management)</span><span><b>QA/QC:</b> Draft</span><span><b>Reporting period:</b> 2028–2033</span><span><b>Code lists:</b> CL-005 KTM · CL-013 KTM indicators</span></div>
+  </div>
+
+  <div class="tab-panel" data-panel-group="pm" data-panel="prog">
+    <div class="card-body" style="padding-bottom:0;">
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i><div>Only MoEPP staff enter and approve progress. Other institutions are recorded as the <b>source</b> (“reported by”: a letter, e-mail, meeting or MoEPP's own data); they have no account in Phase 1. A record counts only after the Approver (MoEPP) has checked it. You are previewing as <b id="pr-role"></b>. <a href="#" id="reset" style="color:#1a6b82;">Reset demo records</a></div></div>
+    </div>
+    <div class="table-container" style="margin-top:12px;"><table class="data-table" id="pr-table">
+      <thead><tr><th>Measure</th><th>As of</th><th>Status</th><th>Delivered</th><th>Indicator</th><th>Schedule</th><th>Reported by</th><th></th></tr></thead><tbody></tbody></table></div>
+    <div style="font-size:11px;color:#94a3b8;padding:6px 20px 0;">Schedule is computed from the deadline: on track if the share delivered is within 10 points of a straight path from 2028 to the deadline, at risk within 25 points, otherwise late.</div>
+
+    <div class="pm-grid2" style="padding:16px 20px 20px;">
+      <div>
+        <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-pen" style="color:#1a6b82;margin-right:6px;"></i>Enter progress (Editor, MoEPP)</h3></div><div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="grid-column:1/-1;"><label class="form-label">Measure</label><select class="form-input" id="f-m"></select></div>
+            <div><label class="form-label">Situation as of</label><input class="form-input" id="f-d" type="date" value="2031-12-31"></div>
+            <div><label class="form-label">Status</label><select class="form-input" id="f-s"><option>Not started</option><option>In preparation</option><option selected>Ongoing</option><option>Delayed</option><option>Completed</option></select></div>
+            <div><label class="form-label">Share delivered (%)</label><input class="form-input" id="f-p" type="number" min="0" max="100" value="50"></div>
+            <div><label class="form-label" id="f-i-l">Indicator value</label><input class="form-input" id="f-i" type="number" value="0"></div>
+            <div style="grid-column:1/-1;"><label class="form-label">Reported by (source)</label><input class="form-input" id="f-src" placeholder="e.g. Municipality of Veles – letter of 2032-01-14"></div>
+            <div style="grid-column:1/-1;"><label class="form-label">Note / milestone / obstacle</label><input class="form-input" id="f-n"></div>
+          </div>
+          <button class="btn btn-primary" id="f-go" style="margin-top:12px;"><i class="fas fa-save"></i>Save for approval</button>
+          <div id="f-note-role" class="form-hint" style="display:none;margin-top:6px;">Entering progress needs the Editor (MoEPP) or Super admin role – switch role in the sidebar.</div>
+          <div style="border-top:1px solid #f1f5f9;margin-top:14px;padding-top:12px;font-size:12px;color:#475569;"><b>Many measures at once:</b> MoEPP collects replies in the Excel template and uploads it through the normal bulk import.
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button class="btn btn-secondary btn-sm" id="tpl"><i class="fas fa-download"></i>Template (CSV)</button><button class="btn btn-secondary btn-sm" id="imp"><i class="fas fa-file-import"></i>Import filled template</button><button class="btn btn-secondary btn-sm" id="exp"><i class="fas fa-file-export"></i>Export progress (CSV)</button></div></div>
+        </div></div>
+        <div class="card" style="margin-top:16px;"><div class="card-header"><h3 class="card-title"><i class="fas fa-user-check" style="color:#7c3aed;margin-right:6px;"></i>Awaiting approval (Approver, MoEPP)</h3></div><div class="card-body" id="pend"></div></div>
+      </div>
+      <div>
+        <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-bullseye" style="color:#1a6b82;margin-right:6px;"></i>Progress per indicator (approved records)</h3></div><div class="card-body" id="ind-list"></div></div>
+      </div>
+    </div>
+    <div style="padding:0 20px 16px;">        <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-history" style="color:#1a6b82;margin-right:6px;"></i>Record history</h3><select class="form-input" id="h-m" style="width:auto;max-width:260px;padding:4px 8px;font-size:12px;"></select></div>
+        <div class="table-container"><table class="data-table" id="hist"><thead><tr><th>As of</th><th>Status</th><th>%</th><th>Ind.</th><th>Reported by</th><th>Entered by</th><th>State</th><th>Note</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+    <div style="font-size:11.5px;color:#94a3b8;padding:0 20px 18px;">The export is the input for the interim report on implementation (WFD Art. 15(3)), which MoEPP writes outside the system in Phase 1. All values are placeholders.</div>
+  </div>
+</div>
   </main>
 </div>
-<script src="../../assets/shell.js?v=20261019o"></script>
+<script src="../../assets/shell.js?v=20261021p"></script>
+<script src="../../assets/pom2.js?v=20261021p"></script>
 
 </body>
 </html>

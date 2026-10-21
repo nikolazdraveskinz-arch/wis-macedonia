@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="../../assets/wis.css?v=20261019o">
+  <link rel="stylesheet" href="../../assets/wis.css?v=20261021p">
 </head>
 <body data-base="../../" data-active="datasets" data-portal="internal">
 <aside id="wis-sidebar"></aside>
@@ -39,6 +39,7 @@
   </div></div>
 
   <div class="tab-panel active" data-panel-group="ds" data-panel="reg">
+    <div id="cy-strip" class="alert alert-info" style="margin:14px 20px 0;align-items:center;"></div>
     <div class="filter-bar">
       <div class="search-wrap"><i class="fas fa-search"></i><input id="ds-q" class="search-input" placeholder="Search datasets, institutions, sources…" oninput="filterTable('ds-q','ds-table')"></div>
       <select class="filter-select"><option>All components</option><option>Water bodies</option><option>Monitoring</option><option>Pressures</option><option>Protected areas</option><option>PoM</option></select>
@@ -105,7 +106,7 @@
 
   </main>
 </div>
-<script src="../../assets/shell.js?v=20261019o"></script>
+<script src="../../assets/shell.js?v=20261021p"></script>
 <script>
 const DS = {"DS-VAR-001": ["DS-VAR-001", "Surface water bodies (rivers, lakes)", "Spatial \u00b7 line/polygon", "MoEPP \u2013 Water Dept.", "NWIS (VRBSD)", "Manual / GIS upload", "v1.4", "2026-09-30", "accepted", "Public"], "DS-VAR-002": ["DS-VAR-002", "Groundwater bodies", "Spatial \u00b7 polygon", "MoEPP \u2013 Water Dept.", "NWIS (GWDMS)", "GIS upload", "v1.2", "2026-09-18", "accepted", "Public"], "DS-VAR-003": ["DS-VAR-003", "Surface water monitoring sites", "Spatial \u00b7 point", "Hydrometeorological Service", "Water Quality platform", "Bulk template", "v2.0", "2026-10-10", "accepted", "Public"], "DS-VAR-004": ["DS-VAR-004", "Surface water quality results 2025", "Tabular \u00b7 time series", "Hydrometeorological Service", "Water Quality platform", "Bulk template", "2025.2", "2026-10-17", "pending", "Restricted"], "DS-VAR-005": ["DS-VAR-005", "Groundwater monitoring sites", "Spatial \u00b7 point", "MoEPP \u2013 Water Dept.", "NWIS (GWDMS)", "Manual entry", "v1.3", "2026-10-17", "accepted", "Public"], "DS-VAR-006": ["DS-VAR-006", "Point-source pressures", "Spatial \u00b7 point", "Subproject 3 (study)", "External study", "Bulk template", "v0.9", "2026-10-05", "pending", "Internal"], "DS-VAR-007": ["DS-VAR-007", "Diffuse pressure zones", "Spatial \u00b7 polygon", "Subproject 3 (study)", "External study", "GIS upload", "v0.6", "2026-10-15", "rejected", "Internal"], "DS-VAR-008": ["DS-VAR-008", "Drinking-water protection zones", "Spatial \u00b7 polygon", "MoEPP / Public Health Institute", "NWIS", "GIS upload", "v1.0", "2026-08-22", "accepted", "Restricted"], "DS-VAR-009": ["DS-VAR-009", "Programme of Measures register", "Tabular", "Subproject 1 (RBM)", "NWIS", "Manual entry", "v0.3", "2026-10-14", "draft", "Internal"], "DS-VAR-010": ["DS-VAR-010", "Ecological status classification", "Tabular", "Subproject 2 (study)", "External study", "Bulk template", "v0.2", "2026-10-01", "draft", "Internal"], "DS-VAR-011": ["DS-VAR-011", "Water permits (Water Book)", "Tabular", "MoEPP \u2013 Water Dept.", "NWIS (Water Book)", "Workflow", "live", "2026-10-17", "accepted", "Public (non-confidential)"], "DS-VAR-012": ["DS-VAR-012", "Digital elevation model 10 m", "Raster \u00b7 file system", "AREC", "SIS (WMS)", "External service", "v2.0", "2026-06-01", "accepted", "Internal"]};
 document.getElementById('imp-period').innerHTML = WIS.CYCLES.map(c => `<option>${c.period} (${c.label})</option>`).join('');
@@ -122,9 +123,24 @@ function showDs(id){
     <div><div class="form-label">Version / timestamp</div>${r[6]} · ${r[7]}</div>
     <div><div class="form-label">QA/QC status</div>${r[8]}</div>
     <div><div class="form-label">Access level</div>${r[9]}</div>
-    <div style="grid-column:span 4;display:flex;gap:8px;"><a class="btn btn-secondary btn-sm" href="../metadata/"><i class="fas fa-database"></i>Metadata record</a><a class="btn btn-secondary btn-sm" href="../identifiers/"><i class="fas fa-fingerprint"></i>Identifiers used</a><button class="btn btn-secondary btn-sm" onclick="switchTab('ds','log')"><i class="fas fa-history"></i>Version history</button></div>
+    <div style="grid-column:span 4;display:flex;gap:8px;"><a class="btn btn-secondary btn-sm" href="../metadata/"><i class="fas fa-database"></i>Metadata record</a><a class="btn btn-secondary btn-sm" href="../identifiers/"><i class="fas fa-fingerprint"></i>Identifiers used</a><button class="btn btn-secondary btn-sm" onclick="switchTab('ds','log')"><i class="fas fa-history"></i>Version history</button><button class="btn btn-secondary btn-sm" onclick="copyNext('${r[0]}')"><i class="fas fa-copy"></i>Copy to RBMP 2034–2039 as draft</button></div>
   </div>`;
 }
+</script>
+<script>
+(function(){
+  const role=(()=>{try{return localStorage.getItem('wis.role')||'superadmin';}catch(e){return 'superadmin';}})();
+  const get=()=>{try{return localStorage.getItem('wis.v2.freeze')==='1';}catch(e){return false;}};
+  const set=v=>{try{localStorage.setItem('wis.v2.freeze',v?'1':'0');}catch(e){}};
+  const logRow=(a,d,x)=>{const tb=document.querySelector('[data-panel="log"] tbody');const t=new Date();tb.insertAdjacentHTML('afterbegin',`<tr><td>${t.toISOString().slice(0,10)} ${t.toTimeString().slice(0,8)}</td><td>${role==='superadmin'?'Super admin':'Editor'} · MoEPP</td><td>${a}</td><td>${d}</td><td>${x}</td></tr>`);};
+  function draw(){const f=get(),el=document.getElementById('cy-strip');
+    el.className='alert '+(f?'alert-warn':'alert-info');
+    el.innerHTML=`<i class="fas ${f?'fa-lock':'fa-unlock'}"></i><div style="flex:1;"><b>${WIS.cycle.label}: ${f?'frozen – adopted and reported version':'open for editing'}</b><br><span style="font-size:11.5px;">${f?'All datasets of this cycle are read-only; corrections go into the next cycle as new versions. The public portal keeps showing the adopted plan.':'After the plan is adopted and reported to WISE, the Super admin freezes the cycle, so the reported version can no longer be overwritten. Datasets are carried into the next cycle with “Copy to RBMP 2034–2039 as draft”.'}</span></div>${role==='superadmin'?`<button class="btn ${f?'btn-secondary':'btn-primary'} btn-sm" id="fz">${f?'Undo freeze (preview)':'Freeze cycle (preview)'}</button>`:'<span style="font-size:11px;">Super admin only</span>'}`;
+    document.querySelectorAll('#ds-table tbody tr').forEach(tr=>{const c=tr.children[1];let b=c.querySelector('.lock-badge');if(f&&!b)c.insertAdjacentHTML('beforeend',' <span class="lock-badge"><i class="fas fa-lock"></i> reported</span>');if(!f&&b)b.remove();});
+    const fz=document.getElementById('fz');if(fz)fz.onclick=()=>{set(!f);logRow(f?'UNFREEZE':'FREEZE',WIS.cycle.label,f?'Preview undone':'Adopted plan locked as reported version');draw();wisToast(f?'Freeze undone (preview).':WIS.cycle.label+' frozen (preview).');};}
+  window.copyNext=id=>{logRow('COPY',id+' → RBMP 2034–2039','Copied as draft v0.1 for review; identifiers kept');wisToast(id+' copied to RBMP 2034–2039 as draft – see Audit trail (mockup).');};
+  draw();
+})();
 </script>
 </body>
 </html>
