@@ -49,7 +49,8 @@
       <div><div class="form-label">Planned measures by key type (KTM)</div><canvas id="c-ktm" height="200"></canvas></div>
       <div><div class="form-label">Estimated cost by key type (million €)</div><canvas id="c-cost" height="200"></canvas></div>
     </div>
-    <div class="meta-row" style="margin-top:10px;"><span><b>Source:</b> draft Programme of Measures register (DS-VAR-009)</span><span>Implementation progress is foreseen in a later phase.</span></div>
+    <div style="margin-top:18px;"><div class="form-label">Implementation progress</div><div id="pub-prog" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;"></div><div id="pub-prog-bar" style="margin-top:10px;"></div></div>
+    <div class="meta-row" style="margin-top:10px;"><span><b>Source:</b> draft Programme of Measures register (DS-VAR-009)</span><span><b>Progress:</b> records checked and approved by MoEPP</span><span id="pub-prog-asof"></span></div>
   </div>
   <div class="tab-panel" data-panel-group="d" data-panel="pp">
     <div class="pub-grid-1" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -63,6 +64,7 @@
 </main>
 <footer id="pub-footer"></footer>
 <script src="../../assets/shell.js?v=20261021p"></script>
+<script src="../../assets/pom2.js?v=20261021q"></script>
 <script src="../../assets/participation.js?v=20261021p"></script>
 <script>
 const C={high:'#1a6b82',good:'#059669',mod:'#d97706',poor:'#dc2626',bad:'#7f1d1d',unk:'#cbd5e1'};
@@ -76,12 +78,25 @@ let mo; function drawMo(){const s=+document.getElementById('mo-st').value,p=+doc
  mo=new Chart(document.getElementById('c-mo'),{type:'line',data:{labels:['2020','2021','2022','2023','2024','2025'],datasets:[{label:'Annual mean',data:MO[s][p],borderColor:'#1a6b82',backgroundColor:'rgba(26,86,219,.08)',fill:true,tension:.3},{label:'Threshold (placeholder)',data:Array(6).fill(p?0.4:(s?50:25)),borderColor:'#dc2626',borderDash:[5,5],pointRadius:0}]},options:{plugins:{legend:{labels:{font:{size:11}}}},scales:{y:{beginAtZero:true}}}});}
 ['mo-st','mo-p'].forEach(i=>document.getElementById(i).onchange=drawMo); drawMo();
 new Chart(document.getElementById('c-pr'),{type:'bar',data:{labels:['Urban wastewater','Diffuse – agriculture','Hydromorphology','Abstraction','Industry and mining','Unknown'],datasets:[{label:'Water bodies',data:[74,61,48,39,22,9],backgroundColor:'#dc2626'}]},options:{indexAxis:'y',plugins:{legend:{display:false}}}});
-new Chart(document.getElementById('c-ktm'),{type:'bar',data:{labels:['KTM1','KTM2','KTM5','KTM8','KTM13','KTM14'],datasets:[{label:'Measures',data:[14,6,5,7,4,8],backgroundColor:'#1a6b82'}]},options:{plugins:{legend:{display:false}}}});
-new Chart(document.getElementById('c-cost'),{type:'bar',data:{labels:['KTM1','KTM2','KTM5','KTM8','KTM13','KTM14'],datasets:[{label:'M€',data:[142,9.6,4.1,2.2,3.8,2.9],backgroundColor:'#059669'}]},options:{plugins:{legend:{display:false}}}});
+const PK=(function(){const M=(window.POM2&&POM2.M)||[];const o={};M.forEach(m=>{const c=parseFloat((m.cost.match(/[\d.]+/)||[0])[0])||0;m.ktm.forEach((k,i)=>{o[k]=o[k]||{n:0,c:0};o[k].n++;if(i===0)o[k].c+=c;});});const labels=Object.keys(o).sort((a,b)=>parseInt(a.slice(3))-parseInt(b.slice(3)));return {labels,n:labels.map(k=>o[k].n),cost:labels.map(k=>+o[k].c.toFixed(1))};})();
+new Chart(document.getElementById('c-ktm'),{type:'bar',data:{labels:PK.labels,datasets:[{label:'Measures',data:PK.n,backgroundColor:'#1a6b82'}]},options:{plugins:{legend:{display:false}},scales:{y:{suggestedMax:3,ticks:{stepSize:1}}}}});
+new Chart(document.getElementById('c-cost'),{type:'bar',data:{labels:PK.labels,datasets:[{label:'M€',data:PK.cost,backgroundColor:'#059669'}]},options:{plugins:{legend:{display:false}}}});
 }
 const cs=WIS.comments(), O=['Incorporated','Partly incorporated','Not incorporated','Out of scope',''], OC=['#059669','#d97706','#dc2626','#94a3b8','#cbd5e1'];
 new Chart(document.getElementById('c-pp'),{type:'bar',data:{labels:['Stage 1','Stage 2','Stage 3'],datasets:O.map((o,i)=>({label:o||'Being assessed',data:[1,2,3].map(n=>cs.filter(c=>c.stage===n&&c.outcome===o).length),backgroundColor:OC[i]}))},options:{scales:{x:{stacked:true},y:{stacked:true,ticks:{precision:0}}},plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10}}}}});
 const g=[...new Set(cs.map(c=>c.who))]; dn('c-who',g,g.map(x=>cs.filter(c=>c.who===x).length),['#1a6b82','#2a8fa8','#7c3aed','#059669','#d97706','#dc2626','#64748b']);
+</script>
+<script>
+(function(){
+  if(!window.POM2) return;
+  const {M,latest}=POM2, L=M.map(m=>latest(m.id,true));
+  const n=f=>L.filter(f).length, w=L.filter(Boolean), avg=w.length?Math.round(w.reduce((a,r)=>a+r[3],0)/w.length):0;
+  const st=[['Completed','#059669',n(r=>r&&r[2]==='Completed')],['Ongoing','#1a6b82',n(r=>r&&r[2]==='Ongoing')],['Delayed','#dc2626',n(r=>r&&r[2]==='Delayed')],['Not started or no information','#cbd5e1',n(r=>!r||['Not started','In preparation'].includes(r[2]))]];
+  const tile=(v,l)=>`<div class="stat-item" style="text-align:left;padding:10px 12px;"><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`;
+  document.getElementById('pub-prog').innerHTML=tile(st[0][2]+' of '+M.length,'Measures completed')+tile(st[1][2],'Measures ongoing')+tile(avg+'%','Average share delivered');
+  document.getElementById('pub-prog-bar').innerHTML=`<div style="display:flex;height:12px;border-radius:99px;overflow:hidden;background:#eef2f5;">${st.map(s=>s[2]?`<i style="flex:${s[2]};background:${s[1]};" title="${s[0]}: ${s[2]}"></i>`:'').join('')}</div><div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:#64748b;margin-top:6px;">${st.map(s=>`<span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${s[1]};margin-right:4px;"></i>${s[0]}: ${s[2]}</span>`).join('')}</div>`;
+  const last=w.map(r=>r[1]).sort().pop(); document.getElementById('pub-prog-asof').innerHTML=last?'<b>Situation as of:</b> '+last:'';
+})();
 </script>
 </body>
 </html>

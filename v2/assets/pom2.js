@@ -80,6 +80,9 @@
   function csv(rows) { return rows.map((r) => r.map((x) => '"' + String(x).replace(/"/g, '""') + '"').join(',')).join('\n'); }
   function dl(name, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 400); }
 
+  /* shared with the internal Dashboard and the public dashboards (approved records only there) */
+  window.POM2 = { M, R, latest, schedule };
+  if (!document.getElementById('ms-table')) return;
   $('#f-m').innerHTML = $('#h-m').innerHTML = M.map((m) => `<option value="${m.id}">${m.id} · ${esc(m.name)}</option>`).join('');
   $('#f-m').onchange = () => { const m = M.find((x) => x.id === $('#f-m').value); $('#f-i-l').textContent = `Indicator value (${m.ind[0]}, target ${m.ind[4]} ${m.ind[2]})`; };
   $('#f-m').onchange();

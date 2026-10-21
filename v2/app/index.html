@@ -59,6 +59,23 @@
   </div>
 </div>
 
+<div class="card" style="margin-top:18px;" id="pom-card">
+  <div class="card-header"><h3 class="card-title"><i class="fas fa-clipboard-check" style="color:#1a6b82;margin-right:6px;"></i>Programme of Measures – implementation <span class="p1-chip">MoEPP record</span></h3><a href="measures/" class="btn btn-secondary btn-sm">Open progress record</a></div>
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;" id="pd-kpi"></div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;" class="pd-grid">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:6px;"><i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i> Measures needing attention</div>
+        <div id="pd-att" style="font-size:12.5px;"></div>
+        <div style="font-size:12px;font-weight:700;color:#0f172a;margin:14px 0 6px;"><i class="fas fa-tasks" style="color:#d97706;"></i> Data upkeep</div>
+        <div id="pd-up" style="font-size:12.5px;"></div>
+      </div>
+      <div><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:6px;">Share delivered by Key Type of Measure (primary KTM)</div><div style="height:210px;"><canvas id="pd-chart"></canvas></div></div>
+    </div>
+    <div style="font-size:11px;color:#94a3b8;margin-top:10px;">Approved progress records only; values are placeholders. Schedule is computed from each measure's deadline.</div>
+  </div>
+</div>
+
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;">
   <div class="card">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-history" style="color:#2a8fa8;margin-right:6px;"></i>Recent data activity (audit trail)</h3></div>
@@ -89,6 +106,7 @@
   </main>
 </div>
 <script src="../assets/shell.js?v=20261021p"></script>
+<script src="../assets/pom2.js?v=20261021q"></script>
 <script>
 const c = WIS.cycle;
 document.getElementById('cycle-card').innerHTML = `
@@ -111,6 +129,27 @@ document.getElementById('tt').innerHTML=TT.map((t,i)=>`<li><span class="tt-d">${
 const op = WIS.STAGES.find(s=>s.state==='Open'), todo = WIS.comments().filter(c=>!c.outcome).length;
 document.getElementById('pp-card').innerHTML = `<div style="font-size:12px;color:#64748b;">Current stage</div><div style="font-weight:800;font-size:16px;color:#0f172a;">${op?('Stage '+op.n+' · '+op.title):'No stage open'}</div>
  <div class="stat-grid" style="margin-top:10px;"><div class="stat-item"><div class="stat-val" style="color:#059669;">${op?op.daysLeft:'–'}</div><div class="stat-lbl">Days left</div></div><div class="stat-item"><div class="stat-val">${WIS.comments().filter(c=>op&&c.stage===op.n).length}</div><div class="stat-lbl">Comments this stage</div></div><div class="stat-item"><div class="stat-val" style="color:#d97706;">${todo}</div><div class="stat-lbl">To process</div></div></div>`;
+</script>
+<script>
+(function(){
+  if(!window.POM2) return;
+  const {M,latest,schedule}=POM2, esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const role=(()=>{try{return localStorage.getItem('wis.role')||'superadmin';}catch(e){return 'superadmin';}})();
+  const L=M.map(m=>({m,r:latest(m.id,true),p:latest(m.id)}));
+  const cnt=f=>L.filter(f).length, withR=L.filter(x=>x.r);
+  const avg=withR.length?Math.round(withR.reduce((a,x)=>a+x.r[3],0)/withR.length):0;
+  const last=withR.map(x=>x.r[1]).sort().pop()||'—';
+  const pend=POM2.R.filter(r=>r[7]==='Pending approval').length;
+  const tile=(v,l,c)=>`<div class="stat-item" style="text-align:left;padding:10px 12px;"><div class="stat-val" style="color:${c||'#0f172a'};">${v}</div><div class="stat-lbl">${l}</div></div>`;
+  document.getElementById('pd-kpi').innerHTML=tile(cnt(x=>x.r&&x.r[2]==='Completed'),'Completed','#059669')+tile(cnt(x=>x.r&&x.r[2]==='Ongoing'),'Ongoing','#1a6b82')+tile(cnt(x=>x.r&&x.r[2]==='Delayed'),'Delayed','#dc2626')+tile(cnt(x=>!x.r||['Not started','In preparation'].includes(x.r[2])),'Not started / in preparation / no record')+tile(avg+'%','Average share delivered')+tile(last,'Latest approved situation');
+  const att=L.filter(x=>x.r&&['Late','At risk'].includes(schedule(x.m,x.r)[0])).sort((a,b)=>schedule(a.m,a.r)[0]==='Late'?-1:1);
+  document.getElementById('pd-att').innerHTML=att.length?att.map(x=>{const [sc,col]=schedule(x.m,x.r);return `<a href="measures/" style="display:block;padding:7px 0;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit;"><span class="id-pill">${x.m.id}</span> <b>${esc(x.m.name)}</b> <span style="color:${col};font-weight:700;">${sc}</span><div style="font-size:11.5px;color:#64748b;">${esc(x.m.lead)} · ${x.r[3]}% delivered · deadline ${x.m.deadline}${x.r[8]?' · '+esc(x.r[8]):''}</div></a>`;}).join(''):'<span style="color:#94a3b8;">No late or at-risk measures.</span>';
+  const ref=last==='—'?null:new Date(last); const stale=L.filter(x=>!x.r||(ref&&(ref-new Date(x.r[1]))>365*864e5));
+  document.getElementById('pd-up').innerHTML=`<div style="padding:4px 0;">${pend?`<b style="color:#d97706;">${pend}</b> progress record${pend>1?'s':''} waiting for approval${['approver','superadmin'].includes(role)?' – <a href="measures/" style="color:#1a6b82;font-weight:600;">review now</a>':''}`:'No records waiting for approval'}</div><div style="padding:4px 0;">${stale.length?`<b>${stale.length}</b> measure${stale.length>1?'s':''} without a record in the 12 months before ${last}: ${stale.map(x=>'<span class="id-pill">'+x.m.id+'</span>').join(' ')}`:'Every measure has a recent record'}</div>`;
+  const g={};L.forEach(x=>{const k=x.m.ktm[0];(g[k]=g[k]||[]);if(x.r)g[k].push(x.r[3]);});
+  const ks=Object.keys(g).sort((a,b)=>parseInt(a.slice(3))-parseInt(b.slice(3)));
+  if(window.Chart) new Chart(document.getElementById('pd-chart'),{type:'bar',data:{labels:ks.map(k=>g[k].length?k:k+' (no record)'),datasets:[{label:'% delivered',data:ks.map(k=>g[k].length?Math.round(g[k].reduce((a,b)=>a+b,0)/g[k].length):0),backgroundColor:'#1a6b82',borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:0,max:100,ticks:{callback:v=>v+'%'}}}}});
+})();
 </script>
 </body>
 </html>
