@@ -1,4 +1,8 @@
-# WIS Macedonia
+# NWIS – National Water Information System (mockups v1 and v2)
 
-Static export of the WIS Macedonia prototype (13 pages), prepared for GitHub Pages.
-Upload all files and folders to the root of the repository, then enable Settings → Pages → Deploy from a branch → main → / (root).
+Interactive mockups of the National Water Information System of North Macedonia. Demonstrators only: all data are placeholders.
+
+- `/v1/` – first prototype (13 pages): https://nikolazdraveskinz-arch.github.io/wis-macedonia/v1/
+- `/v2/` – Phase 1 mockup: https://nikolazdraveskinz-arch.github.io/wis-macedonia/v2/
+- v3 is in the separate repository `wis-macedonia_1`: https://nikolazdraveskinz-arch.github.io/wis-macedonia_1/v3/
+- The root page (`index.html`) lists the three versions.
